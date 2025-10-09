@@ -10,8 +10,8 @@ import threading
 def get_subscriptions(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Subscription).offset(skip).limit(limit).all()
 
-def create_subscription(db: Session, subscription: SubscriptionCreate):
-    db_sub = Subscription(**subscription.model_dump())
+def create_subscription(db: Session, subscription_: SubscriptionCreate):
+    db_sub = Subscription(**subscription_.model_dump())
     db.add(db_sub)
     db.commit()
     db.refresh(db_sub)
@@ -36,16 +36,21 @@ def create_subscription(db: Session, subscription: SubscriptionCreate):
 
     return db_sub
 
-def update_subscription(db: Session, subscription_id: int, subscription_ SubscriptionCreate):
+def update_subscription(db: Session, subscription_id: int, subscription_: SubscriptionCreate):
+    """
+    Update subscription berdasarkan ID.
+    """
     db_sub = db.query(Subscription).filter(Subscription.id == subscription_id).first()
     if db_sub:
+        # Cek apakah tanggal expired berubah
         old_expires_at = db_sub.expires_at
-        for field, value in subscription_data.model_dump().items():
+        for field, value in subscription_.model_dump().items():
             setattr(db_sub, field, value)
         db.commit()
         db.refresh(db_sub)
 
         # --- Real-time check saat update ---
+        # Hanya kirim notifikasi jika tanggal expired berubah
         if old_expires_at != db_sub.expires_at:
             today = date.today()
             if db_sub.expires_at == today + timedelta(days=1):
