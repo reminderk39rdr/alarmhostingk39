@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>K39 Hosting Reminder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔔</text></svg>">
+  <style>body { font-family: 'Segoe UI', system-ui, sans-serif; }</style>
+</head>
+<body class="bg-gray-50 p-4 md:p-6">
+  <div class="max-w-4xl mx-auto">
+    <header class="mb-8 text-center">
+      <h1 class="text-2xl font-bold text-gray-800">🔔 K39 Hosting Reminder</h1>
+      <p class="text-sm text-gray-600">Internal tool for subscription renewal alerts</p>
+    </header>
+
+    <!-- Add Form -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6 border">
+      <h2 class="font-semibold mb-3 text-gray-700">Add New Subscription</h2>
+      <form id="addForm" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input type="text" id="name" placeholder="Name (e.g., AWS)" required
+          class="border p-2 rounded text-sm">
+        <input type="url" id="url" placeholder="https://example.com" required
+          class="border p-2 rounded text-sm">
+        <input type="date" id="expires_at" required
+          class="border p-2 rounded text-sm">
+        <button type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm transition">
+          Add
+        </button>
+      </form>
+    </div>
+
+    <!-- Subscriptions Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden border">
+      <div class="px-4 py-3 border-b">
+        <h2 class="font-semibold text-gray-700">Your Subscriptions</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="p-3 text-left">Name</th>
+              <th class="p-3 text-left">URL</th>
+              <th class="p-3 text-left">Expires</th>
+              <th class="p-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y">
+            <!-- Data will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="p-6 text-center text-gray-500 hidden">
+        No subscriptions yet. Add one above!
+      </div>
+    </div>
+
+    <footer class="mt-8 text-center text-xs text-gray-500">
+      <p>🔒 Internal use only • No data stored in browser</p>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin; // Same origin
+
+    // Load subscriptions
+    async function loadSubs() {
+      try {
+        const res = await fetch(`${API_BASE}/subscriptions/`);
+        const subs = await res.json();
+        const tbody = document.getElementById('tableBody');
+        const empty = document.getElementById('emptyState');
+
+        if (subs.length === 0) {
+          tbody.innerHTML = '';
+          empty.classList.remove('hidden');
+        } else {
+          empty.classList.add('hidden');
+          tbody.innerHTML = subs.map(sub => `
+            <tr>
+              <td class="p-3">${escapeHtml(sub.name)}</td>
+              <td class="p-3">
+                <a href="${escapeHtml(sub.url)}" target="_blank" rel="noopener noreferrer"
+                  class="text-blue-600 hover:underline">${escapeHtml(sub.url)}</a>
+              </td>
+              <td class="p-3">${formatDate(sub.expires_at)}</td>
+              <td class="p-3">
+                <button onclick="deleteSub(${sub.id})"
+                  class="text-red-600 hover:text-red-800 font-medium text-sm">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load subscriptions:', e);
+        alert('Failed to load subscriptions. Please check console for details.');
+      }
+    }
+
+    // Add subscription
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('name').value,
+        url: document.getElementById('url').value,
+        expires_at: document.getElementById('expires_at').value
+      };
+      try {
+        const res = await fetch(`${API_BASE}/subscriptions/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`API error: ${res.status} - ${errorText}`);
+        }
+        document.getElementById('addForm').reset();
+        loadSubs();
+      } catch (e) {
+        console.error('Failed to add subscription:', e);
+        alert('Failed to add subscription. Please check console for details.');
+      }
+    });
+
+    // Delete subscription
+    async function deleteSub(id) {
+      if (!confirm('Delete this subscription?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/subscriptions/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`API error: ${res.status} - ${errorText}`);
+        }
+        loadSubs();
+      } catch (e) {
+        console.error('Failed to delete subscription:', e);
+        alert('Failed to delete subscription. Please check console for details.');
+      }
+    }
+
+    // Helpers
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '<', '>': '>',
+        '"': '&quot;', "'": '&#039;'
+      }[m]));
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-GB');
+    }
+
+    // Init
+    loadSubs();
+  </script>
+</body>
+</html>
