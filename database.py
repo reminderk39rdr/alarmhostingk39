@@ -3,12 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Railway menyediakan DATABASE_URL otomatis
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if not DATABASE_URL:
-    # Fallback untuk development lokal (SQLite)
-    DATABASE_URL = "sqlite:///./subscriptions.db"
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./subscriptions.db")
 
 engine = create_engine(
     DATABASE_URL,
