@@ -19,6 +19,8 @@ class Subscription(SubscriptionBase):
     reminder_count_h0: int
     last_reminder_time: Optional[datetime]
     last_reminder_type: Optional[str]
+    # Tambahkan field created_at
+    created_at: Optional[datetime]
 
     class Config:
         from_attributes = True
