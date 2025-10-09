@@ -1,6 +1,6 @@
 # crud.py
 from sqlalchemy.orm import Session
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from models import Subscription
 from schemas import SubscriptionCreate
 from telegram_bot import send_telegram_message
@@ -21,17 +21,24 @@ def create_subscription(db: Session, subscription: SubscriptionCreate):
     if db_sub.expires_at == today + timedelta(days=1):
         msg = f"🔥 URGENT: '{db_sub.name}' ({db_sub.url}) expires TOMORROW! ({db_sub.expires_at})"
         _send_telegram_async(msg)
+        db_sub.reminder_count_h1 = 1
+        db_sub.last_reminder_time = datetime.now()
+        db_sub.last_reminder_type = 'h1'
+        db.commit()
     elif db_sub.expires_at == today + timedelta(days=3):
         msg = f"🚨 Reminder: '{db_sub.name}' ({db_sub.url}) expires in 3 days! ({db_sub.expires_at})"
         _send_telegram_async(msg)
+        db_sub.reminder_count_h3 = 1
+        db_sub.last_reminder_time = datetime.now()
+        db_sub.last_reminder_type = 'h3'
+        db.commit()
     # --------------------------
 
     return db_sub
 
-def update_subscription(db: Session, subscription_id: int, subscription_data: SubscriptionCreate):
+def update_subscription(db: Session, subscription_id: int, subscription_ SubscriptionCreate):
     db_sub = db.query(Subscription).filter(Subscription.id == subscription_id).first()
     if db_sub:
-        # Cek apakah tanggal expired berubah
         old_expires_at = db_sub.expires_at
         for field, value in subscription_data.model_dump().items():
             setattr(db_sub, field, value)
@@ -39,15 +46,31 @@ def update_subscription(db: Session, subscription_id: int, subscription_data: Su
         db.refresh(db_sub)
 
         # --- Real-time check saat update ---
-        # Hanya kirim notifikasi jika tanggal expired berubah
         if old_expires_at != db_sub.expires_at:
             today = date.today()
             if db_sub.expires_at == today + timedelta(days=1):
                 msg = f"🔥 URGENT: '{db_sub.name}' ({db_sub.url}) expires TOMORROW! ({db_sub.expires_at})"
                 _send_telegram_async(msg)
+                db_sub.reminder_count_h3 = 0
+                db_sub.reminder_count_h0 = 0
+                db_sub.reminder_count_h1 = 1
+                db_sub.last_reminder_time = datetime.now()
+                db_sub.last_reminder_type = 'h1'
             elif db_sub.expires_at == today + timedelta(days=3):
                 msg = f"🚨 Reminder: '{db_sub.name}' ({db_sub.url}) expires in 3 days! ({db_sub.expires_at})"
                 _send_telegram_async(msg)
+                db_sub.reminder_count_h1 = 0
+                db_sub.reminder_count_h0 = 0
+                db_sub.reminder_count_h3 = 1
+                db_sub.last_reminder_time = datetime.now()
+                db_sub.last_reminder_type = 'h3'
+            elif db_sub.expires_at < today:
+                 db_sub.reminder_count_h3 = 0
+                 db_sub.reminder_count_h1 = 0
+                 db_sub.reminder_count_h0 = 0
+                 db_sub.last_reminder_time = None
+                 db_sub.last_reminder_type = None
+            db.commit()
         # --------------------------
 
     return db_sub
@@ -62,6 +85,10 @@ def delete_subscription(db: Session, subscription_id: int):
 def get_expiring_soon(db: Session, days_ahead: int):
     target_date = date.today() + timedelta(days=days_ahead)
     return db.query(Subscription).filter(Subscription.expires_at == target_date).all()
+
+def get_all_subscriptions(db: Session):
+    """Fungsi untuk mendapatkan semua subscription, digunakan oleh scheduler."""
+    return db.query(Subscription).all()
 
 # Fungsi bantu untuk mengirim notifikasi async dari sync context
 def _send_telegram_async(msg: str):
