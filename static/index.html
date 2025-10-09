@@ -11,11 +11,11 @@
 <body class="bg-gray-50 p-4 md:p-6">
   <div class="max-w-4xl mx-auto">
     <header class="mb-8 text-center">
-      <h1 class="text-2xl font-bold text-gray-800">🔔 K39 Hosting Reminder</h1>
-      <p class="text-sm text-gray-600">Internal tool for subscription renewal alerts</p>
+      <h1 class="text-2xl font-bold text-gray-800">K39 Hosting Reminder</h1>
+      <p class="text-sm text-gray-600">Daily Info 09:00 Pagi</p>
     </header>
 
-    <!-- Add Form -->
+    <!-- Add/Edit Form -->
     <div class="bg-white p-4 rounded-lg shadow mb-6 border">
       <h2 class="font-semibold mb-3 text-gray-700">Add New Subscription</h2>
       <form id="addForm" class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -87,6 +87,10 @@
               </td>
               <td class="p-3">${formatDate(sub.expires_at)}</td>
               <td class="p-3">
+                <button onclick="editSub(${sub.id}, '${escapeHtml(sub.name)}', '${escapeHtml(sub.url)}', '${sub.expires_at}')"
+                  class="text-yellow-600 hover:text-yellow-800 font-medium text-sm mr-2">
+                  Edit
+                </button>
                 <button onclick="deleteSub(${sub.id})"
                   class="text-red-600 hover:text-red-800 font-medium text-sm">
                   Delete
@@ -102,30 +106,50 @@
     }
 
     // Add subscription
-    document.getElementById('addForm').addEventListener('submit', async (e) => {
+    document.getElementById('addForm').addEventListener('submit', handleAddSubmit);
+
+    function handleAddSubmit(e) {
       e.preventDefault();
       const data = {
         name: document.getElementById('name').value,
         url: document.getElementById('url').value,
         expires_at: document.getElementById('expires_at').value
       };
-      try {
-        const res = await fetch(`${API_BASE}/subscriptions/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`API error: ${res.status} - ${errorText}`);
-        }
-        document.getElementById('addForm').reset();
-        loadSubs();
-      } catch (e) {
-        console.error('Failed to add subscription:', e);
-        alert('Failed to add subscription. Please check console for details.');
-      }
-    });
+      submitForm(`${API_BASE}/subscriptions/`, 'POST', data);
+    }
+
+    // Edit subscription
+    function editSub(id, currentName, currentUrl, currentExpiresAt) {
+      const form = document.getElementById('addForm');
+      form.innerHTML = `
+        <input type="text" id="editName" value="${currentName}" required
+               class="border p-2 rounded text-sm col-span-1 md:col-span-2">
+        <input type="url" id="editUrl" value="${currentUrl}" required
+               class="border p-2 rounded text-sm col-span-1 md:col-span-2">
+        <input type="date" id="editExpires_at" value="${currentExpiresAt}" required
+               class="border p-2 rounded text-sm col-span-1 md:col-span-2">
+        <div class="flex gap-2 col-span-1 md:col-span-4">
+          <button type="button" onclick="performUpdate(${id})"
+                  class="bg-green-600 hover:bg-green-700 text-white p-2 rounded text-sm transition flex-1">
+            Save
+          </button>
+          <button type="button" onclick="cancelEdit()"
+                  class="bg-gray-500 hover:bg-gray-600 text-white p-2 rounded text-sm transition flex-1">
+            Cancel
+          </button>
+        </div>
+      `;
+      form.setAttribute('id', 'editForm');
+    }
+
+    async function performUpdate(id) {
+      const data = {
+        name: document.getElementById('editName').value,
+        url: document.getElementById('editUrl').value,
+        expires_at: document.getElementById('editExpires_at').value
+      };
+      submitForm(`${API_BASE}/subscriptions/${id}`, 'PUT', data);
+    }
 
     // Delete subscription
     async function deleteSub(id) {
@@ -140,6 +164,47 @@
       } catch (e) {
         console.error('Failed to delete subscription:', e);
         alert('Failed to delete subscription. Please check console for details.');
+      }
+    }
+
+    // Helper untuk submit form (add/update)
+    async function submitForm(url, method, data) {
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`API error: ${res.status} - ${errorText}`);
+        }
+        cancelEdit();
+        loadSubs();
+      } catch (e) {
+        console.error('Failed to submit:', e);
+        alert('Failed to submit. Please check console for details.');
+      }
+    }
+
+    // Cancel edit and restore form
+    function cancelEdit() {
+      const form = document.getElementById('editForm');
+      if (form) {
+        form.innerHTML = `
+          <input type="text" id="name" placeholder="Name (e.g., AWS)" required
+                 class="border p-2 rounded text-sm">
+          <input type="url" id="url" placeholder="https://example.com" required
+                 class="border p-2 rounded text-sm">
+          <input type="date" id="expires_at" required
+                 class="border p-2 rounded text-sm">
+          <button type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm transition">
+            Add
+          </button>
+        `;
+        form.setAttribute('id', 'addForm');
+        document.getElementById('addForm').addEventListener('submit', handleAddSubmit);
       }
     }
 
