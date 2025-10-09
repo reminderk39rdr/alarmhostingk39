@@ -1,3 +1,4 @@
+# render.yaml
 services:
   - type: web
     name: k39-reminder
@@ -7,5 +8,4 @@ services:
     startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.7
-    healthCheckPath: /
+        value: "3.12.7"
