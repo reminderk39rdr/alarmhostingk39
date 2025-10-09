@@ -1,22 +1,21 @@
 # requirements.txt
 
 # Framework utama
-fastapi>=0.110.0,<0.116.0  # Gunakan versi stabil yang kompatibel
-uvicorn[standard]>=0.20.0,<0.35.0  # Versi terbaru dengan Python 3.13 support
+fastapi>=0.110.0,<0.116.0
+uvicorn[standard]>=0.20.0,<0.35.0
 
 # Database ORM
-sqlalchemy>=2.0.36,<3.0.0  # Versi 2.0.36+ sudah kompatibel dengan Python 3.13
-psycopg2-binary>=2.9.9  # Driver PostgreSQL
+sqlalchemy>=2.0.36,<3.0.0
+psycopg2-binary>=2.9.9
 
 # Utilitas
-python-dotenv>=1.0.0  # Untuk membaca environment variables
+python-dotenv>=1.0.0
 
-# Bot Telegram (penting: versi terbaru biasanya lebih kompatibel)
-python-telegram-bot>=21.0,<22.0  # Versi 21+ mendukung Python 3.13
+# Bot Telegram (versi terbaru mendukung Python 3.13)
+python-telegram-bot>=21.0,<22.0
 
 # Scheduler
 apscheduler>=3.10.4,<4.0.0
 
-# Jangan hardcode versi httpx
-# Biarkan fastapi dan python-telegram-bot yang menentukan versi httpx yang dibutuhkan.
-# Ini adalah penyebab utama conflict sebelumnya.
+# Jangan hardcode versi httpx - biarkan library lain yang menentukan
+# httpx==0.27.0  # <-- JANGAN TULIS INI
