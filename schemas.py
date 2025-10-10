@@ -6,6 +6,8 @@ from typing import Optional
 class SubscriptionBase(BaseModel):
     name: str
     url: str
+    # Tambahkan field brand
+    brand: str
     expires_at: date
 
 class SubscriptionCreate(SubscriptionBase):
