@@ -18,11 +18,15 @@
     <!-- Add/Edit Form -->
     <div class="bg-white p-4 rounded-lg shadow mb-6 border">
       <h2 class="font-semibold mb-3 text-gray-700">Add New Subscription</h2>
-      <form id="addForm" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <form id="addForm" class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <input type="text" id="name" placeholder="Name (e.g., AWS)" required
           class="border p-2 rounded text-sm">
         <input type="url" id="url" placeholder="https://example.com" required
           class="border p-2 rounded text-sm">
+        <!-- Tambahkan input brand -->
+        <input type="text" id="brand" placeholder="Brand (e.g., RADAR138)" required
+          class="border p-2 rounded text-sm">
+        <!-- -->
         <input type="date" id="expires_at" required
           class="border p-2 rounded text-sm">
         <button type="submit"
@@ -41,6 +45,7 @@
         <table class="min-w-full text-sm">
           <thead class="bg-gray-50">
             <tr>
+              <th class="p-3 text-left">Brand</th> <!-- Kolom baru -->
               <th class="p-3 text-left">Name</th>
               <th class="p-3 text-left">URL</th>
               <th class="p-3 text-left">Expires</th>
@@ -80,6 +85,7 @@
           empty.classList.add('hidden');
           tbody.innerHTML = subs.map(sub => `
             <tr>
+              <td class="p-3">${escapeHtml(sub.brand)}</td> <!-- Kolom baru -->
               <td class="p-3">${escapeHtml(sub.name)}</td>
               <td class="p-3">
                 <a href="${escapeHtml(sub.url)}" target="_blank" rel="noopener noreferrer"
@@ -87,7 +93,7 @@
               </td>
               <td class="p-3">${formatDate(sub.expires_at)}</td>
               <td class="p-3">
-                <button onclick="editSub(${sub.id}, '${escapeHtml(sub.name)}', '${escapeHtml(sub.url)}', '${sub.expires_at}')"
+                <button onclick="editSub(${sub.id}, '${escapeHtml(sub.name)}', '${escapeHtml(sub.url)}', '${sub.brand}', '${sub.expires_at}')"
                   class="text-yellow-600 hover:text-yellow-800 font-medium text-sm mr-2">
                   Edit
                 </button>
@@ -113,19 +119,26 @@
       const data = {
         name: document.getElementById('name').value,
         url: document.getElementById('url').value,
+        // Tambahkan brand ke data
+        brand: document.getElementById('brand').value,
+        // --
         expires_at: document.getElementById('expires_at').value
       };
       submitForm(`${API_BASE}/subscriptions/`, 'POST', data);
     }
 
     // Edit subscription
-    function editSub(id, currentName, currentUrl, currentExpiresAt) {
+    function editSub(id, currentName, currentUrl, currentBrand, currentExpiresAt) { // Tambahkan currentBrand
       const form = document.getElementById('addForm');
       form.innerHTML = `
         <input type="text" id="editName" value="${currentName}" required
                class="border p-2 rounded text-sm col-span-1 md:col-span-2">
         <input type="url" id="editUrl" value="${currentUrl}" required
                class="border p-2 rounded text-sm col-span-1 md:col-span-2">
+        <!-- Tambahkan input brand -->
+        <input type="text" id="editBrand" value="${currentBrand}" required
+               class="border p-2 rounded text-sm col-span-1 md:col-span-2">
+        <!-- -->
         <input type="date" id="editExpires_at" value="${currentExpiresAt}" required
                class="border p-2 rounded text-sm col-span-1 md:col-span-2">
         <div class="flex gap-2 col-span-1 md:col-span-4">
@@ -146,6 +159,9 @@
       const data = {
         name: document.getElementById('editName').value,
         url: document.getElementById('editUrl').value,
+        // Tambahkan brand ke data
+        brand: document.getElementById('editBrand').value,
+        // --
         expires_at: document.getElementById('editExpires_at').value
       };
       submitForm(`${API_BASE}/subscriptions/${id}`, 'PUT', data);
@@ -196,6 +212,10 @@
                  class="border p-2 rounded text-sm">
           <input type="url" id="url" placeholder="https://example.com" required
                  class="border p-2 rounded text-sm">
+          <!-- Tambahkan input brand -->
+          <input type="text" id="brand" placeholder="Brand (e.g., RADAR138)" required
+                 class="border p-2 rounded text-sm">
+          <!-- -->
           <input type="date" id="expires_at" required
                  class="border p-2 rounded text-sm">
           <button type="submit"
