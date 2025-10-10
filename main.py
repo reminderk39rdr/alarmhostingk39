@@ -72,6 +72,22 @@ def run_dynamic_reminders():
                 if sub.reminder_count_h3 < 2:
                     if sub.reminder_count_h3 == 0:
                         # Perbaiki f-string: gunakan kutip ganda di luar, atau escape kutip dalam
+                        # Asli: f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
+                        # Ini seharusnya valid, tapi mari kita jaga agar tidak ada kesalahan encoding atau parsing
+                        # Kita tetap gunakan kutip tunggal dalam f-string, tapi pastikan penulisan benar
+                        # Baris bermasalah di log adalah: msg = f"🚨 Reminder: '{sub
+                        # Artinya, parser Python berhenti di '{sub dan mengira '{' tidak ditutup.
+                        # Ini bisa terjadi jika ada karakter tak terlihat atau kutip tidak seimbang sebelumnya.
+                        # Kita coba gunakan kutip ganda di luar untuk menghindari kebingungan parser.
+                        # msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
+                        # Atau, kita gunakan escape untuk kutip tunggal di dalam string jika diperlukan.
+                        # msg = f"🚨 Reminder: \'{sub.name}\' ({sub.url}) expires in 3 days! ({sub.expires_at})"
+                        # Atau, kita gunakan format string biasa untuk menghindari masalah parsing.
+                        # msg = "🚨 Reminder: '{}' ({}) expires in 3 days! ({})".format(sub.name, sub.url, sub.expires_at)
+                        # Namun, f-string adalah standar. Kita pastikan tidak ada kutip yang tidak seimbang.
+                        # Baris yang menyebabkan error adalah baris 74 (dalam log sebelumnya).
+                        # Dalam versi sebelumnya, baris 74 mungkin mengandung kutip yang tidak seimbang.
+                        # Kita coba tulis ulang baris ini dengan hati-hati.
                         msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
                         import asyncio
                         def run_async():
