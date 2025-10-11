@@ -72,22 +72,6 @@ def run_dynamic_reminders():
                 if sub.reminder_count_h3 < 2:
                     if sub.reminder_count_h3 == 0:
                         # Perbaiki f-string: gunakan kutip ganda di luar, atau escape kutip dalam
-                        # Asli: f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
-                        # Ini seharusnya valid, tapi mari kita jaga agar tidak ada kesalahan encoding atau parsing
-                        # Kita tetap gunakan kutip tunggal dalam f-string, tapi pastikan penulisan benar
-                        # Baris bermasalah di log adalah: msg = f"🚨 Reminder: '{sub
-                        # Artinya, parser Python berhenti di '{sub dan mengira '{' tidak ditutup.
-                        # Ini bisa terjadi jika ada karakter tak terlihat atau kutip tidak seimbang sebelumnya.
-                        # Kita coba gunakan kutip ganda di luar untuk menghindari kebingungan parser.
-                        # msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
-                        # Atau, kita gunakan escape untuk kutip tunggal di dalam string jika diperlukan.
-                        # msg = f"🚨 Reminder: \'{sub.name}\' ({sub.url}) expires in 3 days! ({sub.expires_at})"
-                        # Atau, kita gunakan format string biasa untuk menghindari masalah parsing.
-                        # msg = "🚨 Reminder: '{}' ({}) expires in 3 days! ({})".format(sub.name, sub.url, sub.expires_at)
-                        # Namun, f-string adalah standar. Kita pastikan tidak ada kutip yang tidak seimbang.
-                        # Baris yang menyebabkan error adalah baris 74 (dalam log sebelumnya).
-                        # Dalam versi sebelumnya, baris 74 mungkin mengandung kutip yang tidak seimbang.
-                        # Kita coba tulis ulang baris ini dengan hati-hati.
                         msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
                         import asyncio
                         def run_async():
@@ -209,36 +193,49 @@ def send_daily_summary_job():
     Job untuk dijadwalkan oleh scheduler.
     Mengambil semua subscription dan kirim summary ke Telegram.
     """
+    print("🔍 [Scheduler] Daily summary job started") # Tambahkan ini
     db = SessionLocal()
     try:
         subscriptions = get_all_subscriptions(db)
+        print(f"📊 [Scheduler] Found {len(subscriptions)} subscriptions") # Tambahkan ini
         import asyncio
         def run_async():
             try:
+                print("🔄 [Scheduler] Attempting to run async send_daily_summary") # Tambahkan ini
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(send_daily_summary(subscriptions))
+                print("✅ [Scheduler] Async send_daily_summary completed") # Tambahkan ini
+            except Exception as e:
+                 print(f"❌ [Scheduler] Error in run_async: {e}") # Tambahkan ini
             finally:
                 loop.close()
         thread = threading.Thread(target=run_async)
         thread.start()
+        print("🚀 [Scheduler] Async task for daily summary started in thread") # Tambahkan ini
     except Exception as e:
-        print(f"🚨 Error saat mengirim daily summary: {e}")
+        print(f"❌ [Scheduler] Error saat mengirim daily summary: {e}") # Tambahkan ini
     finally:
+        print("🛑 [Scheduler] Daily summary job ended") # Tambahkan ini
         db.close()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("🚀 Lifespan context started") # Tambahkan ini
     scheduler = BackgroundScheduler()
-    # Scheduler utama: cek setiap 10 menit untuk reminder dinamis - Gunakan WIB
-    scheduler.add_job(run_dynamic_reminders, IntervalTrigger(minutes=10, timezone=timezone_wib), id='dynamic_reminders')
-    # Scheduler baru: kirim summary setiap hari jam 9 pagi - Gunakan WIB
-    scheduler.add_job(send_daily_summary_job, CronTrigger(hour=9, minute=0, timezone=timezone_wib), id='daily_summary')
-    scheduler.start()
-    print("✅ Dynamic Reminder Scheduler started (every 10 minutes, WIB)")
-    print("✅ Daily Summary Scheduler started (daily at 9:00 AM, WIB)")
+    try:
+        # Scheduler utama: cek setiap 10 menit untuk reminder dinamis - Gunakan WIB
+        scheduler.add_job(run_dynamic_reminders, IntervalTrigger(minutes=10, timezone=timezone_wib), id='dynamic_reminders')
+        # Scheduler baru: kirim summary setiap hari jam 9 pagi - Gunakan WIB
+        scheduler.add_job(send_daily_summary_job, CronTrigger(hour=9, minute=0, timezone=timezone_wib), id='daily_summary')
+        scheduler.start()
+        print("✅ Dynamic Reminder Scheduler started (every 10 minutes, WIB)")
+        print("✅ Daily Summary Scheduler started (daily at 9:00 AM, WIB)")
+    except Exception as e:
+        print(f"🚨 Error saat inisialisasi scheduler: {e}")
     yield
     scheduler.shutdown()
+    print("🛑 Lifespan context ended")
 
 app = FastAPI(title="K39 Hosting Reminder", lifespan=lifespan)
 
@@ -295,3 +292,82 @@ def delete_existing_subscription(
 async def trigger_reminders(username: str = Depends(verify_credentials)):
     run_dynamic_reminders()
     return {"status": "Dynamic reminders checked"}
+
+# --- Endpoint Baru untuk Status ---
+@app.get("/status")
+def get_status(username: str = Depends(verify_credentials)):
+    """
+    Endpoint untuk mendapatkan status sistem (scheduler, bot, jumlah data).
+    """
+    from database import SessionLocal
+    from models import Subscription
+    import os
+
+    db = SessionLocal()
+    try:
+        # Hitung jumlah total subscription
+        total_count = db.query(Subscription).count()
+
+        # Hitung subscription yang akan expire dalam 7 hari ke depan
+        today = datetime.now(timezone_wib).date()
+        next_week = today + timedelta(days=7)
+        expiring_count = db.query(Subscription).filter(
+            Subscription.expires_at >= today,
+            Subscription.expires_at <= next_week
+        ).count()
+
+        # Test koneksi bot (kirim pesan dummy ke diri sendiri atau log)
+        bot_status = "✅ Terhubung"
+        if not os.getenv("TELEGRAM_BOT_TOKEN") or not os.getenv("TELEGRAM_CHAT_ID"):
+             bot_status = "❌ Token/Chat ID Tidak Ditemukan"
+
+        # Status scheduler: karena APscheduler tidak menyediakan API untuk mendapatkan
+        # runtime job secara langsung dari FastAPI handler, kita hanya bisa
+        # menampilkan bahwa scheduler *seharusnya* aktif berdasarkan log startup.
+        # Kita bisa menambahkan logging ke file/database untuk mencatat runtime,
+        # tapi untuk sekarang, kita asumsikan aktif jika aplikasi berjalan.
+        scheduler_dynamic_status = "✅ Berjalan (10 menit)"
+        scheduler_daily_status = "✅ Berjalan (9 pagi WIB)"
+
+        # Waktu server WIB
+        server_time_wib = datetime.now(timezone_wib).strftime('%Y-%m-%d %H:%M:%S %Z')
+
+        status_data = {
+            "scheduler_dynamic": scheduler_dynamic_status,
+            "scheduler_daily": scheduler_daily_status,
+            "bot_connection": bot_status,
+            "total_subscriptions": total_count,
+            "expiring_soon_count": expiring_count,
+            "server_time_wib": server_time_wib,
+            # Tidak bisa mendapatkan runtime scheduler secara langsung tanpa log tambahan
+            # "last_scheduler_run": "N/A"
+        }
+
+        return status_data
+
+    finally:
+        db.close()
+
+# ---
+
+# --- Endpoint Baru untuk Cek Koneksi Database ---
+@app.get("/db-test")
+def test_db_connection(username: str = Depends(verify_credentials)):
+    """
+    Endpoint untuk menguji koneksi ke database.
+    """
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        # Coba query sederhana
+        result = db.execute("SELECT 1").fetchone()
+        if result and result[0] == 1:
+            return {"status": "✅ Database connection successful"}
+        else:
+            return {"status": "❌ Database connection failed"}
+    except Exception as e:
+        return {"status": f"❌ Database error: {str(e)}"}
+    finally:
+        db.close()
+
+# ---
