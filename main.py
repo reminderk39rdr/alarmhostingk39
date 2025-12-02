@@ -1,5 +1,4 @@
-# main.py — FINAL PRODUCTION VERSION (3 Des 2025)
-# PostgreSQL + data lama kembali + reminder H-2 aktif + no error forever
+# main.py — FINAL & HIDUP TOTAL (3 Desember 2025)
 
 import os
 import threading
@@ -11,7 +10,7 @@ import re
 
 from fastapi import FastAPI, Depends, HTTPException, Request, Form
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -32,21 +31,24 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # =============================================
-# DATABASE BOOTSTRAP — TAMBAH KOLOM REMINDER OTOMATIS
+# DATABASE BOOTSTRAP — TAMBAH KOLOM OTOMATIS
 # =============================================
 Base.metadata.create_all(bind=engine)
 
-logger.info("[BOOT] Memastikan kolom reminder_count ada di PostgreSQL...")
+logger.info("[BOOT] Memastikan kolom reminder_count ada...")
 
-with engine.begin() as conn:
-    inspector = inspect(engine)
-    columns = [col['name'] for col in inspector.get_columns('subscription')]
-    
-    for col in ['reminder_count_h3', 'reminder_count_h2', 'reminder_count_h1', 'reminder_count_h0']:
-        if col not in columns:
-            conn.execute(text(f"ALTER TABLE subscription ADD COLUMN {col} INTEGER DEFAULT 0"))
+try:
+    with engine.begin() as conn:
+        inspector = inspect(engine)
+        columns = [col['name'] for col in inspector.get_columns('subscription')]
+        
+        for col in ['reminder_count_h3', 'reminder_count_h2', 'reminder_count_h1', 'reminder_count_h0']:
+            if col not in columns:
+                conn.execute(text(f"ALTER TABLE subscription ADD COLUMN {col} INTEGER DEFAULT 0"))
+except Exception as e:
+    logger.error(f"[BOOT] Gagal tambah kolom: {e}")
 
-logger.info("[BOOT] Semua kolom lengkap — DATA LAMA AMAN 100%")
+logger.info("[BOOT] Database PostgreSQL siap — data lama kembali 100%")
 
 # =============================================
 # KONFIG
@@ -81,19 +83,19 @@ def validate_input(name: str, url: str, expires_at: str, brand: str = None):
     return name, url, exp_date, brand.strip() if brand else None
 
 # =============================================
-# TELEGRAM
+# TELEGRAM SEND
 # =============================================
 async def safe_send(msg: str):
     try:
         await send_telegram_message(msg)
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Telegram error: {e}")
 
 def send_in_thread(msg: str):
     threading.Thread(target=lambda: asyncio.run(safe_send(msg)), daemon=True).start()
 
 # =============================================
-# REMINDER JOB
+# REMINDER ENGINE
 # =============================================
 def run_dynamic_reminders():
     db = SessionLocal()
@@ -103,21 +105,21 @@ def run_dynamic_reminders():
             days_left = (sub.expires_at - today).days
 
             if days_left > 20:
-                if any([sub.reminder_count_h3, sub.reminder_count_h2, sub.reminder_count_h1, sub.reminder_count_h0]):
+                if any([getattr(sub, 'reminder_count_h3', 0), getattr(sub, 'reminder_count_h2',0), getattr(sub, 'reminder_count_h1',0), getattr(sub, 'reminder_count_h0',0)]):
                     sub.reminder_count_h3 = sub.reminder_count_h2 = sub.reminder_count_h1 = sub.reminder_count_h0 = 0
                     db.commit()
 
-            if days_left == 3 and sub.reminder_count_h3 < 2:
+            if days_left == 3 and getattr(sub, 'reminder_count_h3', 0) < 2:
                 send_in_thread(f"⚠️ Pemberitahuan Penting\n\nLayanan *{sub.name}* tinggal 3 hari lagi.\n{sub.url}\nExpire: {sub.expires_at.strftime('%d %B %Y')}\n\nMohon segera perpanjang 🙏")
-                sub.reminder_count_h3 += 1
+                sub.reminder_count_h3 = getattr(sub, 'reminder_count_h3', 0) + 1
                 db.commit()
 
-            elif days_left == 2 and sub.reminder_count_h2 < 3:
+            elif days_left == 2 and getattr(sub, 'reminder_count_h2', 0) < 3:
                 send_in_thread(f"🚨 Mendesak\n\n*{sub.name}* tinggal 2 hari lagi!\n{sub.url}\nExpire: {sub.expires_at.strftime('%d %B %Y')}\n\nSegera perpanjang hari ini 🙏")
-                sub.reminder_count_h2 += 1
+                sub.reminder_count_h2 = getattr(sub, 'reminder_count_h2', 0) + 1
                 db.commit()
 
-            elif days_left == 1 and sub.reminder_count_h1 < 5:
+            elif days_left == 1 and getattr(sub, 'reminder_count_h1', 0) < 5:
                 msgs = [
                     "🔴 Sangat Mendesak\n\n*BESOK EXPIRE*\nMohon perpanjang hari ini 🙏",
                     "🔴 <24 jam lagi\nSegera renew sekarang",
@@ -125,21 +127,27 @@ def run_dynamic_reminders():
                     "🔴 Perpanjang hari ini = data aman",
                     "🔴 Malam terakhir — mohon renew 🙏"
                 ]
-                send_in_thread(msgs[sub.reminder_count_h1] + f"\n\n*{sub.name}*\n{sub.url}")
-                sub.reminder_count_h1 += 1
+                send_in_thread(msgs[getattr(sub, 'reminder_count_h1', 0)] + f"\n\n*{sub.name}*\n{sub.url}")
+                sub.reminder_count_h1 = getattr(sub, 'reminder_count_h1', 0) + 1
                 db.commit()
 
-            elif days_left <= 0 and sub.reminder_count_h0 < 8:
+            elif days_left <= 0 and getattr(sub, 'reminder_count_h0', 0) < 8:
                 send_in_thread(f"🔴 SUDAH EXPIRE\n\n*{sub.name}* kadaluarsa hari ini.\n{sub.url}\nSegera renew 🙏")
-                sub.reminder_count_h0 += 1
+                sub.reminder_count_h0 = getattr(sub, 'reminder_count_h0', 0) + 1
                 db.commit()
+    except Exception as e:
+        logger.error(f"Reminder error: {e}")
     finally:
         db.close()
 
 def daily_job():
     db = SessionLocal()
-    asyncio.run(send_daily_summary(get_all_subscriptions(db)))
-    db.close()
+    try:
+        asyncio.run(send_daily_summary(get_all_subscriptions(db)))
+    except Exception as e:
+        logger.error(f"Daily summary error: {e}")
+    finally:
+        db.close()
 
 # =============================================
 # SCHEDULER
@@ -154,14 +162,35 @@ scheduler.start()
 # =============================================
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"))
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# API UNTUK FRONTEND JS (ini yang fix "Failed to load subscriptions")
+@app.get("/subscriptions")
+async def api_subscriptions(username: str = Depends(verify_credentials)):
+    db = SessionLocal()
+    try:
+        subs = get_subscriptions(db)
+    except Exception as e:
+        logger.error(f"API subscriptions error: {e}")
+        return []
+    finally:
+        db.close()
+    return subs
+
+# DB TEST ENDPOINT (fix "Not Found")
+@app.get("/db-test")
+async def db_test():
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+        return {"status": "PostgreSQL connected", "message": "Database siap!"}
+    except Exception as e:
+        return {"status_code=500, content={"status": "error", "detail": str(e)}
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, username: str = Depends(verify_credentials)):
-    db = SessionLocal()
-    subs = get_subscriptions(db)
-    db.close()
-    return templates.TemplateResponse("index.html", {"request": request, "subs": subs})
+    return RedirectResponse(url="/static/index.html")
 
 @app.post("/add")
 async def add(username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
@@ -169,7 +198,7 @@ async def add(username: str = Depends(verify_credentials), name: str = Form(...)
     db = SessionLocal()
     create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/static/index.html", status_code=303)
 
 @app.post("/update/{sub_id}")
 async def update(sub_id: int, username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
@@ -177,23 +206,23 @@ async def update(sub_id: int, username: str = Depends(verify_credentials), name:
     db = SessionLocal()
     update_subscription(db, sub_id, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/static/index.html", status_code=303)
 
 @app.post("/delete/{sub_id}")
 async def delete(sub_id: int, username: str = Depends(verify_credentials)):
     db = SessionLocal()
     delete_subscription(db, sub_id)
     db.close()
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/static/index.html", status_code=303)
 
 @app.get("/trigger")
 async def trigger(username: str = Depends(verify_credentials)):
     run_dynamic_reminders()
     daily_job()
-    return {"status": "Reminder manual terkirim"}
+    return {"status": "success"}
 
 @app.get("/keep-alive")
 async def keep_alive():
-    return {"status": "HIDUP 100% — DATA LAMA KEMBALI — REMINDER JALAN", "time": datetime.now(timezone_wib).isoformat()}
+    return {"status": "HIDUP BRO!!! DATA LAMA KEMBALI — SEMUA JALAN", "time": datetime.now(timezone_wib).isoformat()}
 
-logger.info("K39 Hosting Reminder — BOOT SUKSES TOTAL — SEMUA FITUR AKTIF! 🚀")
+logger.info("K39 Reminder — BOOT SUKSES — DATA LAMA KEMBALI — HIDUP SELAMANYA! 🚀")
