@@ -1,15 +1,23 @@
-# database.py
+# database.py — VERSI POSTGRESQL RENDER (Permanent & Reliable)
+
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./subscriptions.db")
+# Ambil URL dari environment (Render otomatis inject)
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Kalau URL diawali postgres:// (bukan postgresql://), Render butuh replace
+if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 
 engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    SQLALCHEMY_DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    echo=False  # set True kalau mau liat SQL query di log
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
