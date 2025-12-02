@@ -17,145 +17,33 @@
             --danger: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 2rem 1rem;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border);
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        input {
-            width: 100%;
-            padding: 0.9rem 1rem;
-            background: #1a1a22;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 1rem;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
-        }
-        .btn {
-            background: var(--primary);
-            color: white;
-            padding: 0.9rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background: var(--primary-hover);
-        }
-        .btn-danger {
-            background: var(--danger);
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th {
-            text-align: left;
-            padding: 1rem;
-            background: #1a1a22;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        tr:hover {
-            background: rgba(139, 92, 246, 0.05);
-        }
-        .brand-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 2.5rem 0 1rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-        }
-        .days {
-            font-weight: 600;
-        }
-        .days-critical { color: #ef4444; }
-        .days-warning { color: #f59e0b; }
-        .days-safe { color: #10b981; }
-        footer {
-            text-align: center;
-            margin-top: 4rem;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-        .k39 {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: #8b5cf6;
-            font-size: 0.8rem;
-            letter-spacing: 0.15em;
-        }
-        .trigger-fixed {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--primary);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-            z-index: 100;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        .trigger-fixed:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);
-        }
+        body {font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem 1rem; min-height: 100vh;}
+        .container {max-width: 1100px; margin: 0 auto;}
+        header {text-align: center; margin-bottom: 3rem;}
+        h1 {font-size: 2.5rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;}
+        .subtitle {color: var(--text-secondary); font-size: 1.1rem;}
+        .card {background: var(--card); border-radius: 12px; padding: 1.8rem; margin-bottom: 2rem; border: 1px solid var(--border);}
+        .form-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem;}
+        input {width: 100%; padding: 0.9rem 1rem; background: #1a1a22; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem;}
+        input:focus {outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);}
+        .btn {background: var(--primary); color: white; padding: 0.9rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;}
+        .btn:hover {background: var(--primary-hover);}
+        .btn-danger {background: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem;}
+        .btn-danger:hover {background: #dc2626;}
+        table {width: 100%; border-collapse: collapse; margin-top: 1rem;}
+        th {text-align: left; padding: 1rem; background: #1a1a22; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;}
+        td {padding: 1rem; border-bottom: 1px solid var(--border);}
+        tr:hover {background: rgba(139, 92, 246, 0.05);}
+        .brand-title {font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 2.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary);}
+        .days {font-weight: 600;}
+        .days-critical {color: #ef4444;}
+        .days-warning {color: #f59e0b;}
+        .days-safe {color: #10b981;}
+        footer {text-align: center; margin-top: 4rem; color: var(--text-secondary); font-size: 0.85rem;}
+        .k39 {font-family: 'Courier New', monospace; font-weight: bold; color: #8b5cf6; font-size: 0.8rem; letter-spacing: 0.15em;}
+        .trigger-fixed {position: fixed; bottom: 30px; right:  right: 30px; background: var(--primary); color: white; padding: 1rem 1.5rem; border-radius: 50px; font-weight: 600; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3); z-index: 100; text-decoration: none; transition: all 0.3s;}
+        .trigger-fixed:hover {transform: translateY(-3px); box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);}
+        .action-btn {padding: 0.4rem 0.8rem; font-size: 0.85rem; margin: 0 0.2rem;}
     </style>
 </head>
 <body>
@@ -169,15 +57,16 @@
         </header>
 
         <div class="card">
-            <h2 style="margin-bottom: 1.5rem; color: #ffffff;">Add New Subscription</h2>
-            <form method="post" action="/add">
+            <h2 style="margin-bottom: 1.5rem; color: #ffffff;" id="form-title">Add New Subscription</h2>
+            <form id="subscription-form" method="post">
                 <div class="form-grid">
-                    <input type="text" name="name" placeholder="Service Name" required>
-                    <input type="url" name="url" placeholder="URL" required>
-                    <input type="text" name="brand" placeholder="Brand / Provider">
-                    <input type="text" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
+                    <input type="text" id="name" name="name" placeholder="Service Name" required>
+                    <input type="url" id="url" name="url" placeholder="URL" required>
+                    <input type="text" id="brand" name="brand" placeholder="Brand / Provider">
+                    <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
                 </div>
-                <button type="submit" class="btn" style="margin-top: 1.5rem;">Add Subscription</button>
+                <button type="submit" class="btn" style="margin-top: 1.5rem;">Save Subscription</button>
+                <button type="button" class="btn" onclick="resetForm()" style="margin-left: 1rem; background:#475569;">Cancel Edit</button>
             </form>
         </div>
 
@@ -190,12 +79,12 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 5%;">No</th>
-                                <th style="width: 25%;">Service</th>
-                                <th style="width: 35%;">URL</th>
-                                <th style="width: 15%;">Expire Date</th>
-                                <th style="width: 12%;">Days Left</th>
-                                <th style="width: 8%;">Action</th>
+                                <th>No</th>
+                                <th>Service</th>
+                                <th>URL</th>
+                                <th>Expire Date</th>
+                                <th>Days Left</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -210,8 +99,9 @@
                                         {{ days }} days
                                     </td>
                                     <td>
+                                        <button class="btn action-btn" onclick='editSubscription({{ sub.id }}, "{{ sub.name }}", "{{ sub.url }}", "{{ sub.brand or '' }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")' style="background:#8b5cf6;padding:0.5rem 1rem;">Edit</button>
                                         <form method="post" action="/delete/{{ sub.id }}" style="display:inline;">
-                                            <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Delete</button>
+                                            <button type="submit" class="btn-danger action-btn">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -234,5 +124,23 @@
             <div class="k39">K39</div>
         </footer>
     </div>
+
+    <script>
+        function editSubscription(id, name, url, brand, expires_at) {
+            document.getElementById('form-title').innerText = 'Edit Subscription';
+            document.getElementById('name').value = name;
+            document.getElementById('url').value = url;
+            document.getElementById('brand').value = brand || '';
+            document.getElementById('expires_at').value = expires_at;
+            document.getElementById('subscription-form').action = `/update/${id}`;
+            window.scrollTo(0, 0);
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = 'Add New Subscription';
+            document.getElementById('subscription-form').reset();
+            document.getElementById('subscription-form').action = '/add';
+        }
+    </script>
 </body>
 </html>
