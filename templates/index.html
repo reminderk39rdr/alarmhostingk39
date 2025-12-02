@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K39 Reminder — HIDUP SELAMANYA 🔥</title>
+    <style>
+        body {font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #eee; margin: 0; padding: 20px;}
+        h1, h2 {color: #ff4444; text-align: center;}
+        .container {max-width: 1200px; margin: 0 auto;}
+        table {width: 100%; border-collapse: collapse; margin: 30px 0; background: #1a1a1a;}
+        th, td {padding: 15px; text-align: left; border-bottom: 1px solid #333;}
+        th {background: #222; color: #ff4444;}
+        tr:hover {background: #252525;}
+        .days-left {font-weight: bold;}
+        .expired {color: #ff0000;}
+        .urgent {color: #ff6600;}
+        .warning {color: #ffff00;}
+        .safe {color: #00ff00;}
+        .form-container {background: #222; padding: 20px; border-radius: 10px; margin: 20px 0;}
+        input, button {padding: 10px; margin: 5px; border: none; border-radius: 5px;}
+        input {background: #333; color: #fff; width: 100%; max-width: 300px;}
+        button {background: #ff4444; color: white; cursor: pointer; font-weight: bold;}
+        button:hover {background: #ff6666a;}
+        .actions a, .actions button {margin: 0 5px;}
+        .modal {display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8);}
+        .modal-content {background-color: #222; margin: 10% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px;}
+        .close {color: #aaa; float: right; font-size: 28px; font-weight: bold;}
+        .close:hover {color: #fff;}
+        .trigger-btn {background: #00ff00; color: #000; padding: 15px; font-size: 16px; position: fixed; bottom: 20px; right: 20px; border-radius: 50px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>K39 REMINDER — HIDUP SELAMANYA 💪🔥</h1>
+        <p style="text-align:center;">Total: {{ subs|length }} subscription | {{ now.strftime('%d %B %Y %H:%M:%S WIB') }}</p>
+
+        <div class="form-container">
+            <h2 id="form-title">Add New Subscription</h2>
+            <form id="sub-form" action="/add" method="post">
+                <input type="text" name="name" id="name" placeholder="Name (contoh: Netflix)" required>
+                <input type="url" name="url" id="url" placeholder="URL[](https://...)" required>
+                <input type="text" name="brand" id="brand" placeholder="Brand (opsional, contoh: RADAR138)">
+                <input type="text" name="expires_at" id="expires_at" placeholder="mm/dd/yyyy" required>
+                <button type="submit">➕ ADD NEW</button>
+                <button type="button" onclick="resetForm()">🔄 Reset Form</button>
+            </form>
+        </div>
+
+        <h2>Your Subscriptions</h2>
+        {% if subs %}
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Brand</th>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Expire Date</th>
+                <th>Days Left</th>
+                <th>Actions</th>
+            </tr>
+            {% for sub in subs %}
+            {% set days_left = (sub.expires_at - today).days %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ sub.brand or '-' }}</td>
+                <td><strong>{{ sub.name }}</strong></td>
+                <td><a href="{{ sub.url }}" target="_blank" rel="noopener">{{ sub.url }}</a></td>
+                <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+                <td class="days-left 
+                    {% if days_left <= 0 %}expired
+                    {% elif days_left <= 2 %}expired" style="color:#ff0066; animation: blink 1s infinite;"
+                    {% elif days_left <= 7 %}urgent
+                    {% else %}safe{% endif %}">
+                    {% if days_left <= 0 %}
+                        EXPIRED {{ days_left|abs }} hari lalu!!
+                    {% elif days_left == 1 %}
+                        1 hari lagi (BESOK MATI!)
+                    {% else %}
+                        {{ days_left }} hari lagi
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <button onclick='editSub({{ sub.id }}, "{{ sub.name|replace('"', '\\"') }}", "{{ sub.url }}", "{{ sub.brand or ''|replace('"', '\\"') }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>✏️ Edit</button>
+                    <form action="/delete/{{ sub.id }}" method="post" style="display:inline;" onsubmit="return confirm('Yakin hapus {{ sub.name }}?')">
+                        <button type="submit">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p style="text-align:center; color:orange;">Belum ada subscription. Tambah yang pertama bro! 🚀</p>
+        {% endif %}
+
+        <a href="/trigger"><button class="trigger-btn">⚡ TRIGGER REMINDER SEKARANG</button></a>
+    </div>
+
+    <script>
+        function editSub(id, name, url, brand, expires) {
+            document.getElementById('form-title').innerText = 'Update Subscription';
+            document.getElementById('name').value = name;
+            document.getElementById('url').value = url;
+            document.getElementById('brand').value = brand;
+            document.getElementById('expires_at').value = expires;
+            document.getElementById('sub-form').action = `/update/${id}`;
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = 'Add New Subscription';
+            document.getElementById('sub-form').reset();
+            document.getElementById('sub-form').action = '/add';
+        }
+    </script>
+</body>
+</html>
