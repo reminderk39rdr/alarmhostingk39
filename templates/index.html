@@ -2,115 +2,79 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K39 Reminder — HIDUP SELAMANYA 🔥</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RDR HOSTING REMINDER</title>
     <style>
-        body {font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #eee; margin: 0; padding: 20px;}
-        h1, h2 {color: #ff4444; text-align: center;}
-        .container {max-width: 1200px; margin: 0 auto;}
-        table {width: 100%; border-collapse: collapse; margin: 30px 0; background: #1a1a1a;}
-        th, td {padding: 15px; text-align: left; border-bottom: 1px solid #333;}
-        th {background: #222; color: #ff4444;}
-        tr:hover {background: #252525;}
-        .days-left {font-weight: bold;}
-        .expired {color: #ff0000;}
-        .urgent {color: #ff6600;}
-        .warning {color: #ffff00;}
-        .safe {color: #00ff00;}
-        .form-container {background: #222; padding: 20px; border-radius: 10px; margin: 20px 0;}
-        input, button {padding: 10px; margin: 5px; border: none; border-radius: 5px;}
-        input {background: #333; color: #fff; width: 100%; max-width: 300px;}
-        button {background: #ff4444; color: white; cursor: pointer; font-weight: bold;}
-        button:hover {background: #ff6666a;}
-        .actions a, .actions button {margin: 0 5px;}
-        .modal {display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8);}
-        .modal-content {background-color: #222; margin: 10% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px;}
-        .close {color: #aaa; float: right; font-size: 28px; font-weight: bold;}
-        .close:hover {color: #fff;}
-        .trigger-btn {background: #00ff00; color: #000; padding: 15px; font-size: 16px; position: fixed; bottom: 20px; right: 20px; border-radius: 50px;}
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+        body {font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin:0; padding:20px;}
+        h1 {font-family: 'Orbitron'; color: #ff0066; text-align:center; font-size:3em; text-shadow: 0 0 20px #ff0066;}
+        .container {max-width:1000px; margin:auto; background:#111; padding:20px; border-radius:15px; box-shadow:0 0 30px #ff0066;}
+        input, button {padding:12px; margin:5px; border:none; border-radius:8px; font-size:16px;}
+        input {background:#222; color:#0f0; width:100%; box-sizing:border-box;}
+        button {background:#ff0066; color:white; cursor:pointer; font-weight:bold;}
+        button:hover {background:#ff3399;}
+        table {width:100%; border-collapse:collapse; margin:30px 0;}
+        th {background:#ff0066; color:white; padding:15px;}
+        td {padding:15px; border-bottom:1px solid #333;}
+        .expired {color:#ff0000; font-weight:bold; animation:blink 1s infinite;}
+        .critical {color:#ff0066; font-weight:bold;}
+        .warning {color:#ffaa00;}
+        .safe {color:#00ff00;}
+        @keyframes blink {50% {opacity:0;}}
+        .trigger {background:#00ff00; color:black; padding:20px; font-size:18px; position:fixed; bottom:20px; right:20px; border-radius:50px; box-shadow:0 0 20px #00ff00;}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>K39 REMINDER — HIDUP SELAMANYA 💪🔥</h1>
-        <p style="text-align:center;">Total: {{ subs|length }} subscription | {{ now.strftime('%d %B %Y %H:%M:%S WIB') }}</p>
+<div class="container">
+    <h1>Hosting Reminder</h1>
+    <p style="text-align:center;color:#ffaa00">Total: {{ subs|length }} subscription | {{ now.strftime('%d %B %Y %H:%M:%S WIB') }}</p>
 
-        <div class="form-container">
-            <h2 id="form-title">Add New Subscription</h2>
-            <form id="sub-form" action="/add" method="post">
-                <input type="text" name="name" id="name" placeholder="Name (contoh: Netflix)" required>
-                <input type="url" name="url" id="url" placeholder="URL[](https://...)" required>
-                <input type="text" name="brand" id="brand" placeholder="Brand (opsional, contoh: RADAR138)">
-                <input type="text" name="expires_at" id="expires_at" placeholder="mm/dd/yyyy" required>
-                <button type="submit">➕ ADD NEW</button>
-                <button type="button" onclick="resetForm()">🔄 Reset Form</button>
-            </form>
-        </div>
+    <h2 style="color:#ff0066">Add / Update Subscription</h2>
+    <form method="post" action="/add">
+        <input name="name" placeholder="Name (contoh: Netflix)" required>
+        <input name="url" placeholder="URL[](https://...)" required>
+        <input name="brand" placeholder="Brand (contoh: RADAR138)">
+        <input name="expires_at" placeholder="mm/dd/yyyy" required>
+        <button type="submit">+ ADD NEW</button>
+    </form>
 
-        <h2>Your Subscriptions</h2>
-        {% if subs %}
-        <table>
-            <tr>
-                <th>No</th>
-                <th>Brand</th>
-                <th>Name</th>
-                <th>URL</th>
-                <th>Expire Date</th>
-                <th>Days Left</th>
-                <th>Actions</th>
-            </tr>
-            {% for sub in subs %}
-            {% set days_left = (sub.expires_at - today).days %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ sub.brand or '-' }}</td>
-                <td><strong>{{ sub.name }}</strong></td>
-                <td><a href="{{ sub.url }}" target="_blank" rel="noopener">{{ sub.url }}</a></td>
-                <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-                <td class="days-left 
-                    {% if days_left <= 0 %}expired
-                    {% elif days_left <= 2 %}expired" style="color:#ff0066; animation: blink 1s infinite;"
-                    {% elif days_left <= 7 %}urgent
-                    {% else %}safe{% endif %}">
-                    {% if days_left <= 0 %}
-                        EXPIRED {{ days_left|abs }} hari lalu!!
-                    {% elif days_left == 1 %}
-                        1 hari lagi (BESOK MATI!)
-                    {% else %}
-                        {{ days_left }} hari lagi
-                    {% endif %}
-                </td>
-                <td class="actions">
-                    <button onclick='editSub({{ sub.id }}, "{{ sub.name|replace('"', '\\"') }}", "{{ sub.url }}", "{{ sub.brand or ''|replace('"', '\\"') }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>✏️ Edit</button>
-                    <form action="/delete/{{ sub.id }}" method="post" style="display:inline;" onsubmit="return confirm('Yakin hapus {{ sub.name }}?')">
-                        <button type="submit">🗑️ Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p style="text-align:center; color:orange;">Belum ada subscription. Tambah yang pertama bro! 🚀</p>
-        {% endif %}
+    <h2 style="color:#ff0066">Your Subscriptions</h2>
+    {% if subs %}
+        {% set grouped = {} %}
+        {% for sub in subs %}
+            {% set brand = sub.brand or 'Tanpa Brand' %}
+            {% if brand = brand.upper() %}
+            {% if grouped.update({brand: grouped.get(brand, []) + [sub]}) %} {% endif %}
+        {% endfor %}
 
-        <a href="/trigger"><button class="trigger-btn">⚡ TRIGGER REMINDER SEKARANG</button></a>
-    </div>
+        {% for brand in grouped|dictsort %}
+            <h3 style="color:#ff3399; margin-top:30px">{{ brand[0] }}</h3>
+            <table>
+                <tr><th>No</th><th>Name</th><th>URL</th><th>Expire</th><th>Days Left</th><th>Action</th></tr>
+                {% for sub in grouped[brand] %}
+                    {% set days = (sub.expires_at - today).days %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><b>{{ sub.name }}</b></td>
+                        <td><a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></td>
+                        <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+                        <td class="{% if days <= 0 %}expired{% elif days <= 3 %}critical{% elif days <= 7 %}warning{% else %}safe{% endif %}">
+                            {{ days }} hari lagi
+                        </td>
+                        <td>
+                            <form method="post" action="/delete/{{ sub.id }}" style="display:inline" onsubmit="return confirm('Yakin hapus?')">
+                                <button type="submit" style="background:#ff0000">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% else %}
+        <p style="color:orange;text-align:center">Belum ada subscription bro. Tambah yang pertama! 🚀</p>
+    {% endif %}
 
-    <script>
-        function editSub(id, name, url, brand, expires) {
-            document.getElementById('form-title').innerText = 'Update Subscription';
-            document.getElementById('name').value = name;
-            document.getElementById('url').value = url;
-            document.getElementById('brand').value = brand;
-            document.getElementById('expires_at').value = expires;
-            document.getElementById('sub-form').action = `/update/${id}`;
-        }
-
-        function resetForm() {
-            document.getElementById('form-title').innerText = 'Add New Subscription';
-            document.getElementById('sub-form').reset();
-            document.getElementById('sub-form').action = '/add';
-        }
-    </script>
+    <a href="/trigger"><button class="trigger">⚡ TRIGGER FULL LIST KE TELEGRAM</button></a>
+</div>
 </body>
 </html>
