@@ -3,11 +3,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# FIX 100% UNTUK RENDER + PYTHON 3.13 + POSTGRES
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
+# FIX 100% UNTUK SEMUA FORMAT RENDER (postgres:// atau postgresql:// atau postgresql+psycopg2://)
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql+psycopg2://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
 
 engine = create_engine(
     DATABASE_URL,
