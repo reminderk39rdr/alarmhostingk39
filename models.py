@@ -1,4 +1,4 @@
-# models.py
+# models.py — SUDAH TERMASUK SEMUA COUNTER
 
 from sqlalchemy import Column, Integer, String, Date, DateTime
 from database import Base
@@ -12,9 +12,8 @@ class Subscription(Base):
     expires_at = Column(Date, nullable=False)
     brand = Column(String, nullable=True)
 
-    # Reminder counters — SEMUA SUDAH ADA
     reminder_count_h3 = Column(Integer, default=0)
-    reminder_count_h2 = Column(Integer, default=0)   # <--- PASTI ADA
+    reminder_count_h2 = Column(Integer, default=0)
     reminder_count_h1 = Column(Integer, default=0)
     reminder_count_h0 = Column(Integer, default=0)
 
