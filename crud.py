@@ -17,12 +17,11 @@ def create_subscription(db: Session, sub: SubscriptionCreate):
 
 def update_subscription(db: Session, sub_id: int, sub: SubscriptionCreate):
     db_sub = db.query(Subscription).filter(Subscription.id == sub_id).first()
-    if not db_sub:
-        return None
-    for key, value in sub.model_dump().items():
-        setattr(db_sub, key, value)
-    db.commit()
-    db.refresh(db_sub)
+    if db_sub:
+        for key, value in sub.model_dump().items():
+            setattr(db_sub, key, value)
+        db.commit()
+        db.refresh(db_sub)
     return db_sub
 
 def delete_subscription(db: Session, sub_id: int):
