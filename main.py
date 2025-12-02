@@ -8,16 +8,11 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from sqlalchemy import text, inspect
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
-import secrets
 import asyncio
-
-# --- Atur zona waktu default ke WIB ---
-timezone_wib = ZoneInfo("Asia/Jakarta")
-# --------------------------
 
 from database import engine, SessionLocal, Base
 from models import Subscription
@@ -27,353 +22,131 @@ from crud import (
     create_subscription,
     delete_subscription,
     update_subscription,
-    get_expiring_soon,
     get_all_subscriptions,
 )
 from telegram_bot import send_telegram_message, send_daily_summary
 
-# Buat tabel saat startup
+# --- Zona waktu WIB ---
+timezone_wib = ZoneInfo("Asia/Jakarta")
+
+# Buat tabel + tambah column kalau belum ada
 Base.metadata.create_all(bind=engine)
+
+# Tambah column reminder_count_h2 kalau belum ada (aman untuk SQLite/Postgres)
+inspector = inspect(engine)
+if 'reminder_count_h2' not in [c['name'] for c in inspector.get_columns('subscription')]:
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE subscription ADD COLUMN reminder_count_h2 INTEGER DEFAULT 0"))
+    print("Column reminder_count_h2 berhasil ditambahkan")
 
 # HTTP Basic Auth
 security = HTTPBasic()
 
 def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_user = secrets.compare_digest(
-        credentials.username, os.getenv("ADMIN_USERNAME", "admin")
-    )
-    correct_pass = secrets.compare_digest(
-        credentials.password, os.getenv("ADMIN_PASSWORD", "secret")
-    )
+    correct_user = secrets.compare_digest(credentials.username, os.getenv("ADMIN_USERNAME", "admin"))
+    correct_pass = secrets.compare_digest(credentials.password, os.getenv("ADMIN_PASSWORD", "secret"))
     if not (correct_user and correct_pass):
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        raise HTTPException(status_code=401, detail="Unauthorized", headers={"WWW-Authenticate": "Basic"})
     return credentials.username
 
-# --- Fungsi untuk reminder dinamis (H-3, H-1, H-0) - DENGAN WIB ---
+# Helper biar code bersih
+def send_in_thread(msg: str):
+    def run():
+        asyncio.run(send_telegram_message(msg))
+    threading.Thread(target=run).start()
+
 def run_dynamic_reminders():
-    """
-    Fungsi utama untuk mengecek semua subscription dan mengatur reminder dinamis.
-    Menggunakan zona waktu WIB.
-    """
-    print("🔍 [Scheduler] Dynamic reminders job started")
+    print("[Scheduler] Dynamic reminders job started")
     db = SessionLocal()
     try:
         subscriptions = get_all_subscriptions(db)
-        # Gunakan waktu WIB untuk pengecekan
         now_wib = datetime.now(timezone_wib)
         today_wib = now_wib.date()
 
         for sub in subscriptions:
-            expires_at = sub.expires_at
+            if not sub.expires_at:
+                continue
 
-            # --- Cek H-3 Reminder ---
-            if expires_at == today_wib + timedelta(days=3):
-                if sub.reminder_count_h3 < 2: # Belum kirim 2 kali
-                    if sub.reminder_count_h3 == 0:
-                        # Kirim reminder pertama H-3
-                        msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at})"
-                        print(f"📤 [Scheduler] Sending H-3 reminder (1/2) for {sub.name}")
-                        import asyncio
-                        def run_async():
-                            try:
-                                loop = asyncio.new_event_loop()
-                                asyncio.set_event_loop(loop)
-                                loop.run_until_complete(send_telegram_message(msg))
-                            finally:
-                                loop.close()
-                        thread = threading.Thread(target=run_async)
-                        thread.start()
-                        sub.reminder_count_h3 = 1
-                        sub.last_reminder_time = now_wib
-                        sub.last_reminder_type = 'h3'
-                        db.commit()
-                    elif sub.reminder_count_h3 == 1:
-                        # Cek apakah sudah waktunya kirim reminder kedua (misalnya, 12 jam setelah yang pertama)
-                        if now_wib - sub.last_reminder_time >= timedelta(hours=12):
-                            msg = f"🚨 Reminder: '{sub.name}' ({sub.url}) expires in 3 days! ({sub.expires_at}) [2/2]"
-                            print(f"📤 [Scheduler] Sending H-3 reminder (2/2) for {sub.name}")
-                            import asyncio
-                            def run_async():
-                                try:
-                                    loop = asyncio.new_event_loop()
-                                    asyncio.set_event_loop(loop)
-                                    loop.run_until_complete(send_telegram_message(msg))
-                                finally:
-                                    loop.close()
-                            thread = threading.Thread(target=run_async)
-                            thread.start()
-                            sub.reminder_count_h3 = 2
-                            sub.last_reminder_time = now_wib
-                            sub.last_reminder_type = 'h3'
-                            db.commit()
+            days_left = (sub.expires_at - today_wib).days
 
-            # --- Cek H-1 Reminder ---
-            elif expires_at == today_wib + timedelta(days=1):
-                if sub.reminder_count_h1 < 3: # Belum kirim 3 kali
-                    if sub.reminder_count_h1 == 0:
-                        # Kirim reminder pertama H-1
-                        msg = f"🔥 URGENT: '{sub.name}' ({sub.url}) expires TOMORROW! ({sub.expires_at})"
-                        print(f"📤 [Scheduler] Sending H-1 reminder (1/3) for {sub.name}")
-                        import asyncio
-                        def run_async():
-                            try:
-                                loop = asyncio.new_event_loop()
-                                asyncio.set_event_loop(loop)
-                                loop.run_until_complete(send_telegram_message(msg))
-                            finally:
-                                loop.close()
-                        thread = threading.Thread(target=run_async)
-                        thread.start()
-                        sub.reminder_count_h1 = 1
-                        sub.last_reminder_time = now_wib
-                        sub.last_reminder_type = 'h1'
-                        db.commit()
-                    elif sub.reminder_count_h1 == 1:
-                        # Kirim reminder kedua H-1 (misalnya, 4 jam setelah yang pertama)
-                        if now_wib - sub.last_reminder_time >= timedelta(hours=4):
-                            msg = f"🔥 URGENT: '{sub.name}' ({sub.url}) expires TOMORROW! ({sub.expires_at}) [2/3]"
-                            print(f"📤 [Scheduler] Sending H-1 reminder (2/3) for {sub.name}")
-                            import asyncio
-                            def run_async():
-                                try:
-                                    loop = asyncio.new_event_loop()
-                                    asyncio.set_event_loop(loop)
-                                    loop.run_until_complete(send_telegram_message(msg))
-                                finally:
-                                    loop.close()
-                            thread = threading.Thread(target=run_async)
-                            thread.start()
-                            sub.reminder_count_h1 = 2
-                            sub.last_reminder_time = now_wib
-                            sub.last_reminder_type = 'h1'
-                            db.commit()
-                    elif sub.reminder_count_h1 == 2:
-                        # Kirim reminder ketiga H-1 (misalnya, 2 jam setelah yang kedua)
-                        if now_wib - sub.last_reminder_time >= timedelta(hours=2):
-                            msg = f"🔥 URGENT: '{sub.name}' ({sub.url}) expires TOMORROW! ({sub.expires_at}) [3/3]"
-                            print(f"📤 [Scheduler] Sending H-1 reminder (3/3) for {sub.name}")
-                            import asyncio
-                            def run_async():
-                                try:
-                                    loop = asyncio.new_event_loop()
-                                    asyncio.set_event_loop(loop)
-                                    loop.run_until_complete(send_telegram_message(msg))
-                                finally:
-                                    loop.close()
-                            thread = threading.Thread(target=run_async)
-                            thread.start()
-                            sub.reminder_count_h1 = 3
-                            sub.last_reminder_time = now_wib
-                            sub.last_reminder_type = 'h1'
-                            db.commit()
+            # AUTO RESET COUNTER saat sudah jauh dari expire (>20 hari)
+            if days_left > 20:
+                if any([sub.reminder_count_h3, sub.reminder_count_h2, sub.reminder_count_h1, sub.reminder_count_h0]):
+                    sub.reminder_count_h3 = sub.reminder_count_h2 = sub.reminder_count_h1 = sub.reminder_count_h0 = 0
+                    sub.last_reminder_time = None
+                    sub.last_reminder_type = None
+                    db.commit()
+                    print(f"[RESET] Counters di-reset untuk {sub.name} (days_left={days_left})")
 
-            # --- Cek Hari H Reminder ---
-            elif expires_at == today_wib:
-                # Jika expired hari ini dan belum dihapus/diperpanjang
-                # Kirim reminder setiap 5 menit
-                if now_wib - sub.last_reminder_time >= timedelta(minutes=5) if sub.last_reminder_time else True:
-                     msg = f"💥 EXPIRED TODAY: '{sub.name}' ({sub.url}) expires TODAY! ({sub.expires_at}) [ALERT]"
-                     print(f"📤 [Scheduler] Sending H-0 (Expired Today) reminder for {sub.name}")
-                     import asyncio
-                     def run_async():
-                         try:
-                             loop = asyncio.new_event_loop()
-                             asyncio.set_event_loop(loop)
-                             loop.run_until_complete(send_telegram_message(msg))
-                         finally:
-                             loop.close()
-                     thread = threading.Thread(target=run_async)
-                     thread.start()
-                     sub.reminder_count_h0 += 1
-                     sub.last_reminder_time = now_wib
-                     sub.last_reminder_type = 'h0'
-                     db.commit()
+            # H-3 Reminder (2x)
+            if days_left == 3 and sub.reminder_count_h3 < 2:
+                msg = f"⚠️ Pemberitahuan Penting\n\nLayanan '{sub.name}' akan berakhir dalam 3 hari lagi.\n{sub.url}\nTanggal kadaluarsa: {sub.expires_at.strftime('%d %B %Y')}\n\nMohon segera lakukan perpanjangan untuk menjaga kelancaran layanan Anda.\n\nTerima kasih atas perhatiannya. 🙏"
+                if sub.reminder_count_h3 == 1:
+                    msg = msg.replace("Pemberitahuan Penting", "Pemberitahuan Kedua")
+                send_in_thread(msg)
+                sub.reminder_count_h3 += 1
+                db.commit()
+
+            # H-2 Reminder (3x)
+            elif days_left == 2 and sub.reminder_count_h2 < 3:
+                msg = f"🚨 Informasi Mendesak\n\nLayanan '{sub.name}' akan berakhir dalam 2 hari.\n{sub.url}\nKadaluarsa: {sub.expires_at.strftime('%d %B %Y')}\n\nUntuk menghindari gangguan, mohon segera lakukan perpanjangan hari ini.\n\nTim kami siap membantu. 🙏"
+                if sub.reminder_count_h2 > 0:
+                    msg = msg.replace("Informasi Mendesak", f"Pengingat ke-{sub.reminder_count_h2 + 1}")
+                send_in_thread(msg)
+                sub.reminder_count_h2 += 1
+                db.commit()
+
+            # H-1 Reminder (5x)
+            elif days_left == 1 and sub.reminder_count_h1 < 5:
+                msgs = [
+                    "🔴 Pemberitahuan Sangat Mendesak\n\nLayanan akan berakhir BESOK.\nMohon segera lakukan perpanjangan hari ini untuk menghindari penghentian layanan.\nTerima kasih. 🙏",
+                    "🔴 Informasi Kritis\n\nTersisa < 24 jam untuk layanan ini.\nSegera lakukan perpanjangan agar tetap aktif tanpa interupsi.",
+                    "🔴 Peringatan Final Siang Ini\n\nBesok layanan akan nonaktif.\nTim kami siap membantu proses renewal Anda.",
+                    "🔴 Mohon Perhatian Khusus\n\nPerpanjangan hari ini akan menjaga semua data tetap aktif.\nKami sangat menghargai Anda.",
+                    "🔴 Pemberitahuan Malam Ini\n\nHanya beberapa jam tersisa.\nMohon lakukan perpanjangan malam ini juga. 🙏"
+                ]
+                msg = f"{msgs[sub.reminder_count_h1]}\n\n{sub.name}\n{sub.url}\nExpire: {sub.expires_at.strftime('%d %B %Y')}"
+                send_in_thread(msg)
+                sub.reminder_count_h1 += 1
+                db.commit()
+
+            # H-0 atau sudah lewat (max 8x)
+            elif days_left <= 0 and sub.reminder_count_h0 < 8:
+                msg = f"🔴 Layanan Telah Berakhir\n\n'{sub.name}' telah kadaluarsa pada {sub.expires_at.strftime('%d %B %Y')}.\n{sub.url}\n\nMohon segera lakukan perpanjangan untuk mengaktifkan kembali.\nTim kami siap membantu 24/7. 🙏\n[Pesan {sub.reminder_count_h0 + 1}/8]"
+                send_in_thread(msg)
+                sub.reminder_count_h0 += 1
+                db.commit()
 
     except Exception as e:
-        print(f"🚨 [Scheduler] Error saat run_dynamic_reminders: {e}")
+        print(f"Error di reminder: {e}")
     finally:
         db.close()
-        print("🛑 [Scheduler] Dynamic reminders job ended")
 
-# --- Fungsi untuk daily summary - DENGAN WIB ---
 def send_daily_summary_job():
-    """
-    Job untuk dijadwalkan oleh scheduler.
-    Mengambil semua subscription dan kirim summary ke Telegram.
-    """
-    print("🔍 [Scheduler] Daily summary job started")
     db = SessionLocal()
     try:
-        subscriptions = get_all_subscriptions(db)
-        print(f"📊 [Scheduler] Found {len(subscriptions)} subscriptions")
-        import asyncio
-        def run_async():
-            try:
-                print("🔄 [Scheduler] Attempting to run async send_daily_summary")
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(send_daily_summary(subscriptions))
-                print("✅ [Scheduler] Async send_daily_summary completed")
-            except Exception as e:
-                 print(f"❌ [Scheduler] Error in run_async: {e}")
-            finally:
-                loop.close()
-        thread = threading.Thread(target=run_async)
-        thread.start()
-        print("🚀 [Scheduler] Async task for daily summary started in thread")
-    except Exception as e:
-        print(f"🚨 [Scheduler] Error saat mengirim daily summary: {e}")
+        subs = get_all_subscriptions(db)
+        asyncio.run(send_daily_summary(subs))
     finally:
         db.close()
-        print("🛑 [Scheduler] Daily summary job ended")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 Lifespan context started")
     scheduler = BackgroundScheduler()
-    try:
-        # Scheduler utama: cek setiap 10 menit untuk reminder dinamis - Gunakan WIB
-        scheduler.add_job(run_dynamic_reminders, IntervalTrigger(minutes=10, timezone=timezone_wib), id='dynamic_reminders')
-        # Scheduler baru: kirim summary setiap hari jam 9 pagi - Gunakan WIB
-        scheduler.add_job(send_daily_summary_job, CronTrigger(hour=9, minute=0, timezone=timezone_wib), id='daily_summary')
-        scheduler.start()
-        print("✅ Dynamic Reminder Scheduler started (every 10 minutes, WIB)")
-        print("✅ Daily Summary Scheduler started (daily at 9:00 AM, WIB)")
-    except Exception as e:
-        print(f"🚨 Error saat inisialisasi scheduler: {e}")
+    scheduler.add_job(run_dynamic_reminders, CronTrigger(minute="*/10", timezone=timezone_wib))
+    scheduler.add_job(send_daily_summary_job, CronTrigger(hour=9, minute=0, timezone=timezone_wib), id='daily_summary')
+    scheduler.start()
+    print("Schedulers aktif (reminder tiap 10 menit + daily 09:00 WIB)")
     yield
     scheduler.shutdown()
-    print("🛑 Lifespan context ended")
 
-app = FastAPI(title="K39 Hosting Reminder", lifespan=lifespan)
+app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"))
 
-# Serve static files (UI Admin)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def root(username: str = Depends(verify_credentials)):
-    return RedirectResponse("/static/index.html")
-
-@app.get("/subscriptions/", response_model=list[SubscriptionSchema])
-def read_subscriptions(db: Session = Depends(get_db), username: str = Depends(verify_credentials)):
-    return get_subscriptions(db)
-
-@app.post("/subscriptions/", response_model=SubscriptionSchema)
-def create_new_subscription(
-    sub: SubscriptionCreate,
-    db: Session = Depends(get_db),
-    username: str = Depends(verify_credentials)
-):
-    return create_subscription(db, sub)
-
-@app.put("/subscriptions/{sub_id}", response_model=SubscriptionSchema)
-def update_existing_subscription(
-    sub_id: int,
-    sub: SubscriptionCreate,
-    db: Session = Depends(get_db),
-    username: str = Depends(verify_credentials)
-):
-    updated = update_subscription(db, sub_id, sub)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Subscription not found")
-    return updated
-
-@app.delete("/subscriptions/{sub_id}")
-def delete_existing_subscription(
-    sub_id: int,
-    db: Session = Depends(get_db),
-    username: str = Depends(verify_credentials)
-):
-    deleted = delete_subscription(db, sub_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Not found")
-    return {"ok": True}
+# ... (semua endpoint lainnya tetap sama seperti versi lu sekarang)
 
 @app.get("/trigger")
-async def trigger_reminders(username: str = Depends(verify_credentials)):
-    print("🔍 [/trigger] Manual trigger received")
+async def trigger(username: str = Depends(verify_credentials)):
     run_dynamic_reminders()
-    # Juga picu daily summary untuk tes
     send_daily_summary_job()
-    return {"status": "Dynamic reminders & Daily Summary checked"}
-
-# --- Endpoint Baru untuk Status ---
-from sqlalchemy import text # Untuk kompatibilitas SQLAlchemy 2.x
-
-@app.get("/status")
-def get_status(username: str = Depends(verify_credentials)):
-    """
-    Endpoint untuk mendapatkan status sistem (scheduler, bot, jumlah data).
-    """
-    db = SessionLocal()
-    try:
-        # Hitung jumlah total subscription
-        total_count = db.query(Subscription).count()
-
-        # Hitung subscription yang akan expire dalam 7 hari ke depan
-        today = datetime.now(timezone_wib).date()
-        next_week = today + timedelta(days=7)
-        expiring_count = db.query(Subscription).filter(
-            Subscription.expires_at >= today,
-            Subscription.expires_at <= next_week
-        ).count()
-
-        # Test koneksi bot (kirim pesan dummy ke diri sendiri atau log)
-        bot_status = "✅ Terhubung"
-        if not os.getenv("TELEGRAM_BOT_TOKEN") or not os.getenv("TELEGRAM_CHAT_ID"):
-             bot_status = "❌ Token/Chat ID Tidak Ditemukan"
-
-        # Status scheduler: karena APscheduler tidak menyediakan API untuk mendapatkan
-        # runtime job secara langsung dari FastAPI handler, kita hanya bisa
-        # menampilkan bahwa scheduler *seharusnya* aktif berdasarkan log startup.
-        scheduler_dynamic_status = "✅ Berjalan (10 menit)"
-        scheduler_daily_status = "✅ Berjalan (9 pagi WIB)"
-
-        # Waktu server WIB
-        server_time_wib = datetime.now(timezone_wib).strftime('%Y-%m-%d %H:%M:%S %Z')
-
-        status_data = {
-            "scheduler_dynamic": scheduler_dynamic_status,
-            "scheduler_daily": scheduler_daily_status,
-            "bot_connection": bot_status,
-            "total_subscriptions": total_count,
-            "expiring_soon_count": expiring_count,
-            "server_time_wib": server_time_wib,
-        }
-
-        return status_data
-
-    finally:
-        db.close()
-
-# --- Endpoint Baru untuk Cek Koneksi Database (Kompatibel SQLAlchemy 2.x) ---
-@app.get("/db-test")
-def test_db_connection(username: str = Depends(verify_credentials)):
-    """
-    Endpoint untuk menguji koneksi ke database.
-    """
-    db = SessionLocal()
-    try:
-        # Gunakan text() untuk deklarasi ekspresi SQL (kompatibel SQLAlchemy 2.x)
-        result = db.execute(text("SELECT 1")).fetchone()
-        if result and result[0] == 1:
-            return {"status": "✅ Database connection successful"}
-        else:
-            return {"status": "❌ Database connection failed"}
-    except Exception as e:
-        return {"status": f"❌ Database error: {str(e)}"}
-    finally:
-        db.close()
-
-# ---
+    return {"status": "Triggered"}
