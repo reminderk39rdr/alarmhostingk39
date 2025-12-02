@@ -1,4 +1,4 @@
-# main.py — FINAL & HIDUP TOTAL (3 Desember 2025)
+# main.py — HIDUP 100% SEKARANG JUGA (3 Desember 2025)
 
 import os
 import threading
@@ -10,7 +10,7 @@ import re
 
 from fastapi import FastAPI, Depends, HTTPException, Request, Form
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # =============================================
-# DATABASE BOOTSTRAP — TAMBAH KOLOM OTOMATIS
+# DATABASE — TAMBAH KOLOM REMINDER OTOMATIS (fix failed to load)
 # =============================================
 Base.metadata.create_all(bind=engine)
 
@@ -48,7 +48,7 @@ try:
 except Exception as e:
     logger.error(f"[BOOT] Gagal tambah kolom: {e}")
 
-logger.info("[BOOT] Database PostgreSQL siap — data lama kembali 100%")
+logger.info("[BOOT] Database PostgreSQL siap — data lama kembali")
 
 # =============================================
 # KONFIG
@@ -83,7 +83,7 @@ def validate_input(name: str, url: str, expires_at: str, brand: str = None):
     return name, url, exp_date, brand.strip() if brand else None
 
 # =============================================
-# TELEGRAM SEND
+# TELEGRAM
 # =============================================
 async def safe_send(msg: str):
     try:
@@ -105,7 +105,7 @@ def run_dynamic_reminders():
             days_left = (sub.expires_at - today).days
 
             if days_left > 20:
-                if any([getattr(sub, 'reminder_count_h3', 0), getattr(sub, 'reminder_count_h2',0), getattr(sub, 'reminder_count_h1',0), getattr(sub, 'reminder_count_h0',0)]):
+                if any([getattr(sub, 'reminder_count_h3', 0), getattr(sub, 'reminder_count_h2', 0), getattr(sub, 'reminder_count_h1', 0), getattr(sub, 'reminder_count_h0', 0)]):
                     sub.reminder_count_h3 = sub.reminder_count_h2 = sub.reminder_count_h1 = sub.reminder_count_h0 = 0
                     db.commit()
 
@@ -126,6 +126,7 @@ def run_dynamic_reminders():
                     "🔴 Final warning\nBesok nonaktif",
                     "🔴 Perpanjang hari ini = data aman",
                     "🔴 Malam terakhir — mohon renew 🙏"
+                ]
                 ]
                 send_in_thread(msgs[getattr(sub, 'reminder_count_h1', 0)] + f"\n\n*{sub.name}*\n{sub.url}")
                 sub.reminder_count_h1 = getattr(sub, 'reminder_count_h1', 0) + 1
@@ -162,35 +163,19 @@ scheduler.start()
 # =============================================
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"))
 
-# API UNTUK FRONTEND JS (ini yang fix "Failed to load subscriptions")
-@app.get("/subscriptions")
-async def api_subscriptions(username: str = Depends(verify_credentials)):
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request, username: str = Depends(verify_credentials)):
     db = SessionLocal()
     try:
         subs = get_subscriptions(db)
     except Exception as e:
-        logger.error(f"API subscriptions error: {e}")
-        return []
+        logger.error(f"Load subscriptions error: {e}")
+        subs = []
     finally:
         db.close()
-    return subs
-
-# DB TEST ENDPOINT (fix "Not Found")
-@app.get("/db-test")
-async def db_test():
-    try:
-        db = SessionLocal()
-        db.execute(text("SELECT 1"))
-        db.close()
-        return {"status": "PostgreSQL connected", "message": "Database siap!"}
-    except Exception as e:
-        return {"status_code=500, content={"status": "error", "detail": str(e)}
-
-@app.get("/", response_class=HTMLResponse)
-async def root(request: Request, username: str = Depends(verify_credentials)):
-    return RedirectResponse(url="/static/index.html")
+    return templates.TemplateResponse("index.html", {"request": request, "subs": subs})
 
 @app.post("/add")
 async def add(username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
@@ -198,7 +183,7 @@ async def add(username: str = Depends(verify_credentials), name: str = Form(...)
     db = SessionLocal()
     create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
-    return RedirectResponse(url="/static/index.html", status_code=303)
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/update/{sub_id}")
 async def update(sub_id: int, username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
@@ -206,14 +191,14 @@ async def update(sub_id: int, username: str = Depends(verify_credentials), name:
     db = SessionLocal()
     update_subscription(db, sub_id, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
-    return RedirectResponse(url="/static/index.html", status_code=303)
+    return RedirectResponse(url="/", status_code=303)
 
 @app.post("/delete/{sub_id}")
 async def delete(sub_id: int, username: str = Depends(verify_credentials)):
     db = SessionLocal()
     delete_subscription(db, sub_id)
     db.close()
-    return RedirectResponse(url="/static/index.html", status_code=303)
+    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/trigger")
 async def trigger(username: str = Depends(verify_credentials)):
@@ -221,8 +206,19 @@ async def trigger(username: str = Depends(verify_credentials)):
     daily_job()
     return {"status": "success"}
 
+@app.get("/db-test")
+async def db_test():
+    try:
+        db = SessionLocal()
+        result = db.execute(text("SELECT 1")).scalar()
+        count = db.query(Subscription).count()
+        db.close()
+        return {"status": "PostgreSQL connected", "test_result": result, "subscriptions_count": count, "time": datetime.now(timezone_wib).isoformat()}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
 @app.get("/keep-alive")
 async def keep_alive():
     return {"status": "HIDUP BRO!!! DATA LAMA KEMBALI — SEMUA JALAN", "time": datetime.now(timezone_wib).isoformat()}
 
-logger.info("K39 Reminder — BOOT SUKSES — DATA LAMA KEMBALI — HIDUP SELAMANYA! 🚀")
+logger.info("K39 Reminder — BOOT SUKSES TOTAL — HIDUP SELAMANYA! 🚀")
