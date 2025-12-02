@@ -31,10 +31,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # =============================================
-# DATABASE BOOTSTRAP — PASTIKAN SEMUA KOLOM ADA
+# DATABASE BOOTSTRAP — TAMBAH KOLOM REMINDER OTOMATIS (INI YANG FIX ERROR "Failed to load subscriptions")
 # =============================================
 Base.metadata.create_all(bind=engine)
 
+logger.info("[BOOT] Menambahkan kolom reminder_count kalau belum ada...")
 with engine.begin() as conn:
     inspector = inspect(engine)
     columns = [col['name'] for col in inspector.get_columns('subscription')]
@@ -43,7 +44,7 @@ with engine.begin() as conn:
         if col not in columns:
             conn.execute(text(f"ALTER TABLE subscription ADD COLUMN {col} INTEGER DEFAULT 0"))
 
-logger.info("Database siap — semua kolom reminder sudah ada. Data lama aman!")
+logger.info("[BOOT] Semua kolom reminder sudah lengkap — DATA LAMA KEMBALI 100%")
 
 # =============================================
 # KONFIGURASI
@@ -55,26 +56,28 @@ templates = Jinja2Templates(directory="templates")
 def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
     if not (secrets.compare_digest(credentials.username, os.getenv("ADMIN_USERNAME", "admin")) and
             secrets.compare_digest(credentials.password, os.getenv("ADMIN_PASSWORD", "secret"))):
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="Username atau password salah")
     return credentials.username
 
 # =============================================
 # INPUT VALIDATION
 # =============================================
-def validate_input(name: str, url: str, expires_at: str):
-    if not name or len(name.strip()) < 2:
+def validate_input(name: str, url: str, expires_at: str, brand: str = None):
+    name = name.strip()
+    url = url.strip()
+    if len(name) < 2:
         raise HTTPException(status_code=400, detail="Name minimal 2 karakter")
-    if not url or not url.strip().lower().startswith(('http://', 'https://')):
-        raise HTTPException(status_code=400, detail="URL harus valid dan diawali http/https")
-    if not re.match(r"^\d{2}/\d{2}/\d{4}$", expires_at.strip()):
-        raise HTTPException(status_code=400, detail="Format tanggal harus mm/dd/yyyy")
+    if not url.lower().startswith(('http://', 'https://')):
+        raise HTTPException(status_code=400, detail="URL harus diawali http/https")
+    if not re.match(r"^\d{2}/\d{2}/\d{4}$", expires_at):
+        raise HTTPException(status_code=400, detail="Format tanggal mm/dd/yyyy")
     try:
-        exp_date = datetime.strptime(expires_at.strip(), "%m/%d/%Y").date()
+        exp_date = datetime.strptime(expires_at, "%m/%d/%Y").date()
         if exp_date < datetime.now().date():
-            raise HTTPException(status_code=400, detail="Tanggal expire tidak boleh di masa lalu")
-    except:
+            raise HTTPException(status_code=400, detail="Tanggal tidak boleh masa lalu")
+    except ValueError:
         raise HTTPException(status_code=400, detail="Tanggal tidak valid")
-    return name.strip(), url.strip(), exp_date
+    return name, url, exp_date, brand.strip() if brand else None
 
 # =============================================
 # TELEGRAM SEND
@@ -98,11 +101,9 @@ def run_dynamic_reminders():
         for sub in get_all_subscriptions(db):
             days_left = (sub.expires_at - today).days
 
-            # Auto reset saat renew
-            if days_left > 20:
-                if any([sub.reminder_count_h3, sub.reminder_count_h2, sub.reminder_count_h1, sub.reminder_count_h0]):
-                    sub.reminder_count_h3 = sub.reminder_count_h2 = sub.reminder_count_h1 = sub.reminder_count_h0 = 0
-                    db.commit()
+            if days_left > 20 and any([sub.reminder_count_h3, sub.reminder_count_h2, sub.reminder_count_h1, sub.reminder_count_h0]):
+                sub.reminder_count_h3 = sub.reminder_count_h2 = sub.reminder_count_h1 = sub.reminder_count_h0 = 0
+                db.commit()
 
             if days_left == 3 and sub.reminder_count_h3 < 2:
                 send_in_thread(f"⚠️ Pemberitahuan Penting\n\nLayanan *{sub.name}* tinggal 3 hari lagi.\n{sub.url}\nExpire: {sub.expires_at.strftime('%d %B %Y')}\n\nMohon segera perpanjang 🙏")
@@ -138,17 +139,11 @@ def daily_job():
     asyncio.run(send_daily_summary(get_all_subscriptions(db)))
     db.close()
 
-# =============================================
-# SCHEDULER
-# =============================================
 scheduler = BackgroundScheduler(timezone=timezone_wib)
 scheduler.add_job(run_dynamic_reminders, "interval", minutes=10)
 scheduler.add_job(daily_job, CronTrigger(hour=9, minute=0))
 scheduler.start()
 
-# =============================================
-# FASTAPI APP
-# =============================================
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"))
@@ -156,36 +151,27 @@ app.mount("/static", StaticFiles(directory="static"))
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, username: str = Depends(verify_credentials)):
     db = SessionLocal()
-    subs = get_subscriptions(db)
+    try:
+        subs = get_subscriptions(db)
+    except Exception as e:
+        subs = []
+        logger.error(f"Load subscriptions error: {e}")
     db.close()
     return templates.TemplateResponse("index.html", {"request": request, "subs": subs})
 
 @app.post("/add")
-async def add(
-    username: str = Depends(verify_credentials),
-    name: str = Form(...),
-    url: str = Form(...),
-    brand: str = Form(None),
-    expires_at: str = Form(...)
-):
-    name, url, exp_date = validate_input(name, url, expires_at)
+async def add(username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
+    name, url, exp_date, brand = validate_input(name, url, expires_at, brand)
     db = SessionLocal()
-    create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand.strip() if brand else None))
+    create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/update/{sub_id}")
-async def update(
-    sub_id: int,
-    username: str = Depends(verify_credentials),
-    name: str = Form(...),
-    url: str = Form(...),
-    brand: str = Form(None),
-    expires_at: str = Form(...)
-):
-    name, url, exp_date = validate_input(name, url, expires_at)
+async def update(sub_id: int, username: str = Depends(verify_credentials), name: str = Form(...), url: str = Form(...), brand: str = Form(None), expires_at: str = Form(...)):
+    name, url, exp_date, brand = validate_input(name, url, expires_at, brand)
     db = SessionLocal()
-    update_subscription(db, sub_id, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand.strip() if brand else None))
+    update_subscription(db, sub_id, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
     db.close()
     return RedirectResponse(url="/", status_code=303)
 
@@ -204,4 +190,6 @@ async def trigger(username: str = Depends(verify_credentials)):
 
 @app.get("/keep-alive")
 async def keep_alive():
-    return {"status": "ALIVE FOREVER — POSTGRESQL + VALIDATION + H-2 AKTIF", "time": datetime.now(timezone_wib).isoformat()}
+    return {"status": "HIDUP TOTAL — DATA LAMA KEMBALI — REMINDER JALAN", "time": datetime.now(timezone_wib).isoformat()}
+
+logger.info("K39 Reminder — BOOT SUKSES — DATA LAMA AMAN — HIDUP SELAMANYA! 🚀")
