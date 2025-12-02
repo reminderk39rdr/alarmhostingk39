@@ -2,79 +2,237 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RDR HOSTING REMINDER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDR Hosting Reminder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
-        body {font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin:0; padding:20px;}
-        h1 {font-family: 'Orbitron'; color: #ff0066; text-align:center; font-size:3em; text-shadow: 0 0 20px #ff0066;}
-        .container {max-width:1000px; margin:auto; background:#111; padding:20px; border-radius:15px; box-shadow:0 0 30px #ff0066;}
-        input, button {padding:12px; margin:5px; border:none; border-radius:8px; font-size:16px;}
-        input {background:#222; color:#0f0; width:100%; box-sizing:border-box;}
-        button {background:#ff0066; color:white; cursor:pointer; font-weight:bold;}
-        button:hover {background:#ff3399;}
-        table {width:100%; border-collapse:collapse; margin:30px 0;}
-        th {background:#ff0066; color:white; padding:15px;}
-        td {padding:15px; border-bottom:1px solid #333;}
-        .expired {color:#ff0000; font-weight:bold; animation:blink 1s infinite;}
-        .critical {color:#ff0066; font-weight:bold;}
-        .warning {color:#ffaa00;}
-        .safe {color:#00ff00;}
-        @keyframes blink {50% {opacity:0;}}
-        .trigger {background:#00ff00; color:black; padding:20px; font-size:18px; position:fixed; bottom:20px; right:20px; border-radius:50px; box-shadow:0 0 20px #00ff00;}
+        :root {
+            --bg: #0a0a0f;
+            --card: #111118;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --primary: #8b5cf6;
+            --primary-hover: #7c4dff;
+            --border: #1e293b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: #1a1a22;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th {
+            text-align: left;
+            padding: 1rem;
+            background: #1a1a22;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .brand-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 2.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .days {
+            font-weight: 600;
+        }
+        .days-critical { color: #ef4444; }
+        .days-warning { color: #f59e0b; }
+        .days-safe { color: #10b981; }
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        .k39 {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #8b5cf6;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+        }
+        .trigger-fixed {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+            z-index: 100;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .trigger-fixed:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Hosting Reminder</h1>
-    <p style="text-align:center;color:#ffaa00">Total: {{ subs|length }} subscription | {{ now.strftime('%d %B %Y %H:%M:%S WIB') }}</p>
+    <div class="container">
+        <header>
+            <h1>RDR Hosting Reminder</h1>
+            <p class="subtitle">Professional subscription & hosting expiration management</p>
+            <p style="margin-top: 1rem; color: var(--text-secondary);">
+                Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }} • {{ now.strftime('%d %B %Y - %H:%M WIB') }}
+            </p>
+        </header>
 
-    <h2 style="color:#ff0066">Add / Update Subscription</h2>
-    <form method="post" action="/add">
-        <input name="name" placeholder="Name (contoh: Netflix)" required>
-        <input name="url" placeholder="URL[](https://...)" required>
-        <input name="brand" placeholder="Brand (contoh: RADAR138)">
-        <input name="expires_at" placeholder="mm/dd/yyyy" required>
-        <button type="submit">+ ADD NEW</button>
-    </form>
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; color: #ffffff;">Add New Subscription</h2>
+            <form method="post" action="/add">
+                <div class="form-grid">
+                    <input type="text" name="name" placeholder="Service Name" required>
+                    <input type="url" name="url" placeholder="URL" required>
+                    <input type="text" name="brand" placeholder="Brand / Provider">
+                    <input type="text" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1.5rem;">Add Subscription</button>
+            </form>
+        </div>
 
-    <h2 style="color:#ff0066">Your Subscriptions</h2>
-    {% if subs %}
-        {% set grouped = {} %}
-        {% for sub in subs %}
-            {% set brand = sub.brand or 'Tanpa Brand' %}
-            {% if brand = brand.upper() %}
-            {% if grouped.update({brand: grouped.get(brand, []) + [sub]}) %} {% endif %}
-        {% endfor %}
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; color: #ffffff;">Active Subscriptions</h2>
 
-        {% for brand in grouped|dictsort %}
-            <h3 style="color:#ff3399; margin-top:30px">{{ brand[0] }}</h3>
-            <table>
-                <tr><th>No</th><th>Name</th><th>URL</th><th>Expire</th><th>Days Left</th><th>Action</th></tr>
-                {% for sub in grouped[brand] %}
-                    {% set days = (sub.expires_at - today).days %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><b>{{ sub.name }}</b></td>
-                        <td><a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></td>
-                        <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-                        <td class="{% if days <= 0 %}expired{% elif days <= 3 %}critical{% elif days <= 7 %}warning{% else %}safe{% endif %}">
-                            {{ days }} hari lagi
-                        </td>
-                        <td>
-                            <form method="post" action="/delete/{{ sub.id }}" style="display:inline" onsubmit="return confirm('Yakin hapus?')">
-                                <button type="submit" style="background:#ff0000">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
+            {% if subs %}
+                {% for brand, items in grouped.items() %}
+                    <div class="brand-title">{{ brand }}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 25%;">Service</th>
+                                <th style="width: 35%;">URL</th>
+                                <th style="width: 15%;">Expire Date</th>
+                                <th style="width: 12%;">Days Left</th>
+                                <th style="width: 8%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sub in items %}
+                                {% set days = (sub.expires_at - today).days %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><strong>{{ sub.name }}</strong></td>
+                                    <td><a href="{{ sub.url }}" target="_blank" style="color: var(--primary); text-decoration: none;">{{ sub.url }}</a></td>
+                                    <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+                                    <td class="days {% if days <= 3 %}days-critical{% elif days <= 7 %}days-warning{% else %}days-safe{% endif %}">
+                                        {{ days }} days
+                                    </td>
+                                    <td>
+                                        <form method="post" action="/delete/{{ sub.id }}" style="display:inline;">
+                                            <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 {% endfor %}
-            </table>
-        {% endfor %}
-    {% else %}
-        <p style="color:orange;text-align:center">Belum ada subscription bro. Tambah yang pertama! 🚀</p>
-    {% endif %}
+            {% else %}
+                <p style="text-align: center; color: var(--text-secondary); padding: 3rem 0;">
+                    No active subscriptions. Add your first one above.
+                </p>
+            {% endif %}
+        </div>
 
-    <a href="/trigger"><button class="trigger">⚡ TRIGGER FULL LIST KE TELEGRAM</button></a>
-</div>
+        <a href="/trigger" class="trigger-fixed">
+            Send List to Telegram
+        </a>
+
+        <footer>
+            <div class="k39">K39</div>
+        </footer>
+    </div>
 </body>
 </html>
