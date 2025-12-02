@@ -1,18 +1,13 @@
-# schemas.py
-
-from pydantic import BaseModel
 from datetime import date
+from pydantic import BaseModel
 
-class SubscriptionBase(BaseModel):
+class SubscriptionCreate(BaseModel):
     name: str
     url: str
     expires_at: date
     brand: str | None = None
 
-class SubscriptionCreate(SubscriptionBase):
-    pass
-
-class Subscription(SubscriptionBase):
+class Subscription(SubscriptionCreate):
     id: int
 
     class Config:

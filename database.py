@@ -1,19 +1,14 @@
-# database.py — POSTGRESQL RENDER PERMANENT
-
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
-
-# Fix format Render postgres:// → postgresql+psycopg://
-if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
-    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    pool_pre_ping=True,
-    pool_recycle=300
+    DATABASE_URL,
+    pool_pre_ping=True,        # penting banget buat Render
+    connect_args={"connect_timeout": 10}
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
