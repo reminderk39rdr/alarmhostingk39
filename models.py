@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+# models.py
 
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String, Date, DateTime
+from database import Base
 
 class Subscription(Base):
     __tablename__ = "subscription"
@@ -12,12 +12,11 @@ class Subscription(Base):
     expires_at = Column(Date, nullable=False)
     brand = Column(String, nullable=True)
 
-    # Reminder counters
+    # Reminder counters — SEMUA SUDAH ADA
     reminder_count_h3 = Column(Integer, default=0)
-    reminder_count_h2 = Column(Integer, default=0)
+    reminder_count_h2 = Column(Integer, default=0)   # <--- PASTI ADA
     reminder_count_h1 = Column(Integer, default=0)
     reminder_count_h0 = Column(Integer, default=0)
 
     last_reminder_time = Column(DateTime, nullable=True)
     last_reminder_type = Column(String, nullable=True)
-    created_at = Column(DateTime, nullable=True)
