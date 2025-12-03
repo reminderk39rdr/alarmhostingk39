@@ -274,7 +274,34 @@
     .btn-sm.delete{background:#ef4444; color:white; border-color:#ef4444; grid-column:1 / -1;}
 
     /* ===== Logs ===== */
-    
+    /* === Logs scroll container (lebih pendek + scrollbar keliatan) === */
+.logs-scroll{
+  max-height: 220px;          /* lebih pendek, coba 200–260px sesuai selera */
+  overflow-y: scroll;         /* paksa scrollbar selalu muncul */
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+/* header table tetap nempel pas scroll */
+.logs-scroll thead th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel-2);
+}
+
+/* bikin scrollbar lebih subtle (opsional, aman di Chrome/Edge) */
+.logs-scroll::-webkit-scrollbar{
+  width: 8px;
+}
+.logs-scroll::-webkit-scrollbar-thumb{
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+.logs-scroll::-webkit-scrollbar-track{
+  background: transparent;
+}
+
     .logs-head{
       display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
     }
@@ -324,8 +351,8 @@
     <div class="brandmark">
       <div class="logo">RDR</div>
       <div>
-        <div class="title">Hosting Reminder</div>
-        <div class="subtitle">Enterprise Subscription Watchlist</div>
+        <div class="title">RDR Hosting Reminder</div>
+        <div class="subtitle">Hosting Subscription Watchlist</div>
       </div>
     </div>
 
@@ -616,7 +643,7 @@
 
 
   <footer>
-    <div>© {{ now.year if now else "2025" }} RDR Hosting Reminder. All rights reserved.</div>
+    <div>© {{ now.year if now else "2025" }} K39 - All Rights Reserved</div>
     <div style="font-weight:700;">System timezone: WIB (Asia/Jakarta)</div>
   </footer>
 
