@@ -274,6 +274,7 @@
     .btn-sm.delete{background:#ef4444; color:white; border-color:#ef4444; grid-column:1 / -1;}
 
     /* ===== Logs ===== */
+    
     .logs-head{
       display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
     }
@@ -296,7 +297,7 @@
     .lvl-info{color:#0ea5e9}
     .lvl-warn{color:#f59e0b}
     .lvl-error{color:#ef4444}
-
+    
     footer{
       margin-top:20px; color:var(--muted); font-size:12px;
       display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
@@ -571,13 +572,16 @@
 
   <!-- ===== LOGS ===== -->
   <section class="panel" style="margin-top:16px">
-    <div class="logs-head">
-      <h3 style="margin:0">Logs Terbaru</h3>
-      <div style="font-size:12px;color:var(--muted);font-weight:800;">Last 200 events</div>
-    </div>
+  <div class="logs-head">
+    <h3 style="margin:0">Logs Terbaru</h3>
+    <div style="font-size:12px;color:var(--muted);font-weight:800;">Last 200 events</div>
+  </div>
 
-    {% set logs_safe = logs|default([]) %}
-    {% if logs_safe and logs_safe|length > 0 %}
+  {% set logs_safe = logs|default([]) %}
+  {% if logs_safe and logs_safe|length > 0 %}
+    
+    <!-- WRAPPER SCROLL -->
+    <div class="logs-scroll">
       <table class="logs-table">
         <thead>
           <tr>
@@ -601,12 +605,15 @@
           {% endfor %}
         </tbody>
       </table>
-    {% else %}
-      <div style="padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:700;">
-        Belum ada log.
-      </div>
-    {% endif %}
-  </section>
+    </div>
+
+  {% else %}
+    <div style="padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:700;">
+      Belum ada log.
+    </div>
+  {% endif %}
+</section>
+
 
   <footer>
     <div>© {{ now.year if now else "2025" }} RDR Hosting Reminder. All rights reserved.</div>
