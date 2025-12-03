@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — RDR Hosting Reminder</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --surface:rgba(255,255,255,0.06);
+      --surface2:rgba(255,255,255,0.10);
+      --text:#e6e9ef;
+      --text-secondary:#9aa4b2;
+      --primary:#8b5cf6;
+      --primary-hover:#7c3aed;
+      --border:rgba(255,255,255,0.12);
+      --success:#10b981;
+      --danger:#ef4444;
+      --radius:16px;
+      --shadow:0 14px 50px rgba(0,0,0,0.55);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Inter',sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(139,92,246,.20), transparent 60%),
+        radial-gradient(1000px 700px at 100% 0%, rgba(236,72,153,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:18px;
+    }
+    @media(max-width:860px){
+      .wrap{grid-template-columns:1fr}
+    }
+
+    .promo, .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .promo{
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:340px;
+    }
+    .promo h1{
+      font-size:2rem;
+      font-weight:700;
+      background:linear-gradient(to right,#8b5cf6,#ec4899);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      margin-bottom:8px;
+    }
+    .promo p{
+      color:var(--text-secondary);
+      line-height:1.7;
+      font-size:0.98rem;
+      max-width:52ch;
+    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .chip{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      color:#d7dbe3;
+    }
+    .watermark{
+      position:absolute;right:-30px;bottom:-40px;
+      font-size:120px;font-weight:800;letter-spacing:2px;
+      color:rgba(255,255,255,.04);user-select:none;
+      transform: rotate(-8deg);
+    }
+
+    .card{
+      padding:22px;
+      display:grid;
+      gap:14px;
+      align-content:center;
+      min-height:340px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      margin-bottom:2px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,#8b5cf6,#4f46e5);
+      font-weight:800; color:white;
+      box-shadow:0 10px 22px rgba(139,92,246,.45);
+    }
+    .brand .title{
+      font-weight:700;letter-spacing:.3px;
+    }
+
+    form{display:grid;gap:10px;margin-top:4px}
+    label{font-size:12px;color:var(--text-secondary);margin-left:4px}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+      transition:.15s;
+      font-size:14px;
+    }
+    input:focus{
+      border-color:rgba(139,92,246,.8);
+      box-shadow:0 0 0 4px rgba(139,92,246,.2);
+      background:rgba(0,0,0,.5);
+    }
+
+    .btn{
+      margin-top:6px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      background:linear-gradient(135deg,var(--primary),#ec4899);
+      color:white;
+      transition:.12s;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .hint{font-size:12px;color:var(--text-secondary);text-align:center;margin-top:6px}
+
+    .error{
+      background:rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.45);
+      padding:10px 12px;
+      border-radius:12px;
+      color:#fecaca;
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="promo">
+      <div>
+        <h1>RDR Hosting Reminder</h1>
+        <p>
+          Dashboard profesional untuk memonitor hosting, VPS, dan subscription.
+          Dilengkapi alert bertingkat otomatis dan histori log yang bisa diaudit kapan saja.
+        </p>
+        <div class="chips">
+          <div class="chip">Daily Summary 09:00 WIB</div>
+          <div class="chip">H-3 / H-2 / H-1 Alerts</div>
+          <div class="chip">Telegram Notifier</div>
+          <div class="chip">Audit Logs</div>
+        </div>
+      </div>
+      <div class="watermark">RDR</div>
+    </section>
+
+    <section class="card">
+      <div class="brand">
+        <div class="logo">R</div>
+        <div>
+          <div class="title">Login Admin</div>
+          <div style="font-size:12px;color:var(--text-secondary)">
+            Masuk untuk mengelola subscription
+          </div>
+        </div>
+      </div>
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/login">
+        <div>
+          <label>Username</label>
+          <input name="username" placeholder="adminrdr" autocomplete="username" required>
+        </div>
+        <div>
+          <label>Password</label>
+          <input name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button class="btn" type="submit">Login</button>
+      </form>
+
+      <div class="hint">
+        Secured session • Asia/Jakarta timezone
+      </div>
+    </section>
+  </div>
+</body>
+</html>
