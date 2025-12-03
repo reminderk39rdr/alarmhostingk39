@@ -64,12 +64,8 @@
       background:linear-gradient(135deg, var(--brand), var(--brand-2));
       font-weight:800; letter-spacing:.5px;
     }
-    .brandmark .title{
-      font-weight:800; font-size:15px; line-height:1.1;
-    }
-    .brandmark .subtitle{
-      font-size:12px; color:var(--muted);
-    }
+    .brandmark .title{ font-weight:800; font-size:15px; line-height:1.1; }
+    .brandmark .subtitle{ font-size:12px; color:var(--muted); }
 
     .topbar-spacer{flex:1}
 
@@ -158,7 +154,6 @@
       padding:7px 11px; border-radius:999px;
       font-size:13px; font-weight:700; color:#334155;
       display:flex; align-items:center; gap:7px;
-      white-space:nowrap;
     }
     .filter-pill .dot{
       width:8px; height:8px; border-radius:50%;
@@ -169,22 +164,12 @@
     }
     .filter-pill.active .dot{background:white}
 
-    /* ===== Add / Edit form ===== */
+    /* ===== Add/Edit form ===== */
     .panel{
       margin-top:14px; background:var(--panel); border:1px solid var(--line);
       border-radius:18px; padding:14px; box-shadow:var(--shadow);
     }
     .panel h3{margin:0 0 10px; font-size:16px; font-weight:800}
-    .panel-head{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
-    }
-    .edit-pill{
-      display:none; align-items:center; gap:6px;
-      background:#0f172a; color:white; padding:6px 10px;
-      border-radius:999px; font-size:12px; font-weight:800;
-    }
-    .edit-pill.show{display:inline-flex}
 
     .form-grid{
       display:grid; grid-template-columns:1.2fr 1.6fr .9fr .8fr auto;
@@ -264,7 +249,6 @@
       padding:5px 9px; font-size:11px; font-weight:900;
       border-radius:999px; letter-spacing:.3px; border:1px solid transparent;
       text-transform:uppercase;
-      white-space:nowrap;
     }
     .st-safe{ color:var(--good); background:#ecfdf3; border-color:#b7f0cc;}
     .st-soon{ color:#2563eb; background:#eff6ff; border-color:#b9d5ff;}
@@ -283,7 +267,6 @@
       padding:8px 10px; font-size:12px; border-radius:10px; font-weight:900;
       display:flex; align-items:center; justify-content:center; gap:6px;
       border:1px solid var(--line); background:white; cursor:pointer;
-      white-space:nowrap;
     }
     .btn-sm.edit{background:#0f172a; color:white; border-color:#0f172a;}
     .btn-sm.plus30{background:#16a34a; color:white; border-color:#16a34a;}
@@ -314,7 +297,6 @@
     .lvl-warn{color:#f59e0b}
     .lvl-error{color:#ef4444}
 
-    /* ===== Footer ===== */
     footer{
       margin-top:20px; color:var(--muted); font-size:12px;
       display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
@@ -322,7 +304,6 @@
     }
 
     @media (max-width: 980px){
-      .kpi-row{grid-template-columns:1fr 1fr;}
       .form-grid{grid-template-columns:1fr 1fr; }
       .list-row{
         grid-template-columns:50px 1fr;
@@ -364,13 +345,11 @@
         <a href="/trigger"><i class="fa-solid fa-paper-plane"></i> Send Full List</a>
         <a href="/telegram-test"><i class="fa-brands fa-telegram"></i> Test Telegram</a>
         <a href="/export-csv"><i class="fa-solid fa-file-export"></i> Export CSV</a>
-
         <form action="/import-csv" method="post" enctype="multipart/form-data">
           <label style="display:block;padding:0 6px 6px;color:var(--muted);font-size:11px;font-weight:800;">Import CSV</label>
           <input type="file" name="file" accept=".csv" style="width:100%;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--panel-2);margin-bottom:6px;">
           <button type="submit"><i class="fa-solid fa-file-import"></i> Upload & Import</button>
         </form>
-
         <a href="/logout" class="danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
       </div>
     </div>
@@ -442,22 +421,22 @@
     </div>
   </section>
 
-  <!-- ===== ADD / EDIT ===== -->
-  <section class="panel" id="formPanel">
-    <div class="panel-head">
-      <h3 id="formTitle">Add New Subscription</h3>
-      <div class="edit-pill" id="editPill">
-        <i class="fa-solid fa-pen"></i> Editing Mode
-      </div>
-    </div>
+  <!-- ===== ADD / EDIT SUB ===== -->
+  <section class="panel">
+    <h3 id="formTitle">Add New Subscription</h3>
 
     <form id="subscriptionForm" action="/add" method="post">
       <div class="form-grid">
         <input id="nameInput" name="name" placeholder="Service name" required minlength="3"/>
         <input id="urlInput" name="url" placeholder="https://example.com" required/>
         <input id="brandInput" name="brand" placeholder="Brand / Domain (optional)"/>
-        <input id="expiresInput" name="expires_at" placeholder="mm/dd/yyyy" required/>
-        <button class="btn btn-primary" id="saveBtn" type="submit">
+
+        <!-- UI picker (yyyy-mm-dd) -->
+        <input id="expiresInputUI" type="date" required/>
+        <!-- hidden real payload (mm/dd/yyyy) -->
+        <input id="expiresInput" name="expires_at" type="hidden" required/>
+
+        <button class="btn btn-primary" type="submit">
           <i class="fa-solid fa-plus"></i> Save
         </button>
 
@@ -466,9 +445,8 @@
           <button type="button" class="chip" data-add-days="14">+14 days</button>
           <button type="button" class="chip" data-add-days="30">+30 days</button>
           <button type="button" class="chip" data-add-years="1">+1 year</button>
-
-          <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;margin-left:auto;">
-            <i class="fa-solid fa-xmark"></i> Cancel Edit
+          <button type="button" class="chip" id="resetBtn" style="margin-left:auto;background:white;">
+            Reset Form
           </button>
         </div>
       </div>
@@ -500,18 +478,17 @@
                  data-filter="{{ st }}"
                  data-search="{{ (sub.name ~ ' ' ~ (sub.brand or '') ~ ' ' ~ sub.url)|lower }}"
                  data-expires="{{ sub.expires_at.strftime('%Y-%m-%d') }}"
+                 data-expires-mmdd="{{ sub.expires_at.strftime('%m/%d/%Y') }}"
                  data-id="{{ sub.id }}"
                  data-name="{{ sub.name|e }}"
-                 data-url="{{ sub.url|e }}"
-                 data-brand="{{ (sub.brand or '')|e }}">
+                 data-url="{{ sub.url }}"
+                 data-brand="{{ sub.brand or ''|e }}">
 
               <div class="num">{{ loop.index }}</div>
 
               <div>
                 <div class="svc-name">{{ sub.name }}</div>
-                <div class="svc-url"><i class="fa-solid fa-link"></i>
-                  <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a>
-                </div>
+                <div class="svc-url"><i class="fa-solid fa-link"></i> <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></div>
               </div>
 
               <div>
@@ -548,21 +525,32 @@
 
               <div class="actions-col">
                 <div class="btn-stack">
-                  <!-- EDIT now uses in-page form -->
-                  <button class="btn-sm edit" type="button" onclick="editSubscription({{ sub.id }})">
+
+                  <!-- EDIT inline (no /edit/{id}) -->
+                  <button class="btn-sm edit btn-edit-inline" type="button">
                     <i class="fa-solid fa-pen"></i> Edit
                   </button>
 
-                  <!-- Quick extend uses /update/{id} (no /extend route needed) -->
-                  <button class="btn-sm plus30" type="button" onclick="quickExtend({{ sub.id }}, 30)">
-                    <i class="fa-solid fa-plus"></i> +30d
-                  </button>
+                  <!-- QUICK EXTEND -> POST /update/{id} -->
+                  <form class="extend-form" action="/update/{{ sub.id }}" method="post" data-days="30">
+                    <input type="hidden" name="name" value="{{ sub.name|e }}">
+                    <input type="hidden" name="url" value="{{ sub.url }}">
+                    <input type="hidden" name="brand" value="{{ sub.brand or ''|e }}">
+                    <input type="hidden" name="expires_at" value="">
+                    <button class="btn-sm plus30" type="submit"><i class="fa-solid fa-plus"></i> +30d</button>
+                  </form>
 
-                  <button class="btn-sm plus1y" type="button" onclick="quickExtend({{ sub.id }}, 365)">
-                    <i class="fa-solid fa-plus"></i> +1y
-                  </button>
+                  <form class="extend-form" action="/update/{{ sub.id }}" method="post" data-years="1">
+                    <input type="hidden" name="name" value="{{ sub.name|e }}">
+                    <input type="hidden" name="url" value="{{ sub.url }}">
+                    <input type="hidden" name="brand" value="{{ sub.brand or ''|e }}">
+                    <input type="hidden" name="expires_at" value="">
+                    <button class="btn-sm plus1y" type="submit"><i class="fa-solid fa-plus"></i> +1y</button>
+                  </form>
 
-                  <form action="/delete/{{ sub.id }}" method="post" onsubmit="return confirm('Delete {{ sub.name }} ?')">
+                  <!-- DELETE tetap -->
+                  <form action="/delete/{{ sub.id }}" method="post"
+                        onsubmit="return confirm('Delete {{ sub.name }} ?')">
                     <button class="btn-sm delete" type="submit">
                       <i class="fa-solid fa-trash"></i> Delete
                     </button>
@@ -636,10 +624,7 @@
     if (!menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");
   });
 
-  // ===== Add form date picker =====
-  const expiresInput = document.getElementById("expiresInput");
-  expiresInput.type = "date";
-
+  // ===== Helpers date =====
   function toMMDDYYYY(d){
     const mm = String(d.getMonth()+1).padStart(2,"0");
     const dd = String(d.getDate()).padStart(2,"0");
@@ -652,8 +637,51 @@
     const yy = d.getFullYear();
     return `${yy}-${mm}-${dd}`;
   }
+  function fromMMDDYYYY(mmdd){
+    // mm/dd/yyyy -> yyyy-mm-dd
+    const [m,d,y] = mmdd.split("/");
+    return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
+  }
 
-  document.querySelectorAll(".chip").forEach(btn=>{
+  // ===== Form binding (Add/Edit) =====
+  const subscriptionForm = document.getElementById("subscriptionForm");
+  const formTitle = document.getElementById("formTitle");
+  const nameInput = document.getElementById("nameInput");
+  const urlInput = document.getElementById("urlInput");
+  const brandInput = document.getElementById("brandInput");
+  const expiresUI = document.getElementById("expiresInputUI");
+  const expiresHidden = document.getElementById("expiresInput");
+
+  function syncExpiresHidden(){
+    if (!expiresUI.value) {
+      expiresHidden.value = "";
+      return;
+    }
+    const d = new Date(expiresUI.value + "T00:00:00");
+    expiresHidden.value = toMMDDYYYY(d);
+  }
+  expiresUI.addEventListener("change", syncExpiresHidden);
+
+  // Ensure hidden value ready before submit
+  subscriptionForm.addEventListener("submit", (e)=>{
+    syncExpiresHidden();
+    if (!expiresHidden.value) {
+      e.preventDefault();
+      alert("Tanggal expire wajib diisi.");
+    }
+  });
+
+  // Reset form to "Add"
+  const resetBtn = document.getElementById("resetBtn");
+  resetBtn.addEventListener("click", ()=>{
+    subscriptionForm.action = "/add";
+    formTitle.textContent = "Add New Subscription";
+    subscriptionForm.reset();
+    expiresHidden.value = "";
+  });
+
+  // Quick add date buttons
+  document.querySelectorAll(".chip[data-add-days], .chip[data-add-years]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const now = new Date();
       const addDays = btn.dataset.addDays ? parseInt(btn.dataset.addDays) : 0;
@@ -662,8 +690,26 @@
       if (addDays) now.setDate(now.getDate() + addDays);
       if (addYears) now.setFullYear(now.getFullYear() + addYears);
 
-      expiresInput.value = toYYYYMMDD(now);
-    })
+      expiresUI.value = toYYYYMMDD(now);
+      syncExpiresHidden();
+    });
+  });
+
+  // ===== Inline edit handler =====
+  document.querySelectorAll(".item .btn-edit-inline").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const row = btn.closest(".item");
+      const id = row.dataset.id;
+      nameInput.value = row.dataset.name || "";
+      urlInput.value = row.dataset.url || "";
+      brandInput.value = row.dataset.brand || "";
+      expiresUI.value = row.dataset.expires; // yyyy-mm-dd
+      syncExpiresHidden();
+
+      subscriptionForm.action = `/update/${id}`;
+      formTitle.textContent = `Edit Subscription #${id}`;
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
   });
 
   // ===== Search + filter =====
@@ -690,114 +736,36 @@
     })
   });
 
-  // ===== In-page EDIT (fix 404 /edit/{id}) =====
-  const form = document.getElementById("subscriptionForm");
-  const formTitle = document.getElementById("formTitle");
-  const editPill = document.getElementById("editPill");
-  const cancelEditBtn = document.getElementById("cancelEditBtn");
-  const saveBtn = document.getElementById("saveBtn");
-
-  const nameInput = document.getElementById("nameInput");
-  const urlInput = document.getElementById("urlInput");
-  const brandInput = document.getElementById("brandInput");
-
-  function setEditMode(on, id=null){
-    if(on){
-      form.action = `/update/${id}`;
-      formTitle.textContent = "Edit Subscription";
-      editPill.classList.add("show");
-      cancelEditBtn.style.display = "inline-flex";
-      saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Update';
-      document.getElementById("formPanel").scrollIntoView({behavior:"smooth", block:"center"});
-    }else{
-      form.action = "/add";
-      formTitle.textContent = "Add New Subscription";
-      editPill.classList.remove("show");
-      cancelEditBtn.style.display = "none";
-      saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Save';
-      nameInput.value = "";
-      urlInput.value = "";
-      brandInput.value = "";
-      expiresInput.value = "";
-    }
+  // ===== Extend (+30d / +1y) via /update/{id} =====
+  function addDays(dateStr, n){
+    const d = new Date(dateStr+"T00:00:00");
+    d.setDate(d.getDate()+n);
+    return d;
   }
-
-  cancelEditBtn?.addEventListener("click", ()=> setEditMode(false));
-
-  window.editSubscription = function(id){
-    const row = document.querySelector(`.item[data-id="${id}"]`);
-    if(!row) return;
-
-    nameInput.value = row.dataset.name || "";
-    urlInput.value = row.dataset.url || "";
-    brandInput.value = row.dataset.brand || "";
-    expiresInput.value = row.dataset.expires || "";
-
-    setEditMode(true, id);
-  }
-
-  // ===== Quick extend via /update/{id} (fix 404 /extend/{id}) =====
-  function addDaysISO(iso, n){
-    const d = new Date(iso + "T00:00:00");
-    d.setDate(d.getDate() + n);
+  function addYears(dateStr, n){
+    const d = new Date(dateStr+"T00:00:00");
+    d.setFullYear(d.getFullYear()+n);
     return d;
   }
 
-  window.quickExtend = function(id, daysToAdd){
-    const row = document.querySelector(`.item[data-id="${id}"]`);
-    if(!row) return;
+  document.querySelectorAll(".extend-form").forEach(form=>{
+    form.addEventListener("submit", (e)=>{
+      const row = form.closest(".item");
+      const expiresISO = row.dataset.expires; // yyyy-mm-dd
+      let d;
 
-    // open edit in form, update date, then submit
-    editSubscription(id);
-    const currentISO = row.dataset.expires;
-    const newDate = addDaysISO(currentISO, daysToAdd);
-    expiresInput.value = toYYYYMMDD(newDate);
+      if (form.dataset.days){
+        d = addDays(expiresISO, parseInt(form.dataset.days));
+      } else if (form.dataset.years){
+        d = addYears(expiresISO, parseInt(form.dataset.years));
+      } else {
+        return;
+      }
 
-    form.submit();
-  }
-
-  
-</script>
-              <script>
-  // ... JS kamu yang lain tetap
-
-  function isoToMMDDYYYY(iso){
-    // iso: yyyy-mm-dd
-    if(!iso) return "";
-    const [y,m,d] = iso.split("-");
-    return `${m}/${d}/${y}`;
-  }
-
-  // intercept submit add/update
-  form.addEventListener("submit", (e)=>{
-    // expiresInput value masih yyyy-mm-dd dari date picker
-    const isoVal = expiresInput.value;
-    const mmdd = isoToMMDDYYYY(isoVal);
-    if(!mmdd){
-      e.preventDefault();
-      alert("Expire date wajib diisi");
-      return;
-    }
-
-    // set ke format yang diminta backend
-    expiresInput.type = "text";         // biar yang terkirim mm/dd/yyyy
-    expiresInput.value = mmdd;
-
-    // NOTE: setelah submit, browser akan reload, jadi aman
+      // backend wajib mm/dd/yyyy
+      form.querySelector("input[name='expires_at']").value = toMMDDYYYY(d);
+    });
   });
-
-  // update quickExtend biar isi dulu ISO lalu submit (submit handler akan convert)
-  window.quickExtend = function(id, daysToAdd){
-    const row = document.querySelector(`.item[data-id="${id}"]`);
-    if(!row) return;
-
-    editSubscription(id);
-    const currentISO = row.dataset.expires; // yyyy-mm-dd
-    const d = addDaysISO(currentISO, daysToAdd);
-    expiresInput.value = toYYYYMMDD(d);     // tetap isi ISO
-
-    form.submit(); // submit handler convert ke mm/dd/yyyy
-  }
 </script>
 
 </body>
