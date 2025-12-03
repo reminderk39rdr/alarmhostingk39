@@ -66,7 +66,16 @@ def _to_date(value: Any) -> Optional[date]:
 def _chunks(text: str, size: int = TELEGRAM_MAX_LEN) -> Iterable[str]:
     """Split text jadi beberapa chunk biar gak kena limit Telegram."""
     for i in range(0, len(text), size):
-        yield text[i : i + size]
+        yield text[i: i + size]
+
+
+def _allowed_minute(windows: set[int]) -> bool:
+    """
+    Anti-burst: cuma boleh kirim kalau sekarang ada di minute window yang diizinkan.
+    Berguna kalau server restart dan APScheduler nge-run job yang "missed".
+    """
+    now_minute = datetime.now(timezone_wib).minute
+    return now_minute in windows
 
 
 # =========================================================
@@ -149,6 +158,8 @@ async def send_full_list_trigger():
 
 async def send_daily_summary():
     """Daily summary = full list jam 09:00."""
+    if not _allowed_minute({0}):
+        return
     await send_full_list_trigger()
 
 
@@ -187,6 +198,7 @@ async def _send_filtered_reminders(target_days: list[int], title: str):
 
         for brand, items in sorted(grouped.items()):
             msg += f"<b>{html_escape(brand)}</b>\n"
+
             for i, (sub, expires_date, days_left) in enumerate(items, 1):
 
                 if days_left <= 0:
@@ -220,17 +232,24 @@ async def _send_filtered_reminders(target_days: list[int], title: str):
 
 
 async def send_reminders_3days():
-    """H-3 → 3x sehari."""
+    """H-3 → 3x sehari (minute 0)."""
+    if not _allowed_minute({0}):
+        return
     await _send_filtered_reminders([3], "⚠️ Reminder 3 Hari Lagi")
 
 
 async def send_reminders_2days():
-    """H-2 → 6x sehari."""
+    """H-2 → 6x sehari (minute 0)."""
+    if not _allowed_minute({0}):
+        return
     await _send_filtered_reminders([2], "🚨 Reminder 2 Hari Lagi")
 
 
 async def send_reminders_1day_or_expired():
-    """H-1 / H / expired → bising tiap 30 menit."""
+    """H-1 / H / expired → bising tiap 30 menit (minute 0 & 30)."""
+    if not _allowed_minute({0, 30}):
+        return
+
     db = SessionLocal()
     try:
         subs = get_all_subscriptions(db)
@@ -243,7 +262,7 @@ async def send_reminders_1day_or_expired():
             if expires_date is None:
                 continue
             days_left = (expires_date - today_date).days
-            if days_left <= 1:
+            if days_left <= 1:  # H-1, H, expired
                 targets.add(days_left)
 
         if targets:
