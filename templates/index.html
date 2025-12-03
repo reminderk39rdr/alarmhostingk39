@@ -755,6 +755,50 @@
 
     form.submit();
   }
+
+  
 </script>
+              <script>
+  // ... JS kamu yang lain tetap
+
+  function isoToMMDDYYYY(iso){
+    // iso: yyyy-mm-dd
+    if(!iso) return "";
+    const [y,m,d] = iso.split("-");
+    return `${m}/${d}/${y}`;
+  }
+
+  // intercept submit add/update
+  form.addEventListener("submit", (e)=>{
+    // expiresInput value masih yyyy-mm-dd dari date picker
+    const isoVal = expiresInput.value;
+    const mmdd = isoToMMDDYYYY(isoVal);
+    if(!mmdd){
+      e.preventDefault();
+      alert("Expire date wajib diisi");
+      return;
+    }
+
+    // set ke format yang diminta backend
+    expiresInput.type = "text";         // biar yang terkirim mm/dd/yyyy
+    expiresInput.value = mmdd;
+
+    // NOTE: setelah submit, browser akan reload, jadi aman
+  });
+
+  // update quickExtend biar isi dulu ISO lalu submit (submit handler akan convert)
+  window.quickExtend = function(id, daysToAdd){
+    const row = document.querySelector(`.item[data-id="${id}"]`);
+    if(!row) return;
+
+    editSubscription(id);
+    const currentISO = row.dataset.expires; // yyyy-mm-dd
+    const d = addDaysISO(currentISO, daysToAdd);
+    expiresInput.value = toYYYYMMDD(d);     // tetap isi ISO
+
+    form.submit(); // submit handler convert ke mm/dd/yyyy
+  }
+</script>
+
 </body>
 </html>
