@@ -70,6 +70,7 @@
       padding:5px 9px;border-radius:999px;font-size:12px;font-weight:600;
       color:var(--text-secondary);
       white-space:nowrap;
+      cursor:default;
     }
     .logout{
       background:linear-gradient(135deg,#ef4444,#dc2626);
@@ -79,6 +80,7 @@
       transition:.12s ease;
       display:inline-flex;align-items:center;gap:6px;
       box-shadow:0 6px 12px rgba(239,68,68,.18);
+      white-space:nowrap;
     }
     .logout:hover{filter:brightness(1.05);transform:translateY(-1px)}
 
@@ -118,6 +120,12 @@
     input:focus{
       outline:none;border-color:var(--primary);
       box-shadow:0 0 0 4px rgba(139,92,246,0.12)
+    }
+
+    /* date picker look */
+    input[type="date"]{
+      color:var(--text);
+      font-weight:600;
     }
 
     /* ===== Buttons (pro + icons) ===== */
@@ -165,36 +173,126 @@
       letter-spacing:.2px;
     }
 
-    /* ===== Table responsive ===== */
-    table{width:100%;border-collapse:separate;border-spacing:0 .6rem}
-    th{display:none}
-    td{
-      display:block;width:100%;padding:.9rem;background:var(--surface);
-      border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,0.05);
-      position:relative;padding-left:86px;font-size:0.93rem
-    }
-    td::before{
-      content:attr(data-label);position:absolute;left:.9rem;top:.9rem;font-weight:700;
-      color:var(--text-secondary);font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em
-    }
-    .days{
-      font-weight:800;font-size:1rem!important;display:flex;align-items:center;gap:8px;
+    /* ===== Table (premium) ===== */
+    table.subs-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
     }
 
-    /* Status badge */
-    .status-pill{
-      display:inline-flex;align-items:center;gap:4px;
-      padding:3px 7px;border-radius:999px;
-      font-size:11px;font-weight:800;letter-spacing:.02em;
-      border:1px solid var(--border);
-      background:#fff;white-space:nowrap;
+    table.subs-table thead th{
+      display:table-cell;
+      padding:0.9rem 1rem;
+      background:linear-gradient(#f8fafc,#f1f5f9);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      font-size:0.82rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#0f172a;
     }
-    .st-expired{color:#b91c1c;border-color:#fecaca;background:#fff1f2;}
-    .st-h1{color:#7c2d12;border-color:#fed7aa;background:#fff7ed;}
-    .st-h2{color:#92400e;border-color:#fde68a;background:#fffbeb;}
-    .st-h3{color:#b45309;border-color:#fcd34d;background:#fffbeb;}
-    .st-soon{color:#1d4ed8;border-color:#bfdbfe;background:#eff6ff;}
-    .st-safe{color:#065f46;border-color:#bbf7d0;background:#ecfdf5;}
+    table.subs-table thead th:first-child{
+      border-left:1px solid var(--border);
+      border-radius:12px 0 0 12px;
+    }
+    table.subs-table thead th:last-child{
+      border-right:1px solid var(--border);
+      border-radius:0 12px 12px 0;
+    }
+
+    table.subs-table tbody tr{
+      background:var(--surface);
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      border-radius:14px;
+      overflow:hidden;
+      transition:.12s ease;
+    }
+    table.subs-table tbody tr:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 26px rgba(15,23,42,0.08);
+    }
+
+    table.subs-table td{
+      padding:1rem 1rem;
+      vertical-align:middle;
+      font-size:0.95rem;
+      background:transparent !important;
+      box-shadow:none !important;
+      border:none !important;
+    }
+    table.subs-table td:first-child{
+      font-weight:800;
+      color:#0f172a;
+      width:70px;
+    }
+
+    td[data-label="Service"] strong{
+      font-size:1rem;
+      letter-spacing:.2px;
+    }
+
+    td[data-label="Brand"] strong{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      font-size:0.8rem;
+      font-weight:800;
+      color:#0f172a;
+    }
+
+    td[data-label="URL"] a{
+      color:#7c3aed !important;
+      font-weight:700 !important;
+      text-decoration:none;
+      border-bottom:1px dashed rgba(124,58,237,.35);
+    }
+    td[data-label="URL"] a:hover{
+      border-bottom-style:solid;
+      opacity:.9;
+    }
+
+    td[data-label="Expire"]{
+      font-weight:700;
+      color:#0f172a;
+    }
+
+    .days{
+      font-weight:900;
+      font-size:1.05rem !important;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      white-space:nowrap;
+    }
+    .days .num{
+      font-size:1.2rem;
+      letter-spacing:.2px;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      border:1px solid transparent;
+      background:#fff;
+      box-shadow: inset 0 0 0 1px var(--border);
+      white-space:nowrap;
+    }
+    .st-expired{ color:#b91c1c; background:#fff1f2; box-shadow: inset 0 0 0 1px #fecaca; }
+    .st-h1{ color:#7c2d12; background:#fff7ed; box-shadow: inset 0 0 0 1px #fed7aa; }
+    .st-h2{ color:#92400e; background:#fffbeb; box-shadow: inset 0 0 0 1px #fde68a; }
+    .st-h3{ color:#b45309; background:#fffbeb; box-shadow: inset 0 0 0 1px #fcd34d; }
+    .st-soon{ color:#1d4ed8; background:#eff6ff; box-shadow: inset 0 0 0 1px #bfdbfe; }
+    .st-safe{ color:#065f46; background:#ecfdf5; box-shadow: inset 0 0 0 1px #bbf7d0; }
 
     /* Trigger button fixed */
     .trigger-fixed{
@@ -239,36 +337,12 @@
     .pill-WARN{color:#b45309;}
     .pill-ERROR{color:#b91c1c;}
 
-    /* ===== Desktop: one row card ===== */
+    /* ===== Desktop ===== */
     @media (min-width: 768px){
       .form-grid{grid-template-columns:repeat(4,1fr)}
       .stats-grid{grid-template-columns:repeat(4,1fr);gap:1rem}
-      th{
-        display:table-cell;padding:0.95rem 1rem;background:var(--surface2);
-        color:#0f172a;font-weight:800;font-size:.9rem;
-      }
-      td{
-        display:table-cell;padding:0.95rem 1rem;padding-left:1rem;
-      }
-      td::before{display:none}
       .trigger-fixed{bottom:26px;right:26px;left:auto;transform:none;width:auto}
-
       table.subs-table{border-spacing:0 9px;}
-      table.subs-table tbody tr{
-        background:var(--surface);
-        box-shadow:0 6px 14px rgba(15,23,42,0.06);
-        border-radius:14px;overflow:hidden;
-      }
-      table.subs-table td{
-        background:transparent!important;box-shadow:none!important;border-bottom:none!important;
-        vertical-align:middle;
-      }
-      table.subs-table td:first-child{
-        font-weight:800;color:#0f172a;
-      }
-      table.subs-table td:last-child{
-        white-space:nowrap;
-      }
     }
 
     /* ===== Footer pro ===== */
@@ -310,7 +384,6 @@
         <span class="badge">👤 {{ username }}</span>
         <span class="badge">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
         <a class="logout" href="/logout">
-          <!-- logout icon -->
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16 17 21 12 16 7"/>
@@ -349,11 +422,23 @@
           <input type="text" id="name" name="name" placeholder="Service Name" required>
           <input type="url" id="url" name="url" placeholder="URL" required>
           <input type="text" id="brand" name="brand" placeholder="Brand Domain (contoh: RADAR138, K39, USR)" required>
-          <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
+
+          <!-- date picker for user -->
+          <input type="date" id="expires_at_picker" placeholder="Choose expire date" required>
+          <!-- hidden field sent to backend (mm/dd/yyyy) -->
+          <input type="hidden" id="expires_at" name="expires_at" required>
         </div>
+
+        <!-- quick add buttons -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 10px">
+          <button type="button" class="badge" onclick="quickAddDays(7)">+7 days</button>
+          <button type="button" class="badge" onclick="quickAddDays(14)">+14 days</button>
+          <button type="button" class="badge" onclick="quickAddDays(30)">+30 days</button>
+          <button type="button" class="badge" onclick="quickAddDays(365)">+1 year</button>
+        </div>
+
         <div style="display:flex;gap:.6rem;flex-wrap:wrap">
           <button type="submit" class="btn">
-            <!-- save icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
               <polyline points="17 21 17 13 7 13 7 21"/>
@@ -362,7 +447,6 @@
             Save Subscription
           </button>
           <button type="button" class="btn btn-cancel" onclick="resetForm()">
-            <!-- x icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -412,7 +496,7 @@
                   </td>
 
                   <td data-label="URL">
-                    <a href="{{ sub.url }}" target="_blank" style="color:var(--primary);font-weight:650">
+                    <a href="{{ sub.url }}" target="_blank">
                       {{ sub.url }}
                     </a>
                   </td>
@@ -427,9 +511,10 @@
                         {% elif days <= 7 %}var(--warning)
                         {% else %}var(--success)
                         {% endif %}">
-                    {{ days }} day{{ '' if days == 1 else 's' }}
 
-                    {# ===== status badge ===== #}
+                    <span class="num">{{ days }}</span>
+                    <span>{{ 'day' if days == 1 else 'days' }}</span>
+
                     {% if days < 0 %}
                       <span class="status-pill st-expired">EXPIRED</span>
                     {% elif days == 0 %}
@@ -450,7 +535,6 @@
                   <td data-label="Action">
                     <button class="btn action-btn btn-edit"
                       onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ""|e }}", "{{ sub.expires_at.strftime("%m/%d/%Y") }}")'>
-                      <!-- edit icon -->
                       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                         <path d="M12 20h9"/>
                         <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
@@ -461,7 +545,6 @@
                     <form method="post" action="/delete/{{ sub.id }}" style="display:inline">
                       <button type="submit" class="btn action-btn btn-delete"
                         onclick="return confirm('Delete this subscription?')">
-                        <!-- trash icon -->
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                           <polyline points="3 6 5 6 21 6"/>
                           <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -519,7 +602,6 @@
     </div>
 
     <a href="/trigger" class="trigger-fixed">
-      <!-- send icon -->
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
         <line x1="22" y1="2" x2="11" y2="13"/>
         <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -551,12 +633,42 @@
   </div>
 
   <script>
+    const picker = document.getElementById("expires_at_picker");
+    const hidden = document.getElementById("expires_at");
+
+    function toMMDDYYYY(iso){
+      if(!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${m}/${d}/${y}`;
+    }
+    function toISO(mmddyyyy){
+      if(!mmddyyyy) return "";
+      const [m,d,y] = mmddyyyy.split("/");
+      return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
+    }
+
+    picker.addEventListener("change", () => {
+      hidden.value = toMMDDYYYY(picker.value);
+    });
+
+    function quickAddDays(n){
+      const now = new Date();
+      now.setDate(now.getDate() + n);
+      const iso = now.toISOString().slice(0,10);
+      picker.value = iso;
+      hidden.value = toMMDDYYYY(iso);
+    }
+
     function editSubscription(id, name, url, brand, expires_at){
       document.getElementById('form-title').innerText = 'Edit Subscription';
       document.getElementById('name').value = name;
       document.getElementById('url').value = url;
       document.getElementById('brand').value = brand;
-      document.getElementById('expires_at').value = expires_at;
+
+      // isi date picker via ISO
+      picker.value = toISO(expires_at);
+      hidden.value = expires_at;
+
       document.getElementById('subscription-form').action = `/update/${id}`;
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -564,6 +676,8 @@
     function resetForm(){
       document.getElementById('form-title').innerText='Add New Subscription';
       document.getElementById('subscription-form').reset();
+      picker.value = "";
+      hidden.value = "";
       document.getElementById('subscription-form').action='/add';
     }
 
