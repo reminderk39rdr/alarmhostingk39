@@ -11,6 +11,7 @@ from crud import get_all_subscriptions
 logger = logging.getLogger(__name__)
 timezone_wib = ZoneInfo("Asia/Jakarta")
 
+
 async def send_telegram_message(text: str):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
@@ -32,7 +33,7 @@ async def send_telegram_message(text: str):
                 logger.info("[TELEGRAM] Pesan terkirim!")
                 return True
             else:
-                logger.error(f"[TELEGRAM] Gagal: {r.text}")
+                logger.error(f"[TELEGRAM] Gagal kirim: {r.text}")
     except Exception as e:
         logger.error(f"[TELEGRAM] Error: {e}")
     return False
@@ -62,17 +63,17 @@ async def send_full_list_trigger():
             for i, sub in enumerate(items, 1):
                 days_left = (sub.expires_at - today.date()).days
 
-                # Pilih emoji sesuai hari
+                # EMOJI ASLI — INI YANG BENER!
                 if days_left < 0:
-                    emoji = "Skull"
+                    emoji = "Skull"        # Sudah expire
                 elif days_left == 0:
-                    emoji = "Skull"  # hari ini mati
+                    emoji = "Skull"        # Hari ini mati
                 elif days_left <= 3:
-                    emoji = "Red Circle"
+                    emoji = "Fire"         # SANGAT MENDESAK
                 elif days_left <= 7:
-                    emoji = "Orange Circle"
+                    emoji = "Warning"      # Peringatan
                 else:
-                    emoji = "Green Checkmark"
+                    emoji = "Checkmark Button"  # Aman
 
                 message += f"{i}. <b>{sub.name}</b>\n"
                 message += f"   <a href='{sub.url}'>{sub.url}</a>\n"
@@ -93,6 +94,5 @@ async def send_full_list_trigger():
 
 
 async def send_daily_summary():
-    # Biarin kosong dulu kalau kamu ga butuh daily summary
-    # Atau nanti kita tambah kalau mau
+    # Kosong dulu atau nanti diisi kalau mau daily reminder
     pass
