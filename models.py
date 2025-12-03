@@ -25,7 +25,7 @@ class Subscription(Base):
     last_notified_stage = Column(String, nullable=True)  # e.g. "H-3", "H-2", "H-1/EXPIRED", "DAILY"
 
 
-class Log(Base):
+class LogEntry(Base):
     __tablename__ = "log"
 
     id = Column(Integer, primary_key=True, index=True)
