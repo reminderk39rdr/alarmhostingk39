@@ -7,57 +7,244 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0f;
-            --card: #111118;
-            --text: #e2e8f0;
-            --text-secondary: #94a3b8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface2: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #64748b;
             --primary: #8b5cf6;
-            --primary-hover: #7c4dff;
-            --border: #1e293b;
+            --primary-hover: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
             --danger: #ef4444;
+            --border: #e2e8f0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem 1rem; min-height: 100vh;}
-        .container {max-width: 1100px; margin: 0 auto;}
-        header {text-align: center; margin-bottom: 3rem;}
-        h1 {font-size: 2.5rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;}
-        .subtitle {color: var(--text-secondary); font-size: 1.1rem;}
-        .card {background: var(--card); border-radius: 12px; padding: 1.8rem; margin-bottom: 2rem; border: 1px solid var(--border);}
-        .form-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem;}
-        input {width: 100%; padding: 0.9rem 1rem; background: #1a1a22; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem;}
-        input:focus {outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);}
-        .btn {background: var(--primary); color: white; padding: 0.9rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;}
-        .btn:hover {background: var(--primary-hover);}
-        .btn-danger {background: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem;}
-        .btn-danger:hover {background: #dc2626;}
-        table {width: 100%; border-collapse: collapse; margin-top: 1rem;}
-        th {text-align: left; padding: 1rem; background: #1a1a22; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;}
-        td {padding: 1rem; border-bottom: 1px solid var(--border);}
-        tr:hover {background: rgba(139, 92, 246, 0.05);}
-        .brand-title {font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 2.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary);}
-        .days {font-weight: 600;}
-        .days-critical {color: #ef4444;}
-        .days-warning {color: #f59e0b;}
-        .days-safe {color: #10b981;}
-        footer {text-align: center; margin-top: 4rem; color: var(--text-secondary); font-size: 0.85rem;}
-        .k39 {font-family: 'Courier New', monospace; font-weight: bold; color: #8b5cf6; font-size: 0.8rem; letter-spacing: 0.15em;}
-        .trigger-fixed {position: fixed; bottom: 30px; right:  right: 30px; background: var(--primary); color: white; padding: 1rem 1.5rem; border-radius: 50px; font-weight: 600; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3); z-index: 100; text-decoration: none; transition: all 0.3s;}
-        .trigger-fixed:hover {transform: translateY(-3px); box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);}
-        .action-btn {padding: 0.4rem 0.8rem; font-size: 0.85rem; margin: 0 0.2rem;}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 1.8rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+        }
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .btn-cancel {
+            background: var(--surface2);
+            color: var(--text-secondary);
+        }
+        .btn-cancel:hover {
+            background: #cbd5e1;
+        }
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 3rem 0 1.5rem 0;
+            padding-bottom: 0.8rem;
+            border-bottom: 3px solid var(--primary);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 1rem;
+        }
+        th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: var(--surface2);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        td {
+            padding: 1.5rem;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        tr:hover td {
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            transition: all 0.2s;
+        }
+        .days {
+            font-weight: 600;
+        }
+        .days-critical { color: var(--danger); }
+        .days-warning { color: var(--warning); }
+        .days-safe { color: var(--success); }
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            margin: 0 0.4rem;
+            border-radius: 8px;
+        }
+        .btn-edit {
+            background: #8b5cf6;
+            color: white;
+        }
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .k39 {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: var(--primary);
+            letter-spacing: 0.2em;
+            font-size: 0.8rem;
+        }
+        .trigger-fixed {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            z-index: 100;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .trigger-fixed:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>RDR Hosting Reminder</h1>
-            <p class="subtitle">Professional subscription & hosting expiration management</p>
+            <p class="subtitle">Professional subscription & hosting expiration management system</p>
             <p style="margin-top: 1rem; color: var(--text-secondary);">
                 Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }} • {{ now.strftime('%d %B %Y - %H:%M WIB') }}
             </p>
         </header>
 
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ subs|length }}</div>
+                <div class="stat-label">Total Subscriptions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ grouped|length }}</div>
+                <div class="stat-label">Active Brands</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ (subs|selectattr("expires_at", "le", today + 7)|list)|length }}</div>
+                <div class="stat-label">Expiring in 7 Days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ (subs|selectattr("expires_at", "lt", today)|list)|length }}</div>
+                <div class="stat-label">Already Expired</div>
+            </div>
+        </div>
+
         <div class="card">
-            <h2 style="margin-bottom: 1.5rem; color: #ffffff;" id="form-title">Add New Subscription</h2>
+            <h2 style="margin-bottom: 1.5rem; color: var(--text);" id="form-title">Add New Subscription</h2>
             <form id="subscription-form" method="post">
                 <div class="form-grid">
                     <input type="text" id="name" name="name" placeholder="Service Name" required>
@@ -65,13 +252,13 @@
                     <input type="text" id="brand" name="brand" placeholder="Brand / Provider">
                     <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
                 </div>
-                <button type="submit" class="btn" style="margin-top: 1.5rem;">Save Subscription</button>
-                <button type="button" class="btn" onclick="resetForm()" style="margin-left: 1rem; background:#475569;">Cancel Edit</button>
+                <button type="submit" class="btn">Save Subscription</button>
+                <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
             </form>
         </div>
 
         <div class="card">
-            <h2 style="margin-bottom: 1.5rem; color: #ffffff;">Active Subscriptions</h2>
+            <h2 style="margin-bottom: 1.5rem; color: var(--text);">Active Subscriptions</h2>
 
             {% if subs %}
                 {% for brand, items in grouped.items() %}
@@ -99,9 +286,9 @@
                                         {{ days }} days
                                     </td>
                                     <td>
-                                        <button class="btn action-btn" onclick='editSubscription({{ sub.id }}, "{{ sub.name }}", "{{ sub.url }}", "{{ sub.brand or '' }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")' style="background:#8b5cf6;padding:0.5rem 1rem;">Edit</button>
+                                        <button class="btn action-btn btn-edit" onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ''|e }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>Edit</button>
                                         <form method="post" action="/delete/{{ sub.id }}" style="display:inline;">
-                                            <button type="submit" class="btn-danger action-btn">Delete</button>
+                                            <button type="submit" class="btn action-btn btn-delete">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -110,8 +297,8 @@
                     </table>
                 {% endfor %}
             {% else %}
-                <p style="text-align: center; color: var(--text-secondary); padding: 3rem 0;">
-                    No active subscriptions. Add your first one above.
+                <p style="text-align: center; color: var(--text-secondary); padding: 4rem 0; font-size: 1.1rem;">
+                    No active subscriptions yet. Add your first one above.
                 </p>
             {% endif %}
         </div>
@@ -133,7 +320,7 @@
             document.getElementById('brand').value = brand || '';
             document.getElementById('expires_at').value = expires_at;
             document.getElementById('subscription-form').action = `/update/${id}`;
-            window.scrollTo(0, 0);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function resetForm() {
