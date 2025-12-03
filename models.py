@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
 from datetime import datetime
 from database import Base
 
@@ -12,7 +12,6 @@ class Subscription(Base):
     expires_at = Column(Date, nullable=False)
     brand = Column(String, nullable=True)
 
-    # reminder counters (existing)
     reminder_count_h3 = Column(Integer, default=0)
     reminder_count_h2 = Column(Integer, default=0)
     reminder_count_h1 = Column(Integer, default=0)
@@ -20,15 +19,16 @@ class Subscription(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # ===== NEW (safe migration) =====
+    is_archived = Column(Boolean, default=False)
+    last_notified_at = Column(DateTime, nullable=True)
+    last_notified_stage = Column(String, nullable=True)  # e.g. "H-3", "H-2", "H-1/EXPIRED", "DAILY"
 
-class LogEntry(Base):
-    """
-    Simpel log table buat ditampilin di dashboard.
-    Ini gak ganggu tabel subscription.
-    """
-    __tablename__ = "log_entry"
+
+class Log(Base):
+    __tablename__ = "log"
 
     id = Column(Integer, primary_key=True, index=True)
-    level = Column(String(20), default="INFO")  # INFO/WARN/ERROR
-    message = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    level = Column(String, default="INFO")
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
