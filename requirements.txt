@@ -6,3 +6,4 @@ python-multipart
 httpx
 apscheduler
 psycopg[binary]
+itsdangerous>=2.2.0
