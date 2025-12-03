@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Icons (tiny buttons look pro) -->
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
@@ -21,8 +21,8 @@
       --line:#e6ebf2;
       --text:#0f172a;
       --muted:#64748b;
-      --brand:#0b5fff;         /* corporate blue */
-      --brand-2:#6a5cff;       /* purple accent */
+      --brand:#0b5fff;
+      --brand-2:#6a5cff;
       --good:#16a34a;
       --warn:#f59e0b;
       --bad:#ef4444;
@@ -82,9 +82,7 @@
     }
     .userchip i{color:var(--brand)}
 
-    .actions{
-      position:relative;
-    }
+    .actions{ position:relative; }
     .actions-btn{
       display:flex; align-items:center; gap:8px;
       border:1px solid var(--line);
@@ -160,6 +158,7 @@
       padding:7px 11px; border-radius:999px;
       font-size:13px; font-weight:700; color:#334155;
       display:flex; align-items:center; gap:7px;
+      white-space:nowrap;
     }
     .filter-pill .dot{
       width:8px; height:8px; border-radius:50%;
@@ -170,12 +169,22 @@
     }
     .filter-pill.active .dot{background:white}
 
-    /* ===== Add form ===== */
+    /* ===== Add / Edit form ===== */
     .panel{
       margin-top:14px; background:var(--panel); border:1px solid var(--line);
       border-radius:18px; padding:14px; box-shadow:var(--shadow);
     }
     .panel h3{margin:0 0 10px; font-size:16px; font-weight:800}
+    .panel-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .edit-pill{
+      display:none; align-items:center; gap:6px;
+      background:#0f172a; color:white; padding:6px 10px;
+      border-radius:999px; font-size:12px; font-weight:800;
+    }
+    .edit-pill.show{display:inline-flex}
 
     .form-grid{
       display:grid; grid-template-columns:1.2fr 1.6fr .9fr .8fr auto;
@@ -244,21 +253,18 @@
       width:max-content;
     }
 
-    .expire{
-      font-weight:700;
-    }
+    .expire{ font-weight:700; }
     .days{
       display:flex; align-items:center; gap:8px; font-weight:800;
     }
-    .days .n{
-      font-size:18px;
-    }
+    .days .n{ font-size:18px; }
 
     .status{
       display:inline-flex; align-items:center; gap:6px;
       padding:5px 9px; font-size:11px; font-weight:900;
       border-radius:999px; letter-spacing:.3px; border:1px solid transparent;
       text-transform:uppercase;
+      white-space:nowrap;
     }
     .st-safe{ color:var(--good); background:#ecfdf3; border-color:#b7f0cc;}
     .st-soon{ color:#2563eb; background:#eff6ff; border-color:#b9d5ff;}
@@ -277,6 +283,7 @@
       padding:8px 10px; font-size:12px; border-radius:10px; font-weight:900;
       display:flex; align-items:center; justify-content:center; gap:6px;
       border:1px solid var(--line); background:white; cursor:pointer;
+      white-space:nowrap;
     }
     .btn-sm.edit{background:#0f172a; color:white; border-color:#0f172a;}
     .btn-sm.plus30{background:#16a34a; color:white; border-color:#16a34a;}
@@ -315,6 +322,7 @@
     }
 
     @media (max-width: 980px){
+      .kpi-row{grid-template-columns:1fr 1fr;}
       .form-grid{grid-template-columns:1fr 1fr; }
       .list-row{
         grid-template-columns:50px 1fr;
@@ -347,7 +355,7 @@
     </div>
 
     <div class="actions">
-      <button class="actions-btn" id="actionsToggle">
+      <button class="actions-btn" id="actionsToggle" type="button">
         <i class="fa-solid fa-ellipsis-vertical"></i>
         Actions
         <i class="fa-solid fa-caret-down"></i>
@@ -356,11 +364,13 @@
         <a href="/trigger"><i class="fa-solid fa-paper-plane"></i> Send Full List</a>
         <a href="/telegram-test"><i class="fa-brands fa-telegram"></i> Test Telegram</a>
         <a href="/export-csv"><i class="fa-solid fa-file-export"></i> Export CSV</a>
+
         <form action="/import-csv" method="post" enctype="multipart/form-data">
           <label style="display:block;padding:0 6px 6px;color:var(--muted);font-size:11px;font-weight:800;">Import CSV</label>
           <input type="file" name="file" accept=".csv" style="width:100%;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--panel-2);margin-bottom:6px;">
           <button type="submit"><i class="fa-solid fa-file-import"></i> Upload & Import</button>
         </form>
+
         <a href="/logout" class="danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
       </div>
     </div>
@@ -408,42 +418,46 @@
     </div>
 
     <div class="filters" id="filterBar">
-      <button class="filter-pill active" data-filter="all">
+      <button class="filter-pill active" data-filter="all" type="button">
         <span class="dot"></span> All
       </button>
-      <button class="filter-pill" data-filter="safe">
+      <button class="filter-pill" data-filter="safe" type="button">
         <span class="dot" style="background:var(--good)"></span> Safe
       </button>
-      <button class="filter-pill" data-filter="soon">
+      <button class="filter-pill" data-filter="soon" type="button">
         <span class="dot" style="background:#2563eb"></span> Soon ≤7
       </button>
-      <button class="filter-pill" data-filter="h3">
+      <button class="filter-pill" data-filter="h3" type="button">
         <span class="dot" style="background:#7c3aed"></span> H-3
       </button>
-      <button class="filter-pill" data-filter="h2">
+      <button class="filter-pill" data-filter="h2" type="button">
         <span class="dot" style="background:var(--warn)"></span> H-2
       </button>
-      <button class="filter-pill" data-filter="h1">
+      <button class="filter-pill" data-filter="h1" type="button">
         <span class="dot" style="background:#fb923c"></span> H-1 / Today
       </button>
-      <button class="filter-pill" data-filter="expired">
+      <button class="filter-pill" data-filter="expired" type="button">
         <span class="dot" style="background:var(--bad)"></span> Expired
       </button>
     </div>
   </section>
 
-  <!-- ===== ADD NEW SUB ===== -->
-  <section class="panel">
-    <h3>Add New Subscription</h3>
+  <!-- ===== ADD / EDIT ===== -->
+  <section class="panel" id="formPanel">
+    <div class="panel-head">
+      <h3 id="formTitle">Add New Subscription</h3>
+      <div class="edit-pill" id="editPill">
+        <i class="fa-solid fa-pen"></i> Editing Mode
+      </div>
+    </div>
 
-    <form action="/add" method="post">
+    <form id="subscriptionForm" action="/add" method="post">
       <div class="form-grid">
-        <input name="name" placeholder="Service name" required minlength="3"/>
-        <input name="url" placeholder="https://example.com" required/>
-        <input name="brand" placeholder="Brand / Domain (optional)"/>
-        <!-- gunakan date picker native -->
+        <input id="nameInput" name="name" placeholder="Service name" required minlength="3"/>
+        <input id="urlInput" name="url" placeholder="https://example.com" required/>
+        <input id="brandInput" name="brand" placeholder="Brand / Domain (optional)"/>
         <input id="expiresInput" name="expires_at" placeholder="mm/dd/yyyy" required/>
-        <button class="btn btn-primary" type="submit">
+        <button class="btn btn-primary" id="saveBtn" type="submit">
           <i class="fa-solid fa-plus"></i> Save
         </button>
 
@@ -452,6 +466,10 @@
           <button type="button" class="chip" data-add-days="14">+14 days</button>
           <button type="button" class="chip" data-add-days="30">+30 days</button>
           <button type="button" class="chip" data-add-years="1">+1 year</button>
+
+          <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;margin-left:auto;">
+            <i class="fa-solid fa-xmark"></i> Cancel Edit
+          </button>
         </div>
       </div>
     </form>
@@ -482,13 +500,18 @@
                  data-filter="{{ st }}"
                  data-search="{{ (sub.name ~ ' ' ~ (sub.brand or '') ~ ' ' ~ sub.url)|lower }}"
                  data-expires="{{ sub.expires_at.strftime('%Y-%m-%d') }}"
-                 data-id="{{ sub.id }}">
+                 data-id="{{ sub.id }}"
+                 data-name="{{ sub.name|e }}"
+                 data-url="{{ sub.url|e }}"
+                 data-brand="{{ (sub.brand or '')|e }}">
 
               <div class="num">{{ loop.index }}</div>
 
               <div>
                 <div class="svc-name">{{ sub.name }}</div>
-                <div class="svc-url"><i class="fa-solid fa-link"></i> <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></div>
+                <div class="svc-url"><i class="fa-solid fa-link"></i>
+                  <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a>
+                </div>
               </div>
 
               <div>
@@ -525,22 +548,24 @@
 
               <div class="actions-col">
                 <div class="btn-stack">
-                  <form action="/edit/{{ sub.id }}" method="get">
-                    <button class="btn-sm edit" type="submit"><i class="fa-solid fa-pen"></i> Edit</button>
-                  </form>
+                  <!-- EDIT now uses in-page form -->
+                  <button class="btn-sm edit" type="button" onclick="editSubscription({{ sub.id }})">
+                    <i class="fa-solid fa-pen"></i> Edit
+                  </button>
 
-                  <form class="extend-form" action="/extend/{{ sub.id }}" method="post" data-days="30">
-                    <input type="hidden" name="expires_at" value="">
-                    <button class="btn-sm plus30" type="submit"><i class="fa-solid fa-plus"></i> +30d</button>
-                  </form>
+                  <!-- Quick extend uses /update/{id} (no /extend route needed) -->
+                  <button class="btn-sm plus30" type="button" onclick="quickExtend({{ sub.id }}, 30)">
+                    <i class="fa-solid fa-plus"></i> +30d
+                  </button>
 
-                  <form class="extend-form" action="/extend/{{ sub.id }}" method="post" data-years="1">
-                    <input type="hidden" name="expires_at" value="">
-                    <button class="btn-sm plus1y" type="submit"><i class="fa-solid fa-plus"></i> +1y</button>
-                  </form>
+                  <button class="btn-sm plus1y" type="button" onclick="quickExtend({{ sub.id }}, 365)">
+                    <i class="fa-solid fa-plus"></i> +1y
+                  </button>
 
                   <form action="/delete/{{ sub.id }}" method="post" onsubmit="return confirm('Delete {{ sub.name }} ?')">
-                    <button class="btn-sm delete" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
+                    <button class="btn-sm delete" type="submit">
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
                   </form>
                 </div>
               </div>
@@ -611,9 +636,8 @@
     if (!menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");
   });
 
-  // ===== Quick add date utilities (for add form) =====
+  // ===== Add form date picker =====
   const expiresInput = document.getElementById("expiresInput");
-  // default to native date picker where supported
   expiresInput.type = "date";
 
   function toMMDDYYYY(d){
@@ -635,13 +659,9 @@
       const addDays = btn.dataset.addDays ? parseInt(btn.dataset.addDays) : 0;
       const addYears = btn.dataset.addYears ? parseInt(btn.dataset.addYears) : 0;
 
-      if (addDays){
-        now.setDate(now.getDate() + addDays);
-      }
-      if (addYears){
-        now.setFullYear(now.getFullYear() + addYears);
-      }
-      // use yyyy-mm-dd for input[type=date]
+      if (addDays) now.setDate(now.getDate() + addDays);
+      if (addYears) now.setFullYear(now.getFullYear() + addYears);
+
       expiresInput.value = toYYYYMMDD(now);
     })
   });
@@ -670,36 +690,71 @@
     })
   });
 
-  // ===== Extend (+30d / +1y) without timedelta in Jinja =====
-  function addDays(dateStr, n){
-    const d = new Date(dateStr+"T00:00:00");
-    d.setDate(d.getDate()+n);
+  // ===== In-page EDIT (fix 404 /edit/{id}) =====
+  const form = document.getElementById("subscriptionForm");
+  const formTitle = document.getElementById("formTitle");
+  const editPill = document.getElementById("editPill");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+  const saveBtn = document.getElementById("saveBtn");
+
+  const nameInput = document.getElementById("nameInput");
+  const urlInput = document.getElementById("urlInput");
+  const brandInput = document.getElementById("brandInput");
+
+  function setEditMode(on, id=null){
+    if(on){
+      form.action = `/update/${id}`;
+      formTitle.textContent = "Edit Subscription";
+      editPill.classList.add("show");
+      cancelEditBtn.style.display = "inline-flex";
+      saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Update';
+      document.getElementById("formPanel").scrollIntoView({behavior:"smooth", block:"center"});
+    }else{
+      form.action = "/add";
+      formTitle.textContent = "Add New Subscription";
+      editPill.classList.remove("show");
+      cancelEditBtn.style.display = "none";
+      saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Save';
+      nameInput.value = "";
+      urlInput.value = "";
+      brandInput.value = "";
+      expiresInput.value = "";
+    }
+  }
+
+  cancelEditBtn?.addEventListener("click", ()=> setEditMode(false));
+
+  window.editSubscription = function(id){
+    const row = document.querySelector(`.item[data-id="${id}"]`);
+    if(!row) return;
+
+    nameInput.value = row.dataset.name || "";
+    urlInput.value = row.dataset.url || "";
+    brandInput.value = row.dataset.brand || "";
+    expiresInput.value = row.dataset.expires || "";
+
+    setEditMode(true, id);
+  }
+
+  // ===== Quick extend via /update/{id} (fix 404 /extend/{id}) =====
+  function addDaysISO(iso, n){
+    const d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + n);
     return d;
   }
-  function addYears(dateStr, n){
-    const d = new Date(dateStr+"T00:00:00");
-    d.setFullYear(d.getFullYear()+n);
-    return d;
+
+  window.quickExtend = function(id, daysToAdd){
+    const row = document.querySelector(`.item[data-id="${id}"]`);
+    if(!row) return;
+
+    // open edit in form, update date, then submit
+    editSubscription(id);
+    const currentISO = row.dataset.expires;
+    const newDate = addDaysISO(currentISO, daysToAdd);
+    expiresInput.value = toYYYYMMDD(newDate);
+
+    form.submit();
   }
-
-  document.querySelectorAll(".extend-form").forEach(form=>{
-    form.addEventListener("submit", (e)=>{
-      const row = form.closest(".item");
-      const expiresISO = row.dataset.expires; // yyyy-mm-dd
-      let d;
-
-      if (form.dataset.days){
-        d = addDays(expiresISO, parseInt(form.dataset.days));
-      } else if (form.dataset.years){
-        d = addYears(expiresISO, parseInt(form.dataset.years));
-      } else {
-        return; // no change
-      }
-      // server expects mm/dd/yyyy
-      form.querySelector("input[name='expires_at']").value = toMMDDYYYY(d);
-    });
-  });
-
 </script>
 </body>
 </html>
