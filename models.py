@@ -19,10 +19,10 @@ class Subscription(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # ===== NEW (safe migration) =====
+    # NEW (safe migration)
     is_archived = Column(Boolean, default=False)
     last_notified_at = Column(DateTime, nullable=True)
-    last_notified_stage = Column(String, nullable=True)  # e.g. "H-3", "H-2", "H-1/EXPIRED", "DAILY"
+    last_notified_stage = Column(String, nullable=True)  # "H-3","H-2","H-1/EXPIRED","DAILY"
 
 
 class LogEntry(Base):
