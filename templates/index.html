@@ -4,344 +4,380 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RDR Hosting Reminder</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#f6f7fb;
-      --surface:#ffffff;
-      --surface2:#f1f5f9;
-      --text:#0f172a;
-      --text-secondary:#64748b;
-      --primary:#7c3aed;
-      --primary-2:#8b5cf6;
-      --success:#10b981;
+      /* Corporate palette */
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-muted: #f1f4f9;
+      --text: #0b1220;
+      --text-secondary: #5b6472;
+      --primary: #2563eb;
+      --primary-2:#0ea5e9;
+      --success:#16a34a;
       --warning:#f59e0b;
       --danger:#ef4444;
-      --border:#e5e7eb;
+      --border:#e5e9f2;
       --radius:14px;
-      --radius-lg:18px;
+      --shadow: 0 6px 20px rgba(11,18,32,0.06);
+      --shadow-soft: 0 3px 10px rgba(11,18,32,0.05);
     }
-    *{margin:0;padding:0;box-sizing:border-box}
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
     body{
-      font-family:'Inter',sans-serif;
-      background:var(--bg);
-      color:var(--text);
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: var(--bg);
+      color: var(--text);
       line-height:1.55;
       min-height:100vh;
       padding-bottom:110px;
     }
-    .container{max-width:1240px;margin:0 auto;padding:1.1rem 1rem}
+    .container{ max-width:1280px; margin:0 auto; padding:1rem; }
 
-    /* ===== Topbar ===== */
+    /* ===== TOPBAR ===== */
     .topbar{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:12px;
-      background:rgba(255,255,255,0.9);
+      position: sticky; top:10px; z-index:50;
+      background: var(--surface);
       border:1px solid var(--border);
       border-radius:16px;
-      padding:0.7rem 0.9rem;
-      box-shadow:0 6px 18px rgba(15,23,42,0.06);
-      position:sticky; top:10px; z-index:50;
-      backdrop-filter: blur(6px);
+      padding:0.75rem 0.9rem;
+      box-shadow: var(--shadow);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      backdrop-filter: blur(4px);
     }
-    .top-left{display:flex;align-items:center;gap:10px}
+    .top-left{ display:flex; align-items:center; gap:10px; }
     .logo{
-      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#7c3aed,#ec4899);
-      color:white;font-weight:800;
-      box-shadow:0 8px 18px rgba(124,58,237,.28);
-      font-size:1rem;
+      width:38px; height:38px; border-radius:10px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, #0b1220, #1f2a44);
+      color:#fff; font-weight:800; font-size:0.95rem;
+      box-shadow: 0 8px 18px rgba(11,18,32,0.25);
+      letter-spacing:.02em;
     }
     .title-wrap h1{
-      font-size:1.18rem;font-weight:800;line-height:1.1;
-      letter-spacing:.2px;
+      font-size:1.12rem; font-weight:800; letter-spacing:.02em;
+      color: var(--text);
     }
     .title-wrap .subtitle{
-      font-size:0.8rem;color:var(--text-secondary);
-      margin-top:2px;
+      font-size:0.78rem; color: var(--text-secondary); margin-top:2px;
     }
 
-    .top-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .badge{
-      display:inline-flex;align-items:center;gap:6px;
-      background:var(--surface2);
+    .top-right{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      background: var(--surface-muted);
       border:1px solid var(--border);
-      padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;
-      color:#334155;
-      white-space:nowrap;
-      cursor:default;
-    }
-    .logout{
-      background:linear-gradient(135deg,#ef4444,#dc2626);
-      color:white;border:none;cursor:pointer;
-      padding:7px 10px;border-radius:11px;font-weight:800;font-size:12px;
-      text-decoration:none;
-      transition:.12s ease;
-      display:inline-flex;align-items:center;gap:6px;
-      box-shadow:0 8px 14px rgba(239,68,68,.18);
+      padding:6px 10px; border-radius:999px;
+      font-size:12px; font-weight:700; color: var(--text-secondary);
       white-space:nowrap;
     }
-    .logout:hover{filter:brightness(1.05);transform:translateY(-1px)}
 
-    header{text-align:center;margin:1.2rem 0 0.9rem}
-    header .subtitle{color:var(--text-secondary);font-size:0.92rem;margin-top:4px}
+    /* Dropdown actions */
+    .menu{
+      position:relative;
+    }
+    .menu-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      background:#0b1220; color:#fff;
+      border:none; border-radius:10px;
+      font-size:12px; font-weight:800; cursor:pointer;
+      box-shadow: var(--shadow-soft);
+    }
+    .menu-btn svg{ width:14px;height:14px; }
+    .menu-list{
+      position:absolute; right:0; top:110%;
+      width:220px; background:var(--surface);
+      border:1px solid var(--border); border-radius:12px;
+      box-shadow: var(--shadow);
+      padding:6px; display:none;
+    }
+    .menu.open .menu-list{ display:block; }
+    .menu-item{
+      display:flex; align-items:center; gap:8px;
+      padding:9px 10px; border-radius:10px;
+      font-size:13px; font-weight:700; color:var(--text);
+      text-decoration:none; cursor:pointer;
+    }
+    .menu-item:hover{ background:var(--surface-muted); }
+    .menu-item svg{ width:15px;height:15px; color:#0b1220; }
+    .menu-sep{ height:1px; background:var(--border); margin:6px 4px; }
+
+    .logout{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:7px 10px; border-radius:10px;
+      background: #ef4444; color:#fff; font-size:12px; font-weight:800;
+      text-decoration:none; box-shadow: var(--shadow-soft);
+    }
+    .logout svg{ width:14px;height:14px; }
 
     /* ===== Stats ===== */
+    header{ margin:1.1rem 0 0.75rem; }
+    .subtle{ color:var(--text-secondary); font-size:0.92rem; }
+
     .stats-grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:.8rem;margin:1rem 0 1.4rem;
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:.9rem; margin:0.8rem 0 1.2rem;
     }
     .stat-card{
-      background:var(--surface);border-radius:14px;padding:0.95rem .9rem;
-      border:1px solid var(--border);box-shadow:0 3px 12px rgba(15,23,42,0.05);
-      text-align:center;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:1rem;
+      box-shadow: var(--shadow-soft);
+      display:flex; align-items:center; gap:12px;
     }
-    .stat-value{font-size:1.9rem;font-weight:800;color:var(--primary)}
-    .stat-label{color:var(--text-secondary);font-size:0.82rem;margin-top:0.25rem;font-weight:600}
+    .stat-icon{
+      width:44px;height:44px;border-radius:12px;
+      display:grid;place-items:center;
+      background: #0b1220;
+      color:#fff;font-weight:800;
+      font-size:1rem;
+    }
+    .stat-value{ font-size:1.6rem; font-weight:800; color:var(--text); }
+    .stat-label{ font-size:0.8rem; color:var(--text-secondary); font-weight:700; }
 
-    /* ===== Card ===== */
+    /* ===== Cards ===== */
     .card{
       background:var(--surface);
-      border-radius:var(--radius-lg);
-      padding:1.1rem 1.1rem;
-      margin-bottom:1rem;
       border:1px solid var(--border);
-      box-shadow:0 4px 16px rgba(15,23,42,0.05);
+      border-radius:16px;
+      padding:1.15rem;
+      box-shadow: var(--shadow-soft);
+      margin-bottom:1rem;
     }
     .card-head{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      margin-bottom:.8rem;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap; margin-bottom:.75rem;
     }
-    .card-head h2{font-size:1.05rem;font-weight:800;letter-spacing:.2px}
+    .card-head h2{ font-size:1.05rem; font-weight:800; letter-spacing:.01em; }
 
     /* ===== Form ===== */
     .form-grid{
-      display:grid;grid-template-columns:1fr;gap:.7rem;margin-bottom:.9rem
+      display:grid; grid-template-columns:1fr; gap:.65rem; margin-bottom:.8rem;
     }
     input{
-      width:100%;padding:0.78rem 0.85rem;background:#fff;border:1px solid var(--border);
-      border-radius:12px;font-size:0.95rem;
-      font-weight:600;color:var(--text);
+      width:100%; padding:0.78rem 0.85rem;
+      background:#fff; border:1px solid var(--border);
+      border-radius:12px; font-size:0.95rem;
+      outline:none;
     }
-    input::placeholder{font-weight:500;color:#94a3b8}
     input:focus{
-      outline:none;border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(124,58,237,0.12)
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
     }
-    input[type="date"]{font-weight:700}
+    input[type="date"]{ font-weight:700; }
 
-    /* ===== Buttons ===== */
+    .quick-row{
+      display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 8px;
+    }
+    .quick-btn{
+      appearance:none; border:1px dashed var(--border); background:var(--surface-muted);
+      padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800;
+      color:var(--text-secondary); cursor:pointer;
+    }
+    .quick-btn:hover{ border-style:solid; color:var(--text); }
+
     .btn{
-      appearance:none;border:none;cursor:pointer;
-      font-weight:800;letter-spacing:.2px;
-      padding:0.68rem 1rem;border-radius:11px;
-      transition:.15s ease;
-      display:inline-flex;align-items:center;justify-content:center;gap:7px;
-      box-shadow:0 6px 14px rgba(15,23,42,0.06);
-      background: linear-gradient(135deg,#7c3aed,#8b5cf6);
-      color:#fff;font-size:0.92rem;
+      appearance:none; border:none; cursor:pointer;
+      font-weight:800; letter-spacing:.01em;
+      padding:0.7rem 1rem; border-radius:11px;
+      transition:.12s ease;
+      display:inline-flex; align-items:center; justify-content:center; gap:7px;
+      box-shadow: var(--shadow-soft);
+      background: var(--primary);
+      color:#fff; font-size:0.9rem;
       white-space:nowrap;
     }
-    .btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.03);
-      box-shadow: 0 10px 18px rgba(124,58,237,0.25);
+    .btn:hover{ filter:brightness(1.03); transform:translateY(-1px); }
+    .btn svg{ width:15px;height:15px; }
+    .btn-secondary{
+      background:#111827; color:#fff;
     }
-    .btn:active{ transform: translateY(0); }
-    .btn svg{width:15px;height:15px}
-
     .btn-ghost{
-      background:#f1f5f9;color:#334155;
-      box-shadow:none;border:1px solid var(--border);
-    }
-    .btn-ghost:hover{background:#e2e8f0}
-
-    .action-btn{
-      padding:0.5rem 0.75rem;font-size:0.82rem;border-radius:10px;
-      margin:0.12rem 0.12rem;min-width:74px;
-      box-shadow:none;
-    }
-    .btn-edit{background:linear-gradient(135deg,#7c3aed,#ec4899);}
-    .btn-delete{background:linear-gradient(135deg,#ef4444,#dc2626);}
-    .btn-extend{background:#10b981;color:white;}
-    .btn-extend:hover{filter:brightness(1.03);box-shadow:0 8px 12px rgba(16,185,129,.25)}
-
-    /* ===== Brand block ===== */
-    .brand-title{
-      font-size:1.05rem;font-weight:900;color:#0f172a;
-      margin:1.2rem 0 .5rem;
-      display:flex;align-items:center;justify-content:space-between;
-    }
-    .brand-line{
-      height:2px;flex:1;margin-left:10px;background:linear-gradient(90deg,var(--primary),transparent);
-      border-radius:999px;
+      background:#eef2f7; color:#111827; border:1px solid var(--border);
     }
 
-    /* ===== Filter segmented control ===== */
+    /* ===== Filters (segmented) ===== */
     .filters{
-      display:flex;gap:6px;flex-wrap:wrap;
-      background:#f8fafc;border:1px solid var(--border);
-      padding:6px;border-radius:999px;
+      display:flex; gap:6px; flex-wrap:wrap;
+      background:var(--surface-muted);
+      border:1px solid var(--border);
+      padding:6px; border-radius:999px;
     }
     .filter-btn{
-      border:none;cursor:pointer;
-      padding:6px 10px;border-radius:999px;
-      font-size:12px;font-weight:800;
-      color:#475569;background:transparent;
-      transition:.12s ease;
-      white-space:nowrap;
+      border:none; cursor:pointer;
+      font-size:12px; font-weight:800; letter-spacing:.02em;
+      padding:7px 12px; border-radius:999px;
+      color:#475569; background:transparent;
+      transition:.1s ease;
+      display:inline-flex; align-items:center; gap:6px;
     }
     .filter-btn.active{
-      background:#0f172a;color:white;box-shadow:0 4px 10px rgba(15,23,42,.18);
+      background:#0b1220; color:#fff; box-shadow: var(--shadow-soft);
     }
-    .filter-btn:not(.active):hover{background:#eef2f7}
+    .filter-dot{ width:7px;height:7px;border-radius:999px; display:inline-block; }
+    .dot-safe{background:var(--success)}
+    .dot-soon{background:var(--primary)}
+    .dot-h3{background:var(--warning)}
+    .dot-exp{background:var(--danger)}
 
     /* ===== Table ===== */
     table.subs-table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0 8px;
+      width:100%; border-collapse:separate; border-spacing:0 8px;
     }
     table.subs-table thead th{
-      padding:0.75rem 0.9rem;
-      background:linear-gradient(#f8fafc,#f1f5f9);
+      padding:0.8rem 0.9rem;
+      background: #f8fafc;
       border-top:1px solid var(--border);
       border-bottom:1px solid var(--border);
-      font-size:0.75rem;font-weight:900;
-      text-transform:uppercase;letter-spacing:.08em;
-      color:#0f172a;
+      font-size:0.78rem; font-weight:900;
+      text-transform:uppercase; letter-spacing:.08em;
+      color:#111827;
     }
     table.subs-table thead th:first-child{
-      border-left:1px solid var(--border);
-      border-radius:12px 0 0 12px;
+      border-left:1px solid var(--border); border-radius:12px 0 0 12px;
+      width:64px;
     }
     table.subs-table thead th:last-child{
-      border-right:1px solid var(--border);
-      border-radius:0 12px 12px 0;
+      border-right:1px solid var(--border); border-radius:0 12px 12px 0;
+      width:220px;
     }
 
     table.subs-table tbody tr{
       background:var(--surface);
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
-      border-radius:14px;overflow:hidden;
+      border:1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      border-radius:12px; overflow:hidden;
       transition:.12s ease;
     }
     table.subs-table tbody tr:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 24px rgba(15,23,42,0.08);
+      transform:translateY(-1px); box-shadow: var(--shadow);
     }
     table.subs-table td{
-      padding:0.9rem 0.9rem;
-      vertical-align:middle;font-size:0.95rem;border:none !important;
+      padding:0.95rem 0.9rem; vertical-align:middle; font-size:0.94rem;
+      border:none !important; background:transparent !important;
     }
-    table.subs-table td:first-child{font-weight:900;width:64px;}
-
-    td[data-label="Service"] strong{font-size:1rem;font-weight:800}
-    td[data-label="Brand"] strong{
-      display:inline-flex;padding:4px 8px;border-radius:999px;
-      background:#f8fafc;border:1px solid var(--border);
-      font-size:0.78rem;font-weight:900;color:#0f172a;letter-spacing:.3px;
+    td[data-label="Service"] strong{ font-size:0.98rem; font-weight:800; }
+    td[data-label="Brand"] .brand-pill{
+      display:inline-flex; padding:4px 8px; border-radius:999px;
+      background:#f8fafc; border:1px solid var(--border);
+      font-size:0.8rem; font-weight:900; color:#0b1220;
     }
     td[data-label="URL"] a{
-      color:#6d28d9 !important;font-weight:700 !important;text-decoration:none;
-      border-bottom:1px dashed rgba(109,40,217,.35);
+      color:#1d4ed8; font-weight:800; text-decoration:none;
+      border-bottom:1px dashed rgba(29,78,216,.35);
       word-break:break-all;
     }
-    td[data-label="URL"] a:hover{border-bottom-style:solid;opacity:.9}
-
-    td[data-label="Expire"]{font-weight:700}
+    td[data-label="URL"] a:hover{ border-bottom-style:solid; }
 
     .days{
-      font-weight:900;font-size:1.02rem !important;
-      display:flex;align-items:center;gap:8px;white-space:nowrap;
+      font-weight:900; font-size:1.02rem;
+      display:flex; align-items:center; gap:8px; white-space:nowrap;
     }
-    .days .num{font-size:1.15rem}
+    .days .num{ font-size:1.2rem; }
 
     .status-pill{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:4px 9px;border-radius:999px;font-size:11px;font-weight:900;
-      letter-spacing:.08em;border:1px solid transparent;background:#fff;
-      box-shadow: inset 0 0 0 1px var(--border);
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 9px; border-radius:999px;
+      font-size:11px; font-weight:900; letter-spacing:.06em;
+      border:1px solid transparent; background:#fff;
       white-space:nowrap;
     }
-    .st-expired{ color:#b91c1c; background:#fff1f2; box-shadow: inset 0 0 0 1px #fecaca; }
-    .st-h1{ color:#7c2d12; background:#fff7ed; box-shadow: inset 0 0 0 1px #fed7aa; }
-    .st-h2{ color:#92400e; background:#fffbeb; box-shadow: inset 0 0 0 1px #fde68a; }
-    .st-h3{ color:#b45309; background:#fffbeb; box-shadow: inset 0 0 0 1px #fcd34d; }
-    .st-soon{ color:#1d4ed8; background:#eff6ff; box-shadow: inset 0 0 0 1px #bfdbfe; }
-    .st-safe{ color:#065f46; background:#ecfdf5; box-shadow: inset 0 0 0 1px #bbf7d0; }
+    .st-expired{ color:#b91c1c; background:#fff1f2; border-color:#fecaca; }
+    .st-h1{ color:#7c2d12; background:#fff7ed; border-color:#fed7aa; }
+    .st-h2{ color:#92400e; background:#fffbeb; border-color:#fde68a; }
+    .st-h3{ color:#b45309; background:#fffbeb; border-color:#fcd34d; }
+    .st-soon{ color:#1d4ed8; background:#eff6ff; border-color:#bfdbfe; }
+    .st-safe{ color:#065f46; background:#ecfdf5; border-color:#bbf7d0; }
 
+    /* Action buttons */
     .actions{
-      display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;
+      display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap;
+    }
+    .action-btn{
+      padding:0.5rem 0.75rem; font-size:0.8rem; border-radius:10px;
+      min-width:74px; box-shadow: var(--shadow-soft);
+      display:inline-flex; align-items:center; gap:6px; font-weight:900;
+      border:1px solid transparent; cursor:pointer;
+    }
+    .btn-edit{ background:#0b1220; color:#fff; }
+    .btn-add30{ background:#16a34a; color:#fff; }
+    .btn-add365{ background:#0ea5e9; color:#fff; }
+    .btn-delete{ background:#ef4444; color:#fff; }
+    .action-btn svg{ width:14px;height:14px; }
+    .mini-note{
+      font-size:11px; font-weight:800; color:var(--text-secondary);
+      margin-top:4px; text-align:right;
     }
 
-    /* ===== Trigger floating ===== */
-    .trigger-fixed{
-      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
-      width:92%;max-width:420px;
-      background:linear-gradient(135deg,#7c3aed,#ec4899);
-      color:white;padding:0.9rem 1.2rem;border-radius:50px;font-weight:900;
-      box-shadow:0 12px 28px rgba(124,58,237,0.35);
-      z-index:1000;text-decoration:none;text-align:center;font-size:0.98rem;
-      display:flex;justify-content:center;align-items:center;gap:8px;
-      transition:.15s ease;
-    }
-    .trigger-fixed svg{width:16px;height:16px}
-    .trigger-fixed:hover{filter:brightness(1.04);transform:translateX(-50%) translateY(-1px)}
-
-    /* ===== Logs ===== */
+    /* Logs */
     .logs-wrap{
-      max-height:360px; overflow:auto; border:1px solid var(--border);
-      border-radius:12px; background:var(--surface2);
+      max-height:340px; overflow:auto;
+      border:1px solid var(--border); border-radius:12px;
+      background:var(--surface-muted);
     }
-    .logs{width:100%;border-collapse:collapse;font-size:0.9rem}
+    .logs{ width:100%; border-collapse:collapse; font-size:0.9rem; }
     .logs th,.logs td{
-      padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--border);
+      padding:.6rem .8rem; text-align:left; border-bottom:1px solid var(--border);
       background:transparent;
     }
     .logs th{
-      position:sticky;top:0;background:var(--surface);
-      font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;
-      color:var(--text-secondary);font-weight:900;
+      position:sticky; top:0; background:var(--surface);
+      font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;
+      color:var(--text-secondary); font-weight:900;
     }
-    .logs th:nth-child(1),.logs td:nth-child(1){width:165px;white-space:nowrap}
-    .logs th:nth-child(2),.logs td:nth-child(2){width:95px;text-align:center}
     .log-pill{
-      display:inline-flex;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:900;
-      border:1px solid var(--border);background:white;
+      display:inline-flex; padding:3px 8px; border-radius:999px; font-size:11px; font-weight:900;
+      border:1px solid var(--border); background:white;
     }
     .pill-INFO{color:#2563eb;}
     .pill-WARN{color:#b45309;}
     .pill-ERROR{color:#b91c1c;}
 
-    /* ===== Desktop ===== */
-    @media (min-width: 768px){
-      .form-grid{grid-template-columns:repeat(4,1fr)}
-      .stats-grid{grid-template-columns:repeat(4,1fr);gap:1rem}
-      .trigger-fixed{bottom:26px;right:26px;left:auto;transform:none;width:auto}
-      table.subs-table{border-spacing:0 8px;}
+    /* Trigger fixed */
+    .trigger-fixed{
+      position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+      width:92%; max-width:440px;
+      background:#0b1220; color:white;
+      padding:0.9rem 1.2rem; border-radius:999px;
+      font-weight:900; letter-spacing:.02em;
+      box-shadow: 0 14px 28px rgba(11,18,32,0.30);
+      z-index:1000; text-decoration:none; text-align:center; font-size:0.98rem;
+      display:flex; justify-content:center; align-items:center; gap:8px;
+      transition:.12s ease;
     }
+    .trigger-fixed svg{ width:16px;height:16px; }
+    .trigger-fixed:hover{ filter:brightness(1.05); transform:translateX(-50%) translateY(-1px); }
 
-    /* ===== Footer ===== */
-    .footer{margin-top:1.4rem;padding:1rem 0 1.6rem;color:var(--text-secondary);font-size:0.9rem;}
+    /* Footer */
+    footer{ margin-top:1rem; }
     .footer-inner{
-      background:var(--surface);border:1px solid var(--border);border-radius:16px;
-      padding:0.95rem 1.05rem;display:flex;justify-content:space-between;align-items:center;
-      flex-wrap:wrap;gap:10px;box-shadow:0 6px 18px rgba(15,23,42,0.05);
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:1rem 1.1rem;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:10px; box-shadow: var(--shadow-soft);
+      color:var(--text-secondary); font-size:0.9rem;
     }
-    .footer-brand{display:flex;align-items:center;gap:10px;}
+    .footer-brand{ display:flex; align-items:center; gap:10px;}
     .footer-logo{
-      width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#7c3aed,#ec4899);color:white;font-weight:900;
-      box-shadow:0 8px 14px rgba(124,58,237,.25);font-size:.9rem;
+      width:34px;height:34px;border-radius:9px; display:grid; place-items:center;
+      background:#0b1220;color:white;font-weight:900;font-size:.9rem;
     }
-    .footer-title{font-weight:900;color:#0f172a}
-    .footer-subtitle{font-size:12px}
-    .footer-meta{
-      display:flex;gap:6px;align-items:center;flex-wrap:wrap;
-      font-size:12px;font-weight:700;
+    .footer-title{ font-weight:900; color:#0b1220; }
+    .footer-subtitle{ font-size:12px; font-weight:700; }
+
+    @media (min-width: 768px){
+      .form-grid{ grid-template-columns:repeat(4,1fr); }
+      table.subs-table{ border-spacing:0 7px; }
+      .trigger-fixed{ bottom:26px; right:26px; left:auto; transform:none; width:auto; }
     }
   </style>
 </head>
@@ -352,15 +388,61 @@
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="top-left">
-        <div class="logo">R</div>
+        <div class="logo">RDR</div>
         <div class="title-wrap">
           <h1>RDR Hosting Reminder</h1>
-          <div class="subtitle">Hosting expiration management</div>
+          <div class="subtitle">Corporate subscription expiry monitoring</div>
         </div>
       </div>
+
       <div class="top-right">
-        <span class="badge">👤 {{ username }}</span>
-        <span class="badge">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
+        <span class="chip">👤 {{ username }}</span>
+        <span class="chip">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
+
+        <!-- Actions dropdown -->
+        <div class="menu" id="menu">
+          <button class="menu-btn" type="button" id="menuBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><circle cx="5" cy="12" r="3"/>
+            </svg>
+            Actions
+          </button>
+          <div class="menu-list">
+            <a class="menu-item" href="/trigger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              Send List to Telegram
+            </a>
+            <a class="menu-item" href="/telegram-test">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Test Telegram
+            </a>
+            <a class="menu-item" href="/export">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export CSV
+            </a>
+
+            <div class="menu-sep"></div>
+
+            <label class="menu-item" style="width:100%">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Import CSV
+              <input id="importFile" type="file" accept=".csv" style="display:none">
+            </label>
+          </div>
+        </div>
+
         <a class="logout" href="/logout">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -373,17 +455,47 @@
     </div>
 
     <header>
-      <p class="subtitle">
-        Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }}
-      </p>
+      <p class="subtle">Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }}</p>
+      {% if health %}
+        <p class="subtle" style="margin-top:6px;">
+          Scheduler Health:
+          <strong style="color:#0b1220">{{ health.daily or "-" }}</strong> /
+          <strong style="color:#0b1220">{{ health.h3 or "-" }}</strong> /
+          <strong style="color:#0b1220">{{ health.h2 or "-" }}</strong> /
+          <strong style="color:#0b1220">{{ health.h1 or "-" }}</strong>
+        </p>
+      {% endif %}
     </header>
 
-    <!-- STATS -->
     <div class="stats-grid">
-      <div class="stat-card"><div class="stat-value">{{ subs|length }}</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value">{{ grouped|length }}</div><div class="stat-label">Brands</div></div>
-      <div class="stat-card"><div class="stat-value">{{ expiring_soon }}</div><div class="stat-label">Expiring Soon</div></div>
-      <div class="stat-card"><div class="stat-value">{{ expired_count }}</div><div class="stat-label">Expired</div></div>
+      <div class="stat-card">
+        <div class="stat-icon">Σ</div>
+        <div>
+          <div class="stat-value">{{ subs|length }}</div>
+          <div class="stat-label">Total Subscriptions</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏷️</div>
+        <div>
+          <div class="stat-value">{{ grouped|length }}</div>
+          <div class="stat-label">Brands</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div>
+          <div class="stat-value">{{ expiring_soon }}</div>
+          <div class="stat-label">Expiring Soon (≤7d)</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div>
+          <div class="stat-value">{{ expired_count }}</div>
+          <div class="stat-label">Expired</div>
+        </div>
+      </div>
     </div>
 
     <!-- ADD / EDIT FORM -->
@@ -391,8 +503,8 @@
       <div class="card-head">
         <h2 id="form-title">Add New Subscription</h2>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="badge">Timezone: Asia/Jakarta</span>
-          <span class="badge">Telegram Alerts: ON</span>
+          <span class="chip">Timezone: Asia/Jakarta</span>
+          <span class="chip">Telegram Alerts: ON</span>
         </div>
       </div>
 
@@ -402,18 +514,15 @@
           <input type="url" id="url" name="url" placeholder="URL" required>
           <input type="text" id="brand" name="brand" placeholder="Brand Domain (contoh: RADAR138, K39, USR)" required>
 
-          <!-- date picker -->
           <input type="date" id="expires_at_picker" required>
-          <!-- hidden sent to backend (mm/dd/yyyy) -->
           <input type="hidden" id="expires_at" name="expires_at" required>
         </div>
 
-        <!-- quick add -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 10px">
-          <button type="button" class="badge" onclick="quickAddDays(7)">+7 days</button>
-          <button type="button" class="badge" onclick="quickAddDays(14)">+14 days</button>
-          <button type="button" class="badge" onclick="quickAddDays(30)">+30 days</button>
-          <button type="button" class="badge" onclick="quickAddDays(365)">+1 year</button>
+        <div class="quick-row">
+          <button type="button" class="quick-btn" onclick="quickAddDays(7)">+7 days</button>
+          <button type="button" class="quick-btn" onclick="quickAddDays(14)">+14 days</button>
+          <button type="button" class="quick-btn" onclick="quickAddDays(30)">+30 days</button>
+          <button type="button" class="quick-btn" onclick="quickAddDays(365)">+1 year</button>
         </div>
 
         <div style="display:flex;gap:.6rem;flex-wrap:wrap">
@@ -423,10 +532,10 @@
               <polyline points="17 21 17 13 7 13 7 21"/>
               <polyline points="7 3 7 8 15 8"/>
             </svg>
-            Save Subscription
+            Save
           </button>
           <button type="button" class="btn btn-ghost" onclick="resetForm()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -441,28 +550,24 @@
       <div class="card-head">
         <h2>Active Subscriptions</h2>
 
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input id="search" type="text" placeholder="Search service / brand..." style="max-width:230px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="search" type="text" placeholder="Search service / brand..." style="max-width:240px">
           <div class="filters" id="filters">
             <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="safe">Safe</button>
-            <button class="filter-btn" data-filter="soon">Soon ≤7</button>
-            <button class="filter-btn" data-filter="h3">H-3</button>
+            <button class="filter-btn" data-filter="safe"><span class="filter-dot dot-safe"></span>Safe</button>
+            <button class="filter-btn" data-filter="soon"><span class="filter-dot dot-soon"></span>Soon ≤7</button>
+            <button class="filter-btn" data-filter="h3"><span class="filter-dot dot-h3"></span>H-3</button>
             <button class="filter-btn" data-filter="h2">H-2</button>
-            <button class="filter-btn" data-filter="h1">H-1/Today</button>
-            <button class="filter-btn" data-filter="expired">Expired</button>
+            <button class="filter-btn" data-filter="h1">H-1 / Today</button>
+            <button class="filter-btn" data-filter="expired"><span class="filter-dot dot-exp"></span>Expired</button>
           </div>
         </div>
       </div>
 
       {% if subs %}
         {% for brand, items in grouped.items() %}
-          <div class="brand-title">
-            <span>{{ brand or "No Brand" }}</span>
-            <span class="brand-line"></span>
-            <span style="font-size:12px;color:var(--text-secondary);font-weight:800;">
-              {{ items|length }} items
-            </span>
+          <div class="subtle" style="font-weight:900;margin:8px 0 6px;color:#0b1220">
+            {{ brand or "No Brand" }}
           </div>
 
           <table class="subs-table">
@@ -481,7 +586,7 @@
             <tbody>
               {% for sub in items %}
                 {% set days = (sub.expires_at - today).days %}
-                <tr class="row" data-days="{{ days }}">
+                <tr class="row" data-days="{{ days }}" data-expires="{{ sub.expires_at.strftime('%Y-%m-%d') }}">
                   <td data-label="No">{{ loop.index }}</td>
 
                   <td data-label="Service">
@@ -489,7 +594,7 @@
                   </td>
 
                   <td data-label="Brand">
-                    <strong>{{ sub.brand or "–" }}</strong>
+                    <span class="brand-pill">{{ sub.brand or "–" }}</span>
                   </td>
 
                   <td data-label="URL">
@@ -528,7 +633,7 @@
 
                   <td data-label="Action">
                     <div class="actions">
-                      <button class="btn action-btn btn-edit"
+                      <button class="action-btn btn-edit"
                         onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ""|e }}", "{{ sub.expires_at.strftime("%m/%d/%Y") }}")'>
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                           <path d="M12 20h9"/>
@@ -537,36 +642,36 @@
                         Edit
                       </button>
 
-                      <button type="button" class="btn action-btn btn-extend"
-                        onclick='extendDays({{ sub.id }}, "{{ sub.expires_at.strftime("%m/%d/%Y") }}", 30)'>
+                      <button class="action-btn btn-add30" type="button"
+                        onclick="extendDays({{ sub.id }}, 30, '{{ sub.expires_at.strftime('%Y-%m-%d') }}')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                          <path d="M12 5v14M5 12h14"/>
+                          <path d="M12 5v14"/><path d="M5 12h14"/>
                         </svg>
                         +30d
                       </button>
 
-                      <button type="button" class="btn action-btn btn-extend"
-                        onclick='extendDays({{ sub.id }}, "{{ sub.expires_at.strftime("%m/%d/%Y") }}", 365)'>
+                      <button class="action-btn btn-add365" type="button"
+                        onclick="extendDays({{ sub.id }}, 365, '{{ sub.expires_at.strftime('%Y-%m-%d') }}')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                          <path d="M12 5v14M5 12h14"/>
+                          <path d="M12 5v14"/><path d="M5 12h14"/>
                         </svg>
                         +1y
                       </button>
 
                       <form method="post" action="/delete/{{ sub.id }}" style="display:inline">
-                        <button type="submit" class="btn action-btn btn-delete"
+                        <button type="submit" class="action-btn btn-delete"
                           onclick="return confirm('Delete this subscription?')">
                           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"/>
                             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                            <path d="M10 11v6"/>
-                            <path d="M14 11v6"/>
+                            <path d="M10 11v6"/><path d="M14 11v6"/>
                             <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                           </svg>
                           Delete
                         </button>
                       </form>
                     </div>
+                    <div class="mini-note">Update expire via +30d / +1y tanpa edit manual</div>
                   </td>
                 </tr>
               {% endfor %}
@@ -584,7 +689,7 @@
     <div class="card">
       <div class="card-head">
         <h2>Logs Terbaru</h2>
-        <span class="badge">Last 200 events</span>
+        <span class="chip">Last 200 events</span>
       </div>
 
       {% if logs %}
@@ -609,7 +714,7 @@
           </table>
         </div>
       {% else %}
-        <p style="color:var(--text-secondary)">Belum ada logs.</p>
+        <p class="subtle">Belum ada logs.</p>
       {% endif %}
     </div>
 
@@ -623,22 +728,22 @@
     </a>
 
     <!-- FOOTER -->
-    <footer class="footer">
+    <footer>
       <div class="footer-inner">
         <div class="footer-brand">
-          <div class="footer-logo">R</div>
+          <div class="footer-logo">RDR</div>
           <div>
             <div class="footer-title">RDR Hosting Reminder</div>
-            <div class="footer-subtitle">Monitoring & reminder system</div>
+            <div class="footer-subtitle">Enterprise-grade monitoring & reminder system</div>
           </div>
         </div>
 
-        <div class="footer-meta">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:700">
           <span>Timezone: Asia/Jakarta</span>
           <span>•</span>
           <span>Telegram Alerts Active</span>
           <span>•</span>
-          <span>Build: 03 Dec 2025</span>
+          <span>Build: {{ now.strftime('%d %b %Y') }}</span>
         </div>
       </div>
     </footer>
@@ -646,6 +751,7 @@
   </div>
 
   <script>
+    // ===== Date picker sync: ISO <-> MM/DD/YYYY for backend =====
     const picker = document.getElementById("expires_at_picker");
     const hidden = document.getElementById("expires_at");
 
@@ -693,29 +799,48 @@
       document.getElementById('subscription-form').action='/add';
     }
 
-    // Extend helper (no timedelta in Jinja)
-    function extendDays(id, currentMMDDYYYY, plusDays){
-      const [m,d,y] = currentMMDDYYYY.split("/").map(Number);
-      const dt = new Date(y, m-1, d);
-      dt.setDate(dt.getDate() + plusDays);
-      const iso = dt.toISOString().slice(0,10);
-      const newMMDDYYYY = toMMDDYYYY(iso);
+    // ===== Extend expire client-side (no timedelta in Jinja) =====
+    function extendDays(id, addDays, currentIso){
+      const d = new Date(currentIso);
+      d.setDate(d.getDate() + addDays);
+      const iso = d.toISOString().slice(0,10);
+      const mmdd = toMMDDYYYY(iso);
 
-      // post hidden form to update endpoint
-      const form = document.createElement("form");
-      form.method = "post";
-      form.action = `/update/${id}`;
-      form.innerHTML = `
-        <input type="hidden" name="name" value="">
-        <input type="hidden" name="url" value="">
-        <input type="hidden" name="brand" value="">
-        <input type="hidden" name="expires_at" value="${newMMDDYYYY}">
-      `;
-      document.body.appendChild(form);
-      form.submit();
+      const f = document.createElement("form");
+      f.method = "post";
+      f.action = `/update/${id}`;
+      f.style.display = "none";
+
+      const hiddenExpires = document.createElement("input");
+      hiddenExpires.type = "hidden";
+      hiddenExpires.name = "expires_at";
+      hiddenExpires.value = mmdd;
+
+      const hiddenName = document.createElement("input");
+      hiddenName.type = "hidden";
+      hiddenName.name = "name";
+      hiddenName.value = ""; // backend kamu biasanya ignore kalau tidak ada, tapi ini aman
+
+      const hiddenUrl = document.createElement("input");
+      hiddenUrl.type = "hidden";
+      hiddenUrl.name = "url";
+      hiddenUrl.value = "";
+
+      const hiddenBrand = document.createElement("input");
+      hiddenBrand.type = "hidden";
+      hiddenBrand.name = "brand";
+      hiddenBrand.value = "";
+
+      f.appendChild(hiddenName);
+      f.appendChild(hiddenUrl);
+      f.appendChild(hiddenBrand);
+      f.appendChild(hiddenExpires);
+
+      document.body.appendChild(f);
+      f.submit();
     }
 
-    // search
+    // ===== Search =====
     const search = document.getElementById("search");
     if(search){
       search.addEventListener("input", () => {
@@ -726,7 +851,7 @@
       });
     }
 
-    // filters by days-left
+    // ===== Filters by days =====
     const filters = document.getElementById("filters");
     if(filters){
       filters.addEventListener("click", (e) => {
@@ -734,24 +859,47 @@
         if(!btn) return;
         const f = btn.dataset.filter;
 
-        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        filters.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        document.querySelectorAll(".row").forEach(row => {
-          const days = parseInt(row.dataset.days || "999", 10);
+        document.querySelectorAll(".row").forEach(r => {
+          const days = parseInt(r.dataset.days, 10);
           let show = true;
 
-          switch(f){
-            case "expired": show = days < 0; break;
-            case "h1": show = days <= 1 && days >= 0; break;
-            case "h2": show = days === 2; break;
-            case "h3": show = days === 3; break;
-            case "soon": show = days <= 7 && days >= 0; break;
-            case "safe": show = days > 7; break;
-            default: show = true;
-          }
-          row.style.display = show ? "" : "none";
+          if(f === "expired") show = days < 0;
+          else if(f === "h1") show = (days === 0 || days === 1);
+          else if(f === "h2") show = days === 2;
+          else if(f === "h3") show = days === 3;
+          else if(f === "soon") show = days >= 4 && days <= 7;
+          else if(f === "safe") show = days > 7;
+          else show = true;
+
+          r.style.display = show ? "" : "none";
         });
+      });
+    }
+
+    // ===== Dropdown actions =====
+    const menu = document.getElementById("menu");
+    const menuBtn = document.getElementById("menuBtn");
+    menuBtn.addEventListener("click", () => menu.classList.toggle("open"));
+    document.addEventListener("click", (e) => {
+      if(!menu.contains(e.target)) menu.classList.remove("open");
+    });
+
+    // Import file submit
+    const importFile = document.getElementById("importFile");
+    if(importFile){
+      importFile.addEventListener("change", () => {
+        if(!importFile.files || !importFile.files[0]) return;
+        const f = document.createElement("form");
+        f.method = "post";
+        f.action = "/import";
+        f.enctype = "multipart/form-data";
+        f.style.display="none";
+        f.appendChild(importFile);
+        document.body.appendChild(f);
+        f.submit();
       });
     }
   </script>
