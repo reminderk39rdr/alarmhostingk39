@@ -64,16 +64,16 @@ async def send_full_list_trigger():
                 days_left = (sub.expires_at - today.date()).days
 
                 # EMOJI ASLI — 100% KELUAR DI TELEGRAM
-                if days_left < 0:
-                    emoji = "Skull"
+              if days_left < 0:
+                    emoji = "💀"
                 elif days_left == 0:
-                    emoji = "Skull"
+                    emoji = "💀"
                 elif days_left <= 3:
-                    emoji = "Fire"
+                    emoji = "🔥"
                 elif days_left <= 7:
-                    emoji = "Warning"
+                    emoji = "⚠️"
                 else:
-                    emoji = "Checkmark Button"
+                    emoji = "✅"
 
                 message += f"{i}. <b>{sub.name}</b>\n"
                 message += f"   <a href='{sub.url}'>{sub.url}</a>\n"
