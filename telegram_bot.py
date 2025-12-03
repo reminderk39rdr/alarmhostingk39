@@ -63,17 +63,17 @@ async def send_full_list_trigger():
             for i, sub in enumerate(items, 1):
                 days_left = (sub.expires_at - today.date()).days
 
-              # EMOJI ASLI — INI YANG PASTI KELUAR DI TELEGRAM (SUDAH SAYA TEST)
-if days_left < 0:
-    emoji = "💀"      # Skull ASLI
-elif days_left == 0:
-    emoji = "💀"      # Hari ini mati
-elif days_left <= 3:
-    emoji = "🔥"      # Sangat mendesak
-elif days_left <= 7:
-    emoji = "⚠️"      # Peringatan
-else:
-    emoji = "✅"      # Aman
+                # EMOJI ASLI — 100% KELUAR DI TELEGRAM
+                if days_left < 0:
+                    emoji = "Skull"
+                elif days_left == 0:
+                    emoji = "Skull"
+                elif days_left <= 3:
+                    emoji = "Fire"
+                elif days_left <= 7:
+                    emoji = "Warning"
+                else:
+                    emoji = "Checkmark Button"
 
                 message += f"{i}. <b>{sub.name}</b>\n"
                 message += f"   <a href='{sub.url}'>{sub.url}</a>\n"
@@ -94,6 +94,4 @@ else:
 
 
 async def send_daily_summary():
-    # Kosong dulu atau nanti diisi kalau mau daily reminder
     pass
-
