@@ -64,7 +64,7 @@ async def send_full_list_trigger():
                 days_left = (sub.expires_at - today.date()).days
 
                 # EMOJI ASLI — 100% KELUAR DI TELEGRAM
-              if days_left < 0:
+                             if days_left < 0:
                     emoji = "💀"
                 elif days_left == 0:
                     emoji = "💀"
@@ -95,3 +95,4 @@ async def send_full_list_trigger():
 
 async def send_daily_summary():
     pass
+
