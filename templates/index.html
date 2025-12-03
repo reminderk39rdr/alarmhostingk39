@@ -7,17 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8fafc;
+            --bg: #f9fafb;
             --surface: #ffffff;
-            --surface2: #f1f5f9;
-            --text: #0f172a;
-            --text-secondary: #64748b;
+            --surface2: #f3f4f6;
+            --text: #111827;
+            --text-secondary: #374151;
             --primary: #8b5cf6;
             --primary-hover: #7c3aed;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --border: #e2e8f0;
+            --border: #e5e7eb;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -57,12 +57,13 @@
         .stat-card {
             background: var(--surface);
             border-radius: 16px;
-            padding: 1.8rem;
+            padding: 2rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
         }
         .stat-value {
-            font-size: 2.8rem;
+            font-size: 3rem;
             font-weight: 700;
             color: var(--primary);
         }
@@ -77,7 +78,7 @@
             padding: 2.5rem;
             margin-bottom: 2rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
         .form-grid {
             display: grid;
@@ -119,7 +120,7 @@
             color: var(--text-secondary);
         }
         .btn-cancel:hover {
-            background: #cbd5e1;
+            background: #e5e7eb;
         }
         .brand-title {
             font-size: 1.8rem;
@@ -211,6 +212,7 @@
             .form-grid {
                 grid-template-columns: 1fr;
             }
+            h1 {font-size: 2.2rem;}
         }
     </style>
 </head>
@@ -234,11 +236,11 @@
                 <div class="stat-label">Active Brands</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{{ (subs|selectattr("expires_at", "le", today + 7)|list)|length }}</div>
+                <div class="stat-value">{{ expiring_soon }}</div>
                 <div class="stat-label">Expiring in 7 Days</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{{ (subs|selectattr("expires_at", "lt", today)|list)|length }}</div>
+                <div class="stat-value">{{ expired_count }}</div>
                 <div class="stat-label">Already Expired</div>
             </div>
         </div>
@@ -283,7 +285,7 @@
                                     <td><a href="{{ sub.url }}" target="_blank" style="color: var(--primary); text-decoration: none;">{{ sub.url }}</a></td>
                                     <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
                                     <td class="days {% if days <= 3 %}days-critical{% elif days <= 7 %}days-warning{% else %}days-safe{% endif %}">
-                                        {{ days }} days
+                                        {{ days
                                     </td>
                                     <td>
                                         <button class="btn action-btn btn-edit" onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ''|e }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>Edit</button>
