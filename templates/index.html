@@ -5,634 +5,655 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RDR Hosting Reminder</title>
 
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#EEF0F3;
-      --card:#FFFFFF;
-      --ink:#121417;
-      --muted:#6B7280;
-      --muted-2:#9AA3AF;
-      --primary:#7C5CFA;
-      --primary-2:#9B7BFF;
-      --success:#10B981;
-      --warn:#F59E0B;
-      --danger:#EF4444;
-      --line:#E7E9EE;
-      --chip:#F4F5F8;
-      --chip-active:#0F172A;
+      --bg: #eef1f6;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#6b7280;
+      --line:#e6e9f0;
+      --accent:#7c4dff;
+      --accent-2:#6d28d9;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --chip:#f3f4f6;
+      --chip-ink:#374151;
       --radius:18px;
       --radius-sm:12px;
-      --shadow:0 8px 24px rgba(16,24,40,.06);
-      --shadow-soft:0 2px 10px rgba(16,24,40,.04);
-      --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --shadow: 0 8px 30px rgba(15,23,42,.06);
+      --shadow-soft: 0 2px 10px rgba(15,23,42,.05);
     }
 
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:var(--font);
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--ink);
-      background:var(--bg);
+      background: radial-gradient(1200px 700px at 0% -10%, #f7f4ff, transparent),
+                  radial-gradient(900px 600px at 100% -15%, #e8f0ff, transparent),
+                  var(--bg);
     }
 
-    a{color:#5B6CFF; text-decoration:none}
-    a:hover{text-decoration:underline}
-
-    .wrap{
-      max-width:1200px;
-      margin:22px auto 32px;
+    .container{
+      width:min(1200px, 100%);
+      margin:20px auto 80px;
       padding:0 14px;
     }
 
-    /* Topbar */
+    /* Header */
     .topbar{
       background:var(--card);
+      border:1px solid var(--line);
       box-shadow:var(--shadow);
-      border-radius:20px;
-      padding:14px 16px;
+      border-radius:22px;
+      padding:12px 14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
+      position:sticky;
+      top:10px;
+      z-index:20;
+      backdrop-filter: blur(8px);
     }
+
     .brand{
-      display:flex; align-items:center; gap:12px;
+      display:flex;align-items:center;gap:10px;
+      font-weight:800;letter-spacing:.2px;
     }
-    .logo{
-      width:40px;height:40px;border-radius:12px;
-      background:linear-gradient(145deg,#111827,#374151);
-      display:grid;place-items:center;color:#fff;font-weight:800;letter-spacing:.5px;
+    .brand .logo{
+      width:38px;height:38px;border-radius:12px;
+      display:grid;place-items:center;
+      background:linear-gradient(145deg, #101828, #3b2cc4);
+      color:white;font-weight:800;
+      box-shadow: var(--shadow-soft);
+    }
+    .brand small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+
+    .meta{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+      color:var(--muted);font-size:13px;font-weight:600;
+    }
+    .pill{
+      background:#f8fafc;border:1px solid var(--line);
+      padding:8px 10px;border-radius:999px;display:flex;gap:8px;align-items:center;
+    }
+
+    /* Dropdown actions */
+    .actions{
+      position:relative;
+    }
+    .actions button{
+      border:1px solid var(--line);
+      background:#0f172a;color:white;
+      padding:9px 12px;border-radius:12px;
+      font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:8px;
       box-shadow:var(--shadow-soft);
     }
-    .brand h1{
-      font-size:16.5px; margin:0; font-weight:800;
+    .actions-menu{
+      position:absolute;right:0;top:46px;
+      min-width:220px;background:white;border:1px solid var(--line);
+      border-radius:14px;box-shadow:var(--shadow);
+      padding:6px;display:none;
     }
-    .brand .sub{
-      font-size:12px; color:var(--muted);
+    .actions-menu a, .actions-menu form button{
+      width:100%;text-align:left;display:flex;align-items:center;gap:10px;
+      padding:10px 10px;border-radius:10px;border:none;background:transparent;
+      font-weight:600;color:var(--ink);cursor:pointer;text-decoration:none;
     }
+    .actions-menu a:hover, .actions-menu form button:hover{background:#f3f4f6}
+    .actions.open .actions-menu{display:block}
 
-    .stats{
-      display:flex; gap:8px; flex-wrap:wrap;
-    }
-    .stat{
-      background:var(--chip);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12.5px;
-      display:flex; align-items:center; gap:6px;
-      color:#111827;
-      white-space:nowrap;
-    }
-    .dot{width:8px;height:8px;border-radius:50%}
-    .dot.success{background:var(--success)}
-    .dot.warn{background:var(--warn)}
-    .dot.danger{background:var(--danger)}
-
-    .right-actions{
-      display:flex; align-items:center; gap:8px;
-    }
-    .btn{
-      height:36px; padding:0 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff; color:#111827;
-      font-size:13px; font-weight:700;
-      display:inline-flex; align-items:center; gap:8px;
-      cursor:pointer;
-      box-shadow:var(--shadow-soft);
-      transition:.15s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{
-      background:var(--primary); color:#fff; border-color:transparent;
-      box-shadow:0 8px 18px rgba(124,92,250,.25);
-    }
-    .btn.ghost{background:#fff}
-    .btn.small{height:30px; padding:0 9px; font-size:12px; border-radius:10px}
-    .btn.danger{color:#fff; background:var(--danger); border-color:transparent}
-    .btn.success{color:#fff; background:var(--success); border-color:transparent}
-
-    .icon{
-      width:14px;height:14px;display:inline-block;
-    }
-
-    /* Layout grid */
+    /* Layout sections */
     .grid{
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:14px;
-      margin-top:14px;
+      display:grid;grid-template-columns: 380px 1fr;gap:14px;margin-top:14px;
     }
-    @media (max-width:980px){
+    @media (max-width: 980px){
       .grid{grid-template-columns:1fr}
     }
 
     .card{
       background:var(--card);
+      border:1px solid var(--line);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      border:1px solid #F6F7FA;
     }
-    .card-head{
-      padding:14px 14px 8px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:8px;
-    }
-    .card-title{
-      font-size:14.5px; font-weight:800; margin:0;
-    }
-    .card-sub{font-size:12px;color:var(--muted)}
 
-    /* Form card */
-    .form-body{padding:12px 14px 14px}
+    .section-title{
+      padding:14px 16px;border-bottom:1px dashed var(--line);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .section-title h3{margin:0;font-size:16px;font-weight:800}
+    .section-title .count{font-size:12px;color:var(--muted);font-weight:700}
+
+    /* Stats */
+    .stats{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;
+    }
+    .stat{
+      background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .stat .k{font-size:12px;color:var(--muted);font-weight:700}
+    .stat .v{font-size:20px;font-weight:800}
+    .stat.good .v{color:var(--good)}
+    .stat.warn .v{color:var(--warn)}
+    .stat.bad .v{color:var(--bad)}
+
+    /* Form */
+    form{margin:0}
+    .form-wrap{padding:12px 12px 14px}
     .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-    .label{font-size:12px;color:var(--muted);font-weight:700}
-    input{
-      width:100%;
-      height:42px;
-      padding:0 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:14px;
-      outline:none;
-      transition:.1s ease;
+    .field label{
+      font-size:12px;font-weight:800;color:#111827;letter-spacing:.2px;
+      display:flex;align-items:center;gap:6px;
     }
-    input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(124,92,250,.12)}
-    .row{display:grid;grid-template-columns:1fr 1fr; gap:8px}
-    @media (max-width:980px){
-      .row{grid-template-columns:1fr}
+    .input, .input-date{
+      border:1px solid var(--line);background:white;border-radius:12px;padding:10px 12px;
+      font-size:14px;font-weight:600;color:var(--ink);outline:none;
+      transition:.15s ease;
     }
+    .input:focus, .input-date:focus{border-color:#c7b8ff;box-shadow:0 0 0 3px rgba(124,77,255,.12)}
+    .input::placeholder{color:#9ca3af;font-weight:500}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    @media (max-width:460px){.row{grid-template-columns:1fr}}
 
     .quick{
-      display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;
+      display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px;
     }
     .chip{
-      background:var(--chip);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:5px 9px;
-      font-size:12px; font-weight:800; color:#111827;
-      cursor:pointer; user-select:none;
-      transition:.12s ease;
+      background:var(--chip);border:1px solid var(--line);
+      padding:6px 9px;border-radius:999px;font-size:12px;font-weight:800;color:var(--chip-ink);
+      cursor:pointer;user-select:none;
     }
-    .chip:hover{transform:translateY(-1px)}
-    .form-actions{
-      display:flex; gap:8px; margin-top:10px;
+    .chip:hover{background:#eceff3}
+
+    .btn-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+    .btn{
+      border:none;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;
+      display:inline-flex;align-items:center;gap:8px;font-size:14px;
+    }
+    .btn.primary{
+      background:linear-gradient(145deg,var(--accent),var(--accent-2));color:white;
+      box-shadow:0 8px 18px rgba(124,77,255,.28);
+    }
+    .btn.ghost{
+      background:#f3f4f6;color:#111827;border:1px solid var(--line);
     }
 
-    /* List / filters */
+    /* Filters */
     .filters{
-      padding:0 14px 10px;
-      display:flex; gap:6px; flex-wrap:wrap;
+      padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);
     }
     .filter{
-      background:var(--chip);
-      border:1px solid var(--line);
-      color:#3B4452;
-      font-weight:800;
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:12.5px;
-      cursor:pointer;
-      transition:.12s ease;
+      padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800;
+      background:#f6f7fb;border:1px solid var(--line);color:#374151;
+      cursor:pointer;transition:.12s ease;
     }
     .filter.active{
-      background:var(--chip-active);
-      color:#fff; border-color:transparent;
+      background:#0f172a;color:white;border-color:#0f172a;
+      box-shadow:0 6px 14px rgba(15,23,42,.18);
     }
 
-    .list-body{padding:0 10px 10px}
-
-    .brand-block{
-      margin:8px 0 12px;
-      border-radius:14px;
-      background:#FAFBFD;
-      border:1px solid var(--line);
-      overflow:hidden;
-    }
+    /* Brand blocks */
+    .brand-block{margin-top:12px}
     .brand-head{
-      padding:10px 12px;
-      background:#fff;
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom:1px dashed var(--line);
+      padding:12px 14px;border-bottom:1px dashed var(--line);
+      display:flex;align-items:center;justify-content:space-between;
     }
     .brand-name{
-      font-size:13.5px; font-weight:900; letter-spacing:.3px;
+      display:flex;align-items:center;gap:8px;font-weight:900;font-size:15px;letter-spacing:.7px;
     }
-    .brand-count{
-      font-size:12px;color:var(--muted);font-weight:800;
+    .brand-pill{
+      background:#111827;color:white;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;
     }
 
+    /* Item row */
     .item{
       display:grid;
-      grid-template-columns: 38px 1.3fr 1fr 130px 130px 170px;
-      gap:8px;
-      padding:10px 12px;
+      grid-template-columns: 50px 1.3fr .9fr 1.2fr .8fr .7fr auto;
+      gap:10px;
+      padding:12px 14px;
       align-items:center;
-      background:#fff;
       border-top:1px solid var(--line);
     }
     .item:first-child{border-top:none}
-    @media (max-width:1100px){
+    @media (max-width: 1100px){
       .item{
-        grid-template-columns: 34px 1.5fr 1fr;
+        grid-template-columns: 50px 1fr;
         grid-auto-rows:auto;
-        row-gap:6px;
+        gap:6px;
       }
-      .item .col-exp,
-      .item .col-days,
-      .item .col-actions{grid-column:2 / -1}
+      .item > div[data-col]{grid-column:1/-1}
+      .item .actions-col{grid-column:1/-1}
     }
 
-    .no{
-      font-weight:900; font-size:13px; color:#111827;
-      width:32px;height:32px;border-radius:10px;
-      display:grid;place-items:center;background:#F3F4F6;
+    .num{
+      width:34px;height:34px;border-radius:10px;
+      display:grid;place-items:center;background:#f3f4f6;border:1px solid var(--line);
+      font-weight:900;color:#111827;
     }
 
     .svc{
-      font-weight:900; font-size:14px;
-      display:flex; flex-direction:column; gap:2px;
+      font-weight:800;font-size:14px;line-height:1.35;
     }
-    .svc .name{line-height:1.3}
-    .svc .url{font-size:12.5px; color:#5B6CFF; font-weight:700}
+    .svc .type{display:block;font-size:12px;color:var(--muted);font-weight:700}
+    .url{
+      color:#2563eb;text-decoration:none;font-weight:700;font-size:13px;
+      word-break:break-all;
+      display:inline-flex;align-items:center;gap:6px;
+    }
+    .url:hover{text-decoration:underline}
 
-    .brand-tag{
-      font-size:12.5px; font-weight:900; color:#111827;
+    .expire{
+      font-weight:800;font-size:13px;
     }
-    .muted{color:var(--muted); font-size:12.5px; font-weight:700}
-    .exp-date{font-size:12.5px; font-weight:900}
+    .expire .muted{font-size:12px;color:var(--muted);font-weight:700}
 
     .days{
-      font-size:13px; font-weight:900;
-      display:flex; align-items:center; gap:8px;
+      font-weight:900;font-size:15px;
+      display:flex;align-items:center;gap:8px;
     }
+    .days.good{color:var(--good)}
+    .days.warn{color:var(--warn)}
+    .days.bad{color:var(--bad)}
+
     .badge{
-      font-size:11px; font-weight:900; letter-spacing:.4px;
-      padding:5px 9px; border-radius:999px; border:1px solid;
-      display:inline-flex; align-items:center; gap:6px;
-      white-space:nowrap;
+      font-size:11px;font-weight:900;letter-spacing:.5px;
+      padding:5px 9px;border-radius:999px;border:1px solid transparent;
+      display:inline-flex;align-items:center;gap:6px;
     }
-    .badge.safe{color:#0F766E; background:#ECFDF3; border-color:#A7F3D0}
-    .badge.soon{color:#1D4ED8; background:#EFF6FF; border-color:#BFDBFE}
-    .badge.h3{color:#92400E; background:#FFFBEB; border-color:#FDE68A}
-    .badge.h2{color:#9A3412; background:#FFF7ED; border-color:#FED7AA}
-    .badge.h1{color:#991B1B; background:#FEF2F2; border-color:#FECACA}
-    .badge.expired{color:#991B1B; background:#FFF1F2; border-color:#FECDD3}
+    .badge.safe{color:#0f5132;background:#e9f9ef;border-color:#b8efcd}
+    .badge.soon{color:#0b4cb8;background:#e8f0ff;border-color:#c2d6ff}
+    .badge.h3{color:#7c2d12;background:#fff1e7;border-color:#ffd9c7}
+    .badge.h2{color:#92400e;background:#fff7e6;border-color:#fde2a7}
+    .badge.h1{color:#991b1b;background:#ffecec;border-color:#ffc8c8}
+    .badge.expired{color:#991b1b;background:#ffecec;border-color:#ffc8c8}
 
-    .actions{
-      display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;
+    .actions-col{
+      display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;
     }
-
-    .footer{
-      margin-top:14px;
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
+    .mini{
+      font-size:12px;font-weight:900;border-radius:10px;padding:7px 9px;border:1px solid var(--line);
+      background:white;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
     }
-    .footer b{color:#111827}
+    .mini:hover{background:#f5f6f9}
+    .mini.green{background:#0f9d58;color:white;border-color:#0f9d58}
+    .mini.blue{background:#2563eb;color:white;border-color:#2563eb}
+    .mini.red{background:#ef4444;color:white;border-color:#ef4444}
+    .mini.outline{background:white;color:#111827}
+    .mini svg{width:14px;height:14px}
 
-    /* tiny helpers */
-    .hide{display:none !important}
+    /* Footer */
+    footer{
+      position:fixed;left:0;right:0;bottom:0;
+      background:rgba(255,255,255,.9);
+      border-top:1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+    .footer-in{
+      width:min(1200px, 100%);
+      margin:0 auto;padding:10px 14px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      font-size:12px;color:var(--muted);font-weight:700;
+    }
+    .footer-in a{color:#111827;text-decoration:none;font-weight:800}
+    .footer-in a:hover{text-decoration:underline}
+
+    /* Small helper */
+    .empty{
+      padding:20px;color:var(--muted);font-weight:700;font-size:14px;text-align:center;
+    }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <div class="container">
 
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="brand">
         <div class="logo">RDR</div>
         <div>
-          <h1>RDR Hosting Reminder</h1>
-          <div class="sub">Our Hosting List • {{ now.strftime('%d %B %Y - %H:%M WIB') }}</div>
+          RDR Hosting Reminder
+          <small>Dashboard & Telegram Notify</small>
         </div>
       </div>
 
-      <div class="stats">
-        <div class="stat"><span class="dot success"></span>Total: <b>{{ subs|length }}</b></div>
-        <div class="stat"><span class="dot warn"></span>Expiring ≤7d: <b>{{ expiring_soon }}</b></div>
-        <div class="stat"><span class="dot danger"></span>Expired: <b>{{ expired_count }}</b></div>
-        <div class="stat">Brands: <b>{{ grouped|length }}</b></div>
+      <div class="meta">
+        <div class="pill">🕒 {{ now.strftime('%d %B %Y - %H:%M') }} WIB</div>
+        <div class="pill">📌 Total: {{ subs|length }} item</div>
       </div>
 
-      <div class="right-actions">
-        <button class="btn primary" onclick="location.href='/trigger'">
-          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          Send to Telegram
+      <div class="actions" id="actions">
+        <button type="button" onclick="toggleActions()">
+          ⚙️ Actions
+          <span style="opacity:.7">▾</span>
         </button>
-        <button class="btn ghost" onclick="refreshPage()">
-          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          Refresh
-        </button>
+        <div class="actions-menu">
+          <a href="/trigger">🚀 Send to Telegram (Full List)</a>
+          <a href="/docs">📚 API Docs</a>
+          <a href="/openapi.json">🧾 OpenAPI JSON</a>
+          <a href="/keep-alive">💚 Keep Alive</a>
+        </div>
       </div>
     </div>
 
     <div class="grid">
+      <!-- LEFT: FORM + STATS -->
+      <section class="card">
+        <div class="section-title">
+          <h3>Tambah / Edit Subscription</h3>
+          <div class="count">Input cepat & rapi</div>
+        </div>
 
-      <!-- LEFT: FORM -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title" id="formTitle">Add New Subscription</div>
-            <div class="card-sub" id="formSub">Input service, brand, URL, and expiry date</div>
+        <div class="stats">
+          <div class="stat warn">
+            <div>
+              <div class="k">Expiring ≤ 7 hari</div>
+              <div class="v">{{ expiring_soon }}</div>
+            </div>
+            <div>⚠️</div>
+          </div>
+          <div class="stat bad">
+            <div>
+              <div class="k">Expired</div>
+              <div class="v">{{ expired_count }}</div>
+            </div>
+            <div>💀</div>
           </div>
         </div>
 
-        <div class="form-body">
-          <form id="subForm" method="post" action="/add">
-            <input type="hidden" id="editId" value="">
-            <input type="hidden" id="expires_at_hidden" name="expires_at" value="">
-
+        <div class="form-wrap">
+          <!-- FORM ADD -->
+          <form action="/add" method="post" id="subForm">
             <div class="field">
-              <div class="label">Service Name</div>
-              <input id="name" name="name" placeholder="ex: VPS Namecheap Prosehat" required />
+              <label>Service Name</label>
+              <input class="input" name="name" placeholder="Contoh: VPS HumanCityMD" required>
             </div>
 
             <div class="field">
-              <div class="label">URL</div>
-              <input id="url" name="url" placeholder="https://example.com" required />
+              <label>URL</label>
+              <input class="input" name="url" placeholder="https://domain.com" required>
             </div>
 
             <div class="field">
-              <div class="label">Brand Domain (optional)</div>
-              <input id="brand" name="brand" placeholder="ex: RADAR138" />
+              <label>Brand / Group</label>
+              <input class="input" name="brand" placeholder="RADAR138 / UNSUR138 / dll">
             </div>
 
+            <!-- DATE PICKER (UI) + HIDDEN (SUBMIT mm/dd/yyyy) -->
             <div class="field">
-              <div class="label">Expire Date</div>
-              <input id="expires_at_ui" type="date" required />
+              <label>Expire Date</label>
+              <div class="row">
+                <input class="input-date" type="date" id="expireDatePicker" />
+                <input class="input" type="text" name="expires_at" id="expireText"
+                       placeholder="mm/dd/yyyy" required>
+              </div>
+
               <div class="quick">
                 <div class="chip" onclick="addDays(7)">+7 days</div>
                 <div class="chip" onclick="addDays(14)">+14 days</div>
                 <div class="chip" onclick="addDays(30)">+30 days</div>
                 <div class="chip" onclick="addYears(1)">+1 year</div>
-              </div>
-              <div class="muted" style="margin-top:5px">
-                Tanggal akan tersimpan format mm/dd/YYYY sesuai database kamu.
+                <div class="chip" onclick="setToday()">Today</div>
+                <div class="chip" onclick="clearDate()">Clear</div>
               </div>
             </div>
 
-            <div class="form-actions">
-              <button class="btn primary" type="submit" id="saveBtn">
-                <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Save Subscription
-              </button>
-              <button class="btn ghost hide" type="button" id="cancelBtn" onclick="cancelEdit()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Cancel Edit
-              </button>
+            <div class="btn-row">
+              <button class="btn primary" type="submit">💾 Save Subscription</button>
+              <button class="btn ghost" type="reset" onclick="resetEdit()">↩️ Reset</button>
             </div>
-
           </form>
         </div>
-      </div>
+      </section>
 
       <!-- RIGHT: LIST -->
-      <div class="card">
-        <div class="card-head" style="padding-bottom:6px">
-          <div>
-            <div class="card-title">Subscriptions</div>
-            <div class="card-sub">Manage all your hosting services</div>
-          </div>
+      <section class="card">
+        <div class="filters" id="filters">
+          <div class="filter active" data-filter="all" onclick="applyFilter('all')">All</div>
+          <div class="filter" data-filter="safe" onclick="applyFilter('safe')">Safe</div>
+          <div class="filter" data-filter="soon" onclick="applyFilter('soon')">Soon ≤7</div>
+          <div class="filter" data-filter="h3" onclick="applyFilter('h3')">H-3</div>
+          <div class="filter" data-filter="h2" onclick="applyFilter('h2')">H-2</div>
+          <div class="filter" data-filter="h1" onclick="applyFilter('h1')">H-1/Today</div>
+          <div class="filter" data-filter="expired" onclick="applyFilter('expired')">Expired</div>
         </div>
 
-        <!-- FILTERS -->
-        <div class="filters">
-          <div class="filter active" data-filter="all" onclick="setFilter('all')">All</div>
-          <div class="filter" data-filter="safe" onclick="setFilter('safe')">Safe</div>
-          <div class="filter" data-filter="soon" onclick="setFilter('soon')">Soon ≤7</div>
-          <div class="filter" data-filter="h3" onclick="setFilter('h3')">H-3</div>
-          <div class="filter" data-filter="h2" onclick="setFilter('h2')">H-2</div>
-          <div class="filter" data-filter="h1" onclick="setFilter('h1')">H-1 / Today</div>
-          <div class="filter" data-filter="expired" onclick="setFilter('expired')">Expired</div>
-        </div>
-
-        <div class="list-body">
-
-          {% if not subs %}
-            <div style="padding:18px;color:var(--muted);font-weight:700">
-              Belum ada subscription, bro.
-            </div>
-          {% endif %}
-
+        {% if grouped and grouped|length > 0 %}
           {% for brand, items in grouped.items() %}
-          <div class="brand-block" data-brand="{{ brand }}">
-            <div class="brand-head">
-              <div class="brand-name">{{ brand or "No Brand" }}</div>
-              <div class="brand-count">{{ items|length }} item{{ '' if items|length==1 else 's' }}</div>
-            </div>
-
-            {% for sub in items %}
-              {% set days = (sub.expires_at - now.date()).days %}
-              {% if days < 0 %}
-                {% set status = "expired" %}
-                {% set badge_class = "expired" %}
-                {% set badge_text = "EXPIRED" %}
-                {% set days_text = "Sudah Expired " ~ (-days) ~ " Hari" %}
-                {% set days_color = "var(--danger)" %}
-              {% elif days == 0 or days == 1 %}
-                {% set status = "h1" %}
-                {% set badge_class = "h1" %}
-                {% set badge_text = "H-1/TODAY" %}
-                {% set days_text = days ~ " day" %}
-                {% set days_color = "var(--danger)" %}
-              {% elif days <= 2 %}
-                {% set status = "h2" %}
-                {% set badge_class = "h2" %}
-                {% set badge_text = "H-2" %}
-                {% set days_text = days ~ " days" %}
-                {% set days_color = "var(--warn)" %}
-              {% elif days <= 3 %}
-                {% set status = "h3" %}
-                {% set badge_class = "h3" %}
-                {% set badge_text = "H-3" %}
-                {% set days_text = days ~ " days" %}
-                {% set days_color = "var(--warn)" %}
-              {% elif days <= 7 %}
-                {% set status = "soon" %}
-                {% set badge_class = "soon" %}
-                {% set badge_text = "SOON" %}
-                {% set days_text = days ~ " days" %}
-                {% set days_color = "var(--warn)" %}
-              {% else %}
-                {% set status = "safe" %}
-                {% set badge_class = "safe" %}
-                {% set badge_text = "SAFE" %}
-                {% set days_text = days ~ " days" %}
-                {% set days_color = "var(--success)" %}
-              {% endif %}
-
-              <div class="item" data-status="{{ status }}">
-                <div class="no">{{ loop.index }}</div>
-
-                <div class="svc">
-                  <div class="name">{{ sub.name|e }}</div>
-                  <div class="url">🔗 <a href="{{ sub.url }}" target="_blank" rel="noopener">{{ sub.url }}</a></div>
-                </div>
-
-                <div class="brand-tag">{{ sub.brand or "–" }}</div>
-
-                <div class="col-exp">
-                  <div class="muted">Expire</div>
-                  <div class="exp-date">{{ sub.expires_at.strftime('%d %B %Y') }}</div>
-                </div>
-
-                <div class="col-days days" style="color:{{ days_color }}">
-                  <div>{{ days_text }}</div>
-                  <div class="badge {{ badge_class }}">{{ badge_text }}</div>
-                </div>
-
-                <div class="col-actions actions">
-                  <button class="btn small" type="button"
-                    onclick="startEdit('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10-10-4-4L4 16v4z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    Edit
-                  </button>
-
-                  <!-- Quick extend (client-side prefill) -->
-                  <button class="btn small success" type="button"
-                    onclick="quickExtend('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}',30)">
-                    +30d
-                  </button>
-                  <button class="btn small success" type="button"
-                    onclick="quickExtend('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}',365)">
-                    +1y
-                  </button>
-
-                  <form method="post" action="/delete/{{ sub.id }}"
-                        onsubmit="return confirm('Yakin hapus subscription ini?')">
-                    <button class="btn small danger" type="submit">
-                      <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-1 0v14H9V6h6z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                      Delete
-                    </button>
-                  </form>
+            <div class="brand-block" data-brand="{{ brand }}">
+              <div class="brand-head">
+                <div class="brand-name">
+                  <span class="brand-pill">{{ brand }}</span>
+                  <span style="font-size:12px;color:var(--muted);font-weight:800">
+                    {{ items|length }} item{{ "s" if items|length != 1 else "" }}
+                  </span>
                 </div>
               </div>
-            {% endfor %}
-          </div>
+
+              {% for sub in items %}
+                {% set days_left = (sub.expires_at - today).days %}
+                {% if days_left < 0 %}
+                  {% set status = "expired" %}
+                {% elif days_left == 0 or days_left == 1 %}
+                  {% set status = "h1" %}
+                {% elif days_left == 2 %}
+                  {% set status = "h2" %}
+                {% elif days_left == 3 %}
+                  {% set status = "h3" %}
+                {% elif days_left <= 7 %}
+                  {% set status = "soon" %}
+                {% else %}
+                  {% set status = "safe" %}
+                {% endif %}
+
+                <div class="item" data-status="{{ status }}">
+                  <div class="num">{{ loop.index }}</div>
+
+                  <div data-col>
+                    <div class="svc">
+                      <span class="type">{{ sub.name.split(' ')[0] if sub.name else 'Service' }}</span>
+                      {{ sub.name }}
+                    </div>
+                  </div>
+
+                  <div data-col style="font-weight:800;font-size:13px;">
+                    {{ sub.brand or "Tanpa Brand" }}
+                  </div>
+
+                  <div data-col>
+                    <a class="url" href="{{ sub.url }}" target="_blank" rel="noopener">
+                      🔗 {{ sub.url }}
+                    </a>
+                  </div>
+
+                  <div data-col class="expire">
+                    <div class="muted">Expire</div>
+                    {{ sub.expires_at.strftime('%d %B %Y') }}
+                  </div>
+
+                  <div data-col>
+                    {% if days_left < 0 %}
+                      <div class="days bad">
+                        {{ days_left }} days
+                        <span class="badge expired">EXPIRED</span>
+                      </div>
+                      <div style="font-size:12px;font-weight:800;color:var(--bad)">
+                        Sudah Expired {{ -days_left }} Hari 💀
+                      </div>
+                    {% elif days_left <= 7 %}
+                      <div class="days warn">
+                        {{ days_left }} days
+                        {% if status=="h3" %}<span class="badge h3">H-3</span>{% endif %}
+                        {% if status=="h2" %}<span class="badge h2">H-2</span>{% endif %}
+                        {% if status=="h1" %}<span class="badge h1">H-1/TODAY</span>{% endif %}
+                        {% if status=="soon" %}<span class="badge soon">SOON</span>{% endif %}
+                      </div>
+                    {% else %}
+                      <div class="days good">
+                        {{ days_left }} days
+                        <span class="badge safe">SAFE</span>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <!-- ACTIONS -->
+                  <div class="actions-col actions-col-right actions-col" data-col>
+                    <!-- Edit -->
+                    <form action="/update/{{ sub.id }}" method="post" style="display:none" id="editForm-{{sub.id}}">
+                      <!-- We submit via JS prompt style; but keeping backend compatible -->
+                    </form>
+
+                    <button class="mini outline" type="button"
+                            onclick="openEdit('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url|e }}','{{ sub.brand|default('',true)|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}')">
+                      ✏️ Edit
+                    </button>
+
+                    <form action="/update/{{ sub.id }}" method="post">
+                      <input type="hidden" name="name" value="{{ sub.name }}">
+                      <input type="hidden" name="url" value="{{ sub.url }}">
+                      <input type="hidden" name="brand" value="{{ sub.brand or '' }}">
+                      <input type="hidden" name="expires_at" value="{{ (sub.expires_at + timedelta(days=30)).strftime('%m/%d/%Y') }}">
+                      <button class="mini green" type="submit">➕ 30d</button>
+                    </form>
+
+                    <form action="/update/{{ sub.id }}" method="post">
+                      <input type="hidden" name="name" value="{{ sub.name }}">
+                      <input type="hidden" name="url" value="{{ sub.url }}">
+                      <input type="hidden" name="brand" value="{{ sub.brand or '' }}">
+                      <input type="hidden" name="expires_at" value="{{ (sub.expires_at + timedelta(days=365)).strftime('%m/%d/%Y') }}">
+                      <button class="mini green" type="submit">➕ 1y</button>
+                    </form>
+
+                    <form action="/delete/{{ sub.id }}" method="post"
+                          onsubmit="return confirm('Yakin mau delete {{ sub.name }}?')">
+                      <button class="mini red" type="submit">🗑️ Delete</button>
+                    </form>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
           {% endfor %}
-
-        </div>
-      </div>
+        {% else %}
+          <div class="empty">Belum ada subscription. Tambahin dulu di kiri ✅</div>
+        {% endif %}
+      </section>
     </div>
-
-    <div class="footer">
-      <div>© {{ now.strftime('%Y') }} <b>RDR Hosting Reminder</b> • Built for long-life monitoring</div>
-    </div>
-
   </div>
 
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-in">
+      <div>
+        © {{ now.year }} RDR Hosting Reminder • Built for long-term reliability.
+      </div>
+      <div>
+        Need help? <a href="https://t.me/" target="_blank">Telegram</a>
+      </div>
+    </div>
+  </footer>
+
   <script>
-    function refreshPage(){ location.reload(); }
-
-    // ===== Date helpers =====
-    const uiDate = document.getElementById("expires_at_ui");
-    const hiddenDate = document.getElementById("expires_at_hidden");
-    const form = document.getElementById("subForm");
-
-    function toMMDDYYYY(dateObj){
-      const mm = String(dateObj.getMonth()+1).padStart(2,'0');
-      const dd = String(dateObj.getDate()).padStart(2,'0');
-      const yy = dateObj.getFullYear();
-      return `${mm}/${dd}/${yy}`;
+    // Dropdown
+    function toggleActions(){
+      document.getElementById("actions").classList.toggle("open");
     }
-    function fromMMDDYYYY(str){
-      const [mm,dd,yy] = str.split('/').map(Number);
-      return new Date(yy, mm-1, dd);
-    }
-    function toInputDate(dateObj){
-      const mm = String(dateObj.getMonth()+1).padStart(2,'0');
-      const dd = String(dateObj.getDate()).padStart(2,'0');
-      const yy = dateObj.getFullYear();
-      return `${yy}-${mm}-${dd}`;
-    }
-
-    function addDays(n){
-      let d = uiDate.value ? new Date(uiDate.value) : new Date();
-      d.setDate(d.getDate()+n);
-      uiDate.value = toInputDate(d);
-    }
-    function addYears(n){
-      let d = uiDate.value ? new Date(uiDate.value) : new Date();
-      d.setFullYear(d.getFullYear()+n);
-      uiDate.value = toInputDate(d);
-    }
-
-    // convert before submit
-    form.addEventListener("submit", (e)=>{
-      if(!uiDate.value){
-        alert("Expire date wajib diisi.");
-        e.preventDefault(); return;
-      }
-      const d = new Date(uiDate.value);
-      hiddenDate.value = toMMDDYYYY(d);
+    document.addEventListener("click", (e)=>{
+      const a = document.getElementById("actions");
+      if(!a.contains(e.target)) a.classList.remove("open");
     });
 
-    // ===== Edit mode =====
-    const formTitle = document.getElementById("formTitle");
-    const formSub = document.getElementById("formSub");
-    const saveBtn = document.getElementById("saveBtn");
-    const cancelBtn = document.getElementById("cancelBtn");
+    // Filter items by status
+    function applyFilter(key){
+      const filters = document.querySelectorAll(".filter");
+      filters.forEach(f => f.classList.toggle("active", f.dataset.filter === key));
 
-    function startEdit(id,name,url,brand,mmddyyyy){
-      document.getElementById("name").value = name;
-      document.getElementById("url").value = url;
-      document.getElementById("brand").value = brand || "";
-      const d = fromMMDDYYYY(mmddyyyy);
-      uiDate.value = toInputDate(d);
-
-      form.action = `/update/${id}`;
-      formTitle.textContent = "Edit Subscription";
-      formSub.textContent = "Update data lalu Save";
-      saveBtn.innerHTML = `
-        <svg class="icon" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        Save Changes`;
-      cancelBtn.classList.remove("hide");
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-
-    function quickExtend(id,name,url,brand,mmddyyyy,days){
-      const d = fromMMDDYYYY(mmddyyyy);
-      d.setDate(d.getDate()+days);
-      startEdit(id,name,url,brand,toMMDDYYYY(d));
-    }
-
-    function cancelEdit(){
-      form.action = "/add";
-      form.reset();
-      uiDate.value = "";
-      hiddenDate.value = "";
-      formTitle.textContent = "Add New Subscription";
-      formSub.textContent = "Input service, brand, URL, and expiry date";
-      saveBtn.innerHTML = `
-        <svg class="icon" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        Save Subscription`;
-      cancelBtn.classList.add("hide");
-    }
-
-    // ===== Filters =====
-    let activeFilter = "all";
-    function setFilter(key){
-      activeFilter = key;
-      document.querySelectorAll(".filter").forEach(f=>{
-        f.classList.toggle("active", f.dataset.filter===key);
-      });
-      document.querySelectorAll(".item").forEach(item=>{
-        const st = item.dataset.status;
-        item.classList.toggle("hide", !(key==="all" || st===key));
+      document.querySelectorAll(".item").forEach(it=>{
+        const s = it.dataset.status;
+        it.style.display = (key==="all" || s===key) ? "grid" : "none";
       });
     }
 
-    // init default date today
-    uiDate.value = toInputDate(new Date());
+    // Date helpers (submit mm/dd/yyyy)
+    const picker = document.getElementById("expireDatePicker");
+    const text = document.getElementById("expireText");
+
+    function toMMDDYYYY(d){
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const yy = d.getFullYear();
+      return `${mm}/${dd}/${yy}`;
+    }
+
+    function setPickerFromText(){
+      const v = text.value.trim();
+      const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(!m) return;
+      const [_, mm, dd, yy] = m;
+      picker.value = `${yy}-${mm}-${dd}`;
+    }
+
+    function setTextFromPicker(){
+      if(!picker.value) return;
+      const d = new Date(picker.value+"T00:00:00");
+      text.value = toMMDDYYYY(d);
+    }
+
+    picker.addEventListener("change", setTextFromPicker);
+    text.addEventListener("blur", setPickerFromText);
+
+    function addDays(n){
+      const base = picker.value ? new Date(picker.value+"T00:00:00") : new Date();
+      base.setDate(base.getDate()+n);
+      picker.value = base.toISOString().slice(0,10);
+      setTextFromPicker();
+    }
+    function addYears(n){
+      const base = picker.value ? new Date(picker.value+"T00:00:00") : new Date();
+      base.setFullYear(base.getFullYear()+n);
+      picker.value = base.toISOString().slice(0,10);
+      setTextFromPicker();
+    }
+    function setToday(){
+      const d = new Date();
+      picker.value = d.toISOString().slice(0,10);
+      setTextFromPicker();
+    }
+    function clearDate(){
+      picker.value = "";
+      text.value = "";
+    }
+
+    function resetEdit(){
+      clearDate();
+    }
+
+    // Simple edit flow: fill left form then scroll
+    function openEdit(id,name,url,brand,expires){
+      const form = document.getElementById("subForm");
+      form.action = "/update/"+id;
+
+      form.querySelector("input[name='name']").value = name;
+      form.querySelector("input[name='url']").value = url;
+      form.querySelector("input[name='brand']").value = brand || "";
+      text.value = expires;
+      setPickerFromText();
+
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    // Auto-init: try sync picker from existing text
+    setPickerFromText();
   </script>
 </body>
 </html>
