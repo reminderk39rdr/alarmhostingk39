@@ -1,846 +1,705 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>RDR Hosting Reminder — Dashboard</title>
 
-  <!-- Font (corporate, clean) -->
+  <!-- Inter font (corporate default) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icons (tiny buttons look pro) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
     :root{
-      --bg: #F4F6FA;
-      --surface: #FFFFFF;
-      --surface-2: #F9FBFF;
-      --ink: #0E1320;
-      --muted: #667085;
-      --line: #E6EAF2;
-
-      --brand: #2B59FF;      /* corporate blue */
-      --brand-2:#6C8BFF;
-      --ok: #12B76A;
-      --warn: #F79009;
-      --danger: #F04438;
-
-      --radius-xl: 18px;
-      --radius-lg: 14px;
-      --radius-md: 10px;
-      --shadow-sm: 0 2px 8px rgba(16,24,40,.05);
-      --shadow-md: 0 8px 28px rgba(16,24,40,.08);
+      --bg: #f4f6f9;
+      --panel: #ffffff;
+      --panel-2:#f8fafc;
+      --line:#e6ebf2;
+      --text:#0f172a;
+      --muted:#64748b;
+      --brand:#0b5fff;         /* corporate blue */
+      --brand-2:#6a5cff;       /* purple accent */
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --radius:16px;
+      --radius-sm:12px;
+      --shadow:0 6px 18px rgba(15, 23, 42, .06);
+      --shadow-sm:0 2px 6px rgba(15, 23, 42, .05);
     }
-
-    [data-theme="dark"]{
-      --bg: #0C1020;
-      --surface: #12162A;
-      --surface-2:#0F1429;
-      --ink: #ECF0FF;
-      --muted:#A6B0CF;
-      --line:#1F2747;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,.35);
-      --shadow-md: 0 8px 28px rgba(0,0,0,.45);
-    }
-
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--ink);
-      background:var(--bg);
+      margin:0; font-family:Inter,system-ui,Arial,sans-serif;
+      background:var(--bg); color:var(--text);
     }
-
     a{color:var(--brand); text-decoration:none}
     a:hover{text-decoration:underline}
 
     .container{
-      width:min(1200px, 94vw);
-      margin:20px auto 60px;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
+      width:min(1200px, 96vw);
+      margin:20px auto 40px;
     }
 
-    /* ======= Header ======= */
+    /* ===== Header ===== */
     .topbar{
-      background:var(--surface);
+      background:var(--panel);
       border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow-sm);
-      padding:12px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      position:sticky;
-      top:10px;
-      z-index:10;
-      backdrop-filter: blur(6px);
+      box-shadow:var(--shadow);
+      border-radius:20px;
+      padding:14px 16px;
+      display:flex; align-items:center; gap:12px;
+      position:sticky; top:12px; z-index:5;
+    }
+    .brandmark{
+      display:flex; align-items:center; gap:10px; padding:6px 8px;
+      border-radius:12px; background:var(--panel-2);
+    }
+    .brandmark .logo{
+      width:36px; height:36px; border-radius:50%;
+      display:grid; place-items:center; color:white;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      font-weight:800; letter-spacing:.5px;
+    }
+    .brandmark .title{
+      font-weight:800; font-size:15px; line-height:1.1;
+    }
+    .brandmark .subtitle{
+      font-size:12px; color:var(--muted);
     }
 
-    .brand{
+    .topbar-spacer{flex:1}
+
+    .userchip{
       display:flex; align-items:center; gap:10px;
-      font-weight:700; letter-spacing:.2px;
-    }
-    .brand-logo{
-      width:38px; height:38px; border-radius:12px;
-      background: radial-gradient(70% 70% at 30% 20%, #7AA2FF 0%, #2B59FF 60%, #1E3FAF 100%);
-      box-shadow:0 6px 14px rgba(43,89,255,.25);
-    }
-    .brand small{color:var(--muted); font-weight:600}
-
-    .topbar-right{
-      display:flex; align-items:center; gap:10px;
-    }
-
-    .chip{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
-      background:var(--surface-2);
+      background:var(--panel-2);
       border:1px solid var(--line);
-      font-size:12px; font-weight:600; color:var(--muted);
-    }
-
-    .btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--surface);
-      color:var(--ink);
+      padding:8px 10px; border-radius:999px;
       font-weight:600; font-size:13px;
-      cursor:pointer;
-      transition:150ms ease;
-      box-shadow:var(--shadow-sm);
     }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .btn-primary{
-      background:var(--brand);
-      border-color:transparent;
-      color:#fff;
-      box-shadow:0 8px 18px rgba(43,89,255,.35);
-    }
-    .btn-ghost{
-      background:transparent;
-      box-shadow:none;
-    }
-    .btn-danger{
-      background:var(--danger);
-      border-color:transparent;
-      color:#fff;
-      box-shadow:0 8px 18px rgba(240,68,56,.30);
-    }
-    .btn-icon{
-      width:36px; height:36px; padding:0; justify-content:center;
-      border-radius:10px;
-    }
+    .userchip i{color:var(--brand)}
 
-    /* dropdown */
-    .dropdown{position:relative}
-    .dropdown-menu{
+    .actions{
+      position:relative;
+    }
+    .actions-btn{
+      display:flex; align-items:center; gap:8px;
+      border:1px solid var(--line);
+      background:white;
+      padding:8px 12px; border-radius:999px;
+      font-weight:600; font-size:13px;
+      cursor:pointer; box-shadow:var(--shadow-sm);
+    }
+    .actions-menu{
       position:absolute; right:0; top:44px;
-      min-width:220px;
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:12px;
-      box-shadow:var(--shadow-md);
-      padding:6px;
-      display:none;
+      width:220px; background:white; border:1px solid var(--line);
+      border-radius:14px; box-shadow:var(--shadow);
+      padding:6px; display:none;
     }
-    .dropdown.open .dropdown-menu{display:block}
-    .dropdown-item{
-      display:flex; align-items:center; gap:10px;
-      padding:9px 10px; border-radius:10px;
-      font-size:13px; font-weight:600; color:var(--ink);
-      cursor:pointer;
+    .actions-menu.show{display:block}
+    .actions-menu a, .actions-menu form button{
+      width:100%; text-align:left; border:0; background:transparent;
+      padding:10px 10px; border-radius:10px; cursor:pointer;
+      font-weight:600; font-size:13px; color:var(--text);
+      display:flex; align-items:center; gap:8px;
     }
-    .dropdown-item:hover{background:var(--surface-2)}
+    .actions-menu a:hover,
+    .actions-menu form button:hover{ background:var(--panel-2); }
+    .actions-menu .danger{ color:var(--bad); }
 
-    /* ======= Cards / Sections ======= */
-    .card{
-      background:var(--surface);
+    /* ===== KPI row ===== */
+    .kpi-row{
+      margin-top:14px;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+    }
+    .kpi{
+      background:var(--panel); border:1px solid var(--line);
+      border-radius:16px; padding:12px 14px; box-shadow:var(--shadow-sm);
+      display:flex; align-items:center; gap:12px;
+    }
+    .kpi .ico{
+      width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
+      background:var(--panel-2); color:var(--brand); font-size:18px;
+    }
+    .kpi .label{font-size:12px; color:var(--muted); font-weight:600}
+    .kpi .value{font-size:20px; font-weight:800; margin-top:2px}
+
+    /* ===== Control Bar ===== */
+    .controlbar{
+      margin-top:14px;
+      background:var(--panel);
       border:1px solid var(--line);
-      border-radius:var(--radius-xl);
+      border-radius:16px;
+      padding:10px;
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       box-shadow:var(--shadow-sm);
-      padding:16px;
     }
-    .card-header{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      margin-bottom:12px;
-    }
-    .card-title{
-      font-weight:700; font-size:18px;
-    }
-    .card-sub{color:var(--muted); font-size:13px}
-
-    /* ======= Add Form ======= */
-    .form-grid{
-      display:grid;
-      grid-template-columns: 1.2fr 1.2fr .9fr .7fr auto;
-      gap:10px;
-    }
-    .input{
-      width:100%;
-      padding:10px 12px;
-      border-radius:12px;
+    .searchbox{
+      flex:1; min-width:220px;
+      display:flex; align-items:center; gap:8px;
+      background:var(--panel-2);
       border:1px solid var(--line);
-      background:var(--surface);
+      padding:8px 10px; border-radius:12px;
+    }
+    .searchbox input{
+      width:100%; border:0; outline:none; background:transparent;
       font-size:14px;
-      outline:none;
-      transition:120ms ease;
-    }
-    .input:focus{
-      border-color:var(--brand-2);
-      box-shadow:0 0 0 4px rgba(43,89,255,.12);
-    }
-
-    .date-wrap{position:relative}
-    .date-wrap .calendar{
-      position:absolute; right:10px; top:50%; transform:translateY(-50%);
-      pointer-events:none; opacity:.6;
-    }
-
-    .quick-date{
-      display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;
-    }
-    .quick-date .btn{padding:6px 10px; font-size:12px; box-shadow:none}
-
-    /* ======= Toolbar (search + filter) ======= */
-    .toolbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; flex-wrap:wrap;
-      margin:8px 0 10px;
-    }
-    .search{
-      flex:1; min-width:220px; position:relative;
-    }
-    .search .input{padding-left:36px}
-    .search .search-ico{
-      position:absolute; left:10px; top:50%; transform:translateY(-50%);
-      opacity:.55;
     }
 
     .filters{
-      display:inline-flex; gap:8px; flex-wrap:wrap;
-      background:var(--surface-2);
+      display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+      background:var(--panel-2);
       border:1px solid var(--line);
       padding:6px; border-radius:999px;
     }
-    .filter-chip{
-      padding:7px 12px; border-radius:999px;
-      font-size:12px; font-weight:700; color:var(--muted);
-      cursor:pointer; border:1px solid transparent;
-      display:inline-flex; gap:6px; align-items:center;
+    .filter-pill{
+      border:0; background:transparent; cursor:pointer;
+      padding:7px 11px; border-radius:999px;
+      font-size:13px; font-weight:700; color:#334155;
+      display:flex; align-items:center; gap:7px;
     }
-    .filter-chip.active{
-      background:var(--ink);
-      color:#fff;
+    .filter-pill .dot{
+      width:8px; height:8px; border-radius:50%;
+      background:#cbd5e1;
+    }
+    .filter-pill.active{
+      background:#0f172a; color:white;
+    }
+    .filter-pill.active .dot{background:white}
+
+    /* ===== Add form ===== */
+    .panel{
+      margin-top:14px; background:var(--panel); border:1px solid var(--line);
+      border-radius:18px; padding:14px; box-shadow:var(--shadow);
+    }
+    .panel h3{margin:0 0 10px; font-size:16px; font-weight:800}
+
+    .form-grid{
+      display:grid; grid-template-columns:1.2fr 1.6fr .9fr .8fr auto;
+      gap:8px; align-items:center;
+    }
+    .form-grid input{
+      width:100%; padding:10px 12px; border-radius:12px;
+      border:1px solid var(--line); background:white; outline:none;
+      font-size:14px;
+    }
+    .form-grid input:focus{
+      border-color:var(--brand); box-shadow:0 0 0 3px rgba(11,95,255,.12);
+    }
+
+    .quick-btns{
+      grid-column:1 / -1;
+      display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;
+    }
+    .chip{
+      border:1px solid var(--line); background:var(--panel-2);
+      padding:6px 10px; border-radius:999px;
+      font-weight:700; font-size:12px; cursor:pointer;
+    }
+
+    .btn{
+      border:0; cursor:pointer; font-weight:800; font-size:13px;
+      padding:10px 12px; border-radius:12px; display:inline-flex; align-items:center; gap:8px;
       box-shadow:var(--shadow-sm);
     }
-    .dot{width:7px;height:7px;border-radius:50%}
-    .dot.ok{background:var(--ok)}
-    .dot.warn{background:var(--warn)}
-    .dot.danger{background:var(--danger)}
-    .dot.gray{background:#98A2B3}
+    .btn-primary{background:var(--brand); color:white;}
+    .btn-ghost{background:white; border:1px solid var(--line); color:var(--text);}
 
-    /* ======= Group & Rows ======= */
-    .group{
-      border:1px dashed var(--line);
-      border-radius:var(--radius-lg);
-      padding:10px;
-      margin-top:10px;
-      background:linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-    }
-    .group-head{
+    /* ===== Brand section ===== */
+    .brand-section{margin-top:14px;}
+    .brand-head{
       display:flex; align-items:center; justify-content:space-between;
-      padding:6px 8px 10px;
-      font-weight:800; letter-spacing:.4px;
+      margin:8px 2px;
     }
-    .group-count{color:var(--muted); font-weight:700; font-size:12px}
+    .brand-title{
+      font-weight:900; letter-spacing:.4px;
+      font-size:15px;
+    }
+    .brand-count{color:var(--muted); font-size:12px; font-weight:700}
 
-    .rows{
-      display:flex; flex-direction:column; gap:8px;
+    .list{
+      background:var(--panel); border:1px solid var(--line);
+      border-radius:16px; overflow:hidden;
     }
-    .row{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
+    .list-row{
       display:grid;
-      grid-template-columns: 44px 2fr 1fr 2fr 1.1fr .9fr 1.2fr;
-      gap:10px;
-      align-items:center;
+      grid-template-columns:60px 2fr 1.1fr 2.1fr 1.2fr 1.2fr 190px;
+      gap:10px; align-items:center;
+      padding:12px 14px; border-top:1px solid var(--line);
     }
-    .row:hover{box-shadow:var(--shadow-sm)}
-
-    .cell-muted{color:var(--muted); font-size:12px; font-weight:600}
-    .service{
-      font-weight:700; font-size:14.5px;
-      display:flex; flex-direction:column; gap:4px;
+    .list-row:first-child{border-top:0}
+    .num{
+      width:36px; height:36px; border-radius:10px; background:var(--panel-2);
+      display:grid; place-items:center; font-weight:900;
     }
-    .svc-url{
-      font-weight:600; font-size:12.5px; color:var(--brand);
-      display:flex; gap:6px; align-items:center;
-    }
-
-    .badge{
+    .svc-name{font-weight:800}
+    .svc-url{font-size:12px; color:var(--muted); margin-top:3px; word-break:break-all}
+    .brand-badge{
       display:inline-flex; align-items:center; gap:6px;
-      font-size:12px; font-weight:800; letter-spacing:.3px;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid var(--line);
-      background:var(--surface-2);
-      color:var(--muted);
-      white-space:nowrap;
+      background:var(--panel-2); border:1px solid var(--line);
+      padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800;
+      width:max-content;
     }
-    .badge.safe{background:rgba(18,183,106,.12); color:#0B7A46; border-color:rgba(18,183,106,.35)}
-    .badge.soon{background:rgba(247,144,9,.12); color:#A15C00; border-color:rgba(247,144,9,.35)}
-    .badge.h3{background:rgba(43,89,255,.10); color:#1E3FAF; border-color:rgba(43,89,255,.30)}
-    .badge.h2{background:rgba(102,112,133,.12); color:#344054; border-color:rgba(102,112,133,.25)}
-    .badge.h1{background:rgba(240,68,56,.12); color:#B42318; border-color:rgba(240,68,56,.35)}
-    .badge.expired{background:rgba(240,68,56,.12); color:#B42318; border-color:rgba(240,68,56,.45)}
 
-    .days-left{
-      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-      font-weight:800;
+    .expire{
+      font-weight:700;
     }
-    .days-num{
+    .days{
+      display:flex; align-items:center; gap:8px; font-weight:800;
+    }
+    .days .n{
       font-size:18px;
-      padding:4px 8px; border-radius:8px;
-      background:var(--surface-2);
-      border:1px solid var(--line);
-    }
-    .days-num.safe{color:var(--ok)}
-    .days-num.soon{color:var(--warn)}
-    .days-num.expired{color:var(--danger)}
-
-    .actions{
-      display:flex; align-items:center; justify-content:flex-end;
-      gap:6px; flex-wrap:wrap;
-    }
-    .actions .btn{padding:7px 10px; font-size:12px}
-    .actions .btn-icon{width:auto; height:auto; padding:7px 10px}
-
-    .mini{
-      font-size:11px; color:var(--muted); font-weight:600; margin-top:4px;
-      text-align:right;
     }
 
-    /* ======= Edit inline ======= */
-    .edit-panel{
-      margin-top:8px;
-      padding:10px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:var(--surface-2);
-      display:none;
+    .status{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 9px; font-size:11px; font-weight:900;
+      border-radius:999px; letter-spacing:.3px; border:1px solid transparent;
+      text-transform:uppercase;
     }
-    .edit-panel.open{display:block}
-    .edit-grid{
-      display:grid;
-      grid-template-columns: 1.3fr 1.5fr 1fr .8fr auto;
-      gap:8px;
-      align-items:center;
-    }
+    .st-safe{ color:var(--good); background:#ecfdf3; border-color:#b7f0cc;}
+    .st-soon{ color:#2563eb; background:#eff6ff; border-color:#b9d5ff;}
+    .st-h3{ color:#7c3aed; background:#f5f3ff; border-color:#ddd6fe;}
+    .st-h2{ color:var(--warn); background:#fffbeb; border-color:#fde68a;}
+    .st-h1{ color:#fb923c; background:#fff7ed; border-color:#fed7aa;}
+    .st-exp{ color:var(--bad); background:#fef2f2; border-color:#fecaca;}
 
-    /* ======= Logs ======= */
+    .actions-col{
+      display:flex; justify-content:flex-end;
+    }
+    .btn-stack{
+      display:grid; grid-template-columns:1fr 1fr; gap:6px; width:180px;
+    }
+    .btn-sm{
+      padding:8px 10px; font-size:12px; border-radius:10px; font-weight:900;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      border:1px solid var(--line); background:white; cursor:pointer;
+    }
+    .btn-sm.edit{background:#0f172a; color:white; border-color:#0f172a;}
+    .btn-sm.plus30{background:#16a34a; color:white; border-color:#16a34a;}
+    .btn-sm.plus1y{background:#0ea5e9; color:white; border-color:#0ea5e9;}
+    .btn-sm.delete{background:#ef4444; color:white; border-color:#ef4444; grid-column:1 / -1;}
+
+    /* ===== Logs ===== */
+    .logs-head{
+      display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+    }
     .logs-table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0 8px;
-      font-size:13px;
+      width:100%; border-collapse:separate; border-spacing:0;
+      overflow:hidden; border-radius:14px; border:1px solid var(--line);
     }
-    .logs-table thead th{
-      text-align:left;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-      padding:0 10px;
+    .logs-table th, .logs-table td{
+      padding:10px 12px; font-size:13px; border-bottom:1px solid var(--line);
+      text-align:left; vertical-align:top;
     }
-    .log-row td{
-      background:var(--surface);
-      border:1px solid var(--line);
-      padding:10px;
+    .logs-table th{
+      background:var(--panel-2); font-size:12px; letter-spacing:.4px; text-transform:uppercase;
+      color:#334155;
     }
-    .log-row td:first-child{border-radius:10px 0 0 10px}
-    .log-row td:last-child{border-radius:0 10px 10px 0}
     .level{
-      font-weight:800; font-size:11px; padding:4px 8px; border-radius:999px;
-      display:inline-flex; align-items:center; gap:6px; border:1px solid transparent;
+      font-weight:900; font-size:11px; padding:4px 8px; border-radius:999px; display:inline-block;
+      background:var(--panel-2); border:1px solid var(--line);
     }
-    .level.INFO{background:rgba(43,89,255,.10); color:#1E3FAF; border-color:rgba(43,89,255,.25)}
-    .level.WARN{background:rgba(247,144,9,.12); color:#A15C00; border-color:rgba(247,144,9,.3)}
-    .level.ERROR{background:rgba(240,68,56,.12); color:#B42318; border-color:rgba(240,68,56,.3)}
+    .lvl-info{color:#0ea5e9}
+    .lvl-warn{color:#f59e0b}
+    .lvl-error{color:#ef4444}
 
-    /* ======= Footer ======= */
+    /* ===== Footer ===== */
     footer{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;
-      padding:0 8px;
+      margin-top:20px; color:var(--muted); font-size:12px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+      padding:12px 4px;
     }
-    .foot-links a{color:var(--muted); font-weight:600; margin-left:8px}
 
-    /* responsive */
-    @media(max-width:980px){
-      .form-grid{grid-template-columns:1fr 1fr 1fr 1fr; }
-      .form-grid .btn{grid-column:1/-1;}
-      .row{
-        grid-template-columns: 36px 1fr;
-        gap:8px;
+    @media (max-width: 980px){
+      .form-grid{grid-template-columns:1fr 1fr; }
+      .list-row{
+        grid-template-columns:50px 1fr;
+        grid-auto-rows:auto;
       }
-      .row > div:nth-child(n+3){grid-column:2}
-      .actions{justify-content:flex-start}
-      .edit-grid{grid-template-columns:1fr 1fr; }
-      .edit-grid .btn{grid-column:1/-1;}
+      .actions-col{justify-content:flex-start;}
+      .btn-stack{width:100%;}
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
 
-    <!-- ======= TOP BAR ======= -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-logo"></div>
-        <div>
-          <div>RDR Hosting Reminder</div>
-          <small>Premium Corporate Dashboard</small>
+<div class="container">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="brandmark">
+      <div class="logo">RDR</div>
+      <div>
+        <div class="title">Hosting Reminder</div>
+        <div class="subtitle">Enterprise Subscription Watchlist</div>
+      </div>
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="userchip">
+      <i class="fa-solid fa-user-shield"></i>
+      <span>{{ username or "admin" }}</span>
+    </div>
+
+    <div class="actions">
+      <button class="actions-btn" id="actionsToggle">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+        Actions
+        <i class="fa-solid fa-caret-down"></i>
+      </button>
+      <div class="actions-menu" id="actionsMenu">
+        <a href="/trigger"><i class="fa-solid fa-paper-plane"></i> Send Full List</a>
+        <a href="/telegram-test"><i class="fa-brands fa-telegram"></i> Test Telegram</a>
+        <a href="/export-csv"><i class="fa-solid fa-file-export"></i> Export CSV</a>
+        <form action="/import-csv" method="post" enctype="multipart/form-data">
+          <label style="display:block;padding:0 6px 6px;color:var(--muted);font-size:11px;font-weight:800;">Import CSV</label>
+          <input type="file" name="file" accept=".csv" style="width:100%;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--panel-2);margin-bottom:6px;">
+          <button type="submit"><i class="fa-solid fa-file-import"></i> Upload & Import</button>
+        </form>
+        <a href="/logout" class="danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== KPI ===== -->
+  <section class="kpi-row">
+    <div class="kpi">
+      <div class="ico"><i class="fa-solid fa-layer-group"></i></div>
+      <div>
+        <div class="label">Total Subscription</div>
+        <div class="value">{{ subs|length }}</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="ico"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div>
+        <div class="label">Expiring Soon (≤7d)</div>
+        <div class="value">{{ expiring_soon or 0 }}</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="ico"><i class="fa-solid fa-skull-crossbones"></i></div>
+      <div>
+        <div class="label">Expired</div>
+        <div class="value">{{ expired_count or 0 }}</div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="ico"><i class="fa-solid fa-clock"></i></div>
+      <div>
+        <div class="label">Now (WIB)</div>
+        <div class="value" style="font-size:14px;font-weight:800;">
+          {{ now.strftime('%d %b %Y · %H:%M') if now else "" }}
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="topbar-right">
-        <div class="chip" title="Login user">
-          <!-- user icon -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21c0-3.314-3.582-6-8-6s-8 2.686-8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
-          {{ username }}
-        </div>
-        <div class="chip" title="Waktu server">
-          <!-- clock -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          {{ now.strftime('%d %B %Y - %H:%M WIB') if now else '' }}
-        </div>
+  <!-- ===== CONTROL BAR ===== -->
+  <section class="controlbar">
+    <div class="searchbox">
+      <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+      <input id="searchInput" type="text" placeholder="Search service / brand / url..." />
+    </div>
 
-        <!-- dropdown actions -->
-        <div class="dropdown" id="actionsDropdown">
-          <button class="btn" id="dropdownBtn" type="button">
-            <!-- menu -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Menu
-          </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="/trigger">
-              <!-- send -->
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Send Full List (Telegram)
-            </a>
-            <a class="dropdown-item" href="/keep-alive" target="_blank">
-              <!-- heartbeat -->
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-5 4 10 2-5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Health / Keep-Alive
-            </a>
+    <div class="filters" id="filterBar">
+      <button class="filter-pill active" data-filter="all">
+        <span class="dot"></span> All
+      </button>
+      <button class="filter-pill" data-filter="safe">
+        <span class="dot" style="background:var(--good)"></span> Safe
+      </button>
+      <button class="filter-pill" data-filter="soon">
+        <span class="dot" style="background:#2563eb"></span> Soon ≤7
+      </button>
+      <button class="filter-pill" data-filter="h3">
+        <span class="dot" style="background:#7c3aed"></span> H-3
+      </button>
+      <button class="filter-pill" data-filter="h2">
+        <span class="dot" style="background:var(--warn)"></span> H-2
+      </button>
+      <button class="filter-pill" data-filter="h1">
+        <span class="dot" style="background:#fb923c"></span> H-1 / Today
+      </button>
+      <button class="filter-pill" data-filter="expired">
+        <span class="dot" style="background:var(--bad)"></span> Expired
+      </button>
+    </div>
+  </section>
 
-            <div class="dropdown-item" id="toggleTheme">
-              <!-- moon -->
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 109.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Toggle Dark Mode
-            </div>
+  <!-- ===== ADD NEW SUB ===== -->
+  <section class="panel">
+    <h3>Add New Subscription</h3>
 
-            <form action="/logout" method="get">
-              <button class="dropdown-item" type="submit" style="width:100%; background:transparent; border:none; text-align:left;">
-                <!-- logout -->
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 21H4a2 2 0 01-2-2V5a2 2 0 012-2h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Logout
-              </button>
-            </form>
-          </div>
-        </div>
+    <form action="/add" method="post">
+      <div class="form-grid">
+        <input name="name" placeholder="Service name" required minlength="3"/>
+        <input name="url" placeholder="https://example.com" required/>
+        <input name="brand" placeholder="Brand / Domain (optional)"/>
+        <!-- gunakan date picker native -->
+        <input id="expiresInput" name="expires_at" placeholder="mm/dd/yyyy" required/>
+        <button class="btn btn-primary" type="submit">
+          <i class="fa-solid fa-plus"></i> Save
+        </button>
 
-      </div>
-    </header>
-
-    <!-- ======= HEALTH CARD ======= -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Scheduler Health</div>
-          <div class="card-sub">Status reminder otomatis dan ringkasan harian</div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <span class="badge h3">Daily: {{ (health.daily if health and health.daily else '-') }}</span>
-          <span class="badge h3">H-3: {{ (health.h3 if health and health.h3 else '-') }}</span>
-          <span class="badge h2">H-2: {{ (health.h2 if health and health.h2 else '-') }}</span>
-          <span class="badge h1">H-1/Today: {{ (health.h1 if health and health.h1 else '-') }}</span>
+        <div class="quick-btns">
+          <button type="button" class="chip" data-add-days="7">+7 days</button>
+          <button type="button" class="chip" data-add-days="14">+14 days</button>
+          <button type="button" class="chip" data-add-days="30">+30 days</button>
+          <button type="button" class="chip" data-add-years="1">+1 year</button>
         </div>
       </div>
-    </section>
+    </form>
+  </section>
 
-    <!-- ======= ADD FORM ======= -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Add New Subscription</div>
-          <div class="card-sub">Masukkan hosting/VPS/domain yang ingin dipantau</div>
-        </div>
-      </div>
-
-      <form action="/add" method="post" id="addForm">
-        <div class="form-grid">
-          <input class="input" type="text" name="name" placeholder="Service Name" required />
-          <input class="input" type="url" name="url" placeholder="https://example.com/" required />
-          <input class="input" type="text" name="brand" placeholder="Brand / Group (optional)" />
-          <div class="date-wrap">
-            <!-- Pakai input type=date biar mudah -->
-            <input class="input" type="date" id="expires_at_date" required />
-            <span class="calendar">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke="currentColor" stroke-width="2"/></svg>
-            </span>
-            <!-- hidden field mm/dd/yyyy sesuai backend -->
-            <input type="hidden" name="expires_at" id="expires_at_hidden">
-          </div>
-          <button class="btn btn-primary" type="submit">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Save Subscription
-          </button>
+  <!-- ===== LIST ===== -->
+  <section class="brand-section">
+    {% set grouped_safe = grouped|default({}) %}
+    {% if grouped_safe %}
+      {% for brand, items in grouped_safe.items() %}
+        <div class="brand-head">
+          <div class="brand-title">{{ brand }}</div>
+          <div class="brand-count">{{ items|length }} items</div>
         </div>
 
-        <div class="quick-date">
-          <button class="btn btn-ghost" type="button" data-add-days="7">+7 days</button>
-          <button class="btn btn-ghost" type="button" data-add-days="14">+14 days</button>
-          <button class="btn btn-ghost" type="button" data-add-days="30">+30 days</button>
-          <button class="btn btn-ghost" type="button" data-add-days="365">+1 year</button>
-        </div>
-      </form>
-    </section>
+        <div class="list">
+          {% for sub in items %}
+            {% set days_left = (sub.expires_at - today).days %}
+            {% set st = "safe" %}
+            {% if days_left < 0 %}{% set st="expired" %}
+            {% elif days_left <= 1 %}{% set st="h1" %}
+            {% elif days_left == 2 %}{% set st="h2" %}
+            {% elif days_left == 3 %}{% set st="h3" %}
+            {% elif days_left <= 7 %}{% set st="soon" %}
+            {% endif %}
 
-    <!-- ======= ACTIVE LIST ======= -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Active Subscriptions</div>
-          <div class="card-sub">
-            Total: {{ subs|length if subs else 0 }}
-            • Expiring ≤7d: {{ expiring_soon or 0 }}
-            • Expired: {{ expired_count or 0}}
-          </div>
-        </div>
-      </div>
+            <div class="list-row item"
+                 data-filter="{{ st }}"
+                 data-search="{{ (sub.name ~ ' ' ~ (sub.brand or '') ~ ' ' ~ sub.url)|lower }}"
+                 data-expires="{{ sub.expires_at.strftime('%Y-%m-%d') }}"
+                 data-id="{{ sub.id }}">
 
-      <div class="toolbar">
-        <div class="search">
-          <span class="search-ico">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </span>
-          <input class="input" id="searchInput" placeholder="Search service / brand / url..." />
-        </div>
+              <div class="num">{{ loop.index }}</div>
 
-        <div class="filters" id="filters">
-          <div class="filter-chip active" data-filter="all"><span class="dot gray"></span>All</div>
-          <div class="filter-chip" data-filter="safe"><span class="dot ok"></span>Safe</div>
-          <div class="filter-chip" data-filter="soon"><span class="dot warn"></span>Soon ≤7</div>
-          <div class="filter-chip" data-filter="h3"><span class="dot h3" style="background:var(--brand);"></span>H-3</div>
-          <div class="filter-chip" data-filter="h2"><span class="dot gray"></span>H-2</div>
-          <div class="filter-chip" data-filter="h1"><span class="dot danger"></span>H-1 / Today</div>
-          <div class="filter-chip" data-filter="expired"><span class="dot danger"></span>Expired</div>
-        </div>
-      </div>
+              <div>
+                <div class="svc-name">{{ sub.name }}</div>
+                <div class="svc-url"><i class="fa-solid fa-link"></i> <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></div>
+              </div>
 
-      {% if grouped %}
-        {% for brand, items in grouped.items() %}
-          <div class="group brand-group" data-brand="{{ brand }}">
-            <div class="group-head">
-              <div>{{ brand }}</div>
-              <div class="group-count">{{ items|length }} items</div>
-            </div>
+              <div>
+                <span class="brand-badge">{{ sub.brand or "Tanpa Brand" }}</span>
+              </div>
 
-            <div class="rows">
-              {% for sub in items %}
-                {% set days = (sub.expires_at - today).days %}
-                {% set status = 'safe' %}
-                {% if days < 0 %}
-                  {% set status = 'expired' %}
-                {% elif days <= 1 %}
-                  {% set status = 'h1' %}
-                {% elif days == 2 %}
-                  {% set status = 'h2' %}
-                {% elif days == 3 %}
-                  {% set status = 'h3' %}
-                {% elif days <= 7 %}
-                  {% set status = 'soon' %}
+              <div class="expire">
+                {{ sub.expires_at.strftime('%d %B %Y') }}
+              </div>
+
+              <div class="days">
+                <span class="n"
+                  style="color:{% if days_left<0 %}var(--bad){% elif days_left<=7 %}var(--warn){% else %}var(--good){% endif %}">
+                  {{ days_left }}
+                </span>
+                <span style="color:var(--muted);font-size:12px;font-weight:700;">days</span>
+              </div>
+
+              <div>
+                {% if st=="safe" %}
+                  <span class="status st-safe">SAFE</span>
+                {% elif st=="soon" %}
+                  <span class="status st-soon">SOON</span>
+                {% elif st=="h3" %}
+                  <span class="status st-h3">H-3</span>
+                {% elif st=="h2" %}
+                  <span class="status st-h2">H-2</span>
+                {% elif st=="h1" %}
+                  <span class="status st-h1">H-1 / TODAY</span>
+                {% else %}
+                  <span class="status st-exp">EXPIRED</span>
                 {% endif %}
+              </div>
 
-                <div class="row subscription-row"
-                     data-status="{{ status }}"
-                     data-search="{{ (sub.name ~ ' ' ~ (sub.brand or '') ~ ' ' ~ sub.url)|lower }}">
-                  <div class="cell-muted">#{{ loop.index }}</div>
+              <div class="actions-col">
+                <div class="btn-stack">
+                  <form action="/edit/{{ sub.id }}" method="get">
+                    <button class="btn-sm edit" type="submit"><i class="fa-solid fa-pen"></i> Edit</button>
+                  </form>
 
-                  <div class="service">
-                    <div>{{ sub.name }}</div>
-                    <div class="svc-url">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                      <a href="{{ sub.url }}" target="_blank" rel="noopener">{{ sub.url }}</a>
-                    </div>
-                  </div>
+                  <form class="extend-form" action="/extend/{{ sub.id }}" method="post" data-days="30">
+                    <input type="hidden" name="expires_at" value="">
+                    <button class="btn-sm plus30" type="submit"><i class="fa-solid fa-plus"></i> +30d</button>
+                  </form>
 
-                  <div>
-                    <span class="badge">{{ sub.brand or 'Tanpa Brand' }}</span>
-                  </div>
+                  <form class="extend-form" action="/extend/{{ sub.id }}" method="post" data-years="1">
+                    <input type="hidden" name="expires_at" value="">
+                    <button class="btn-sm plus1y" type="submit"><i class="fa-solid fa-plus"></i> +1y</button>
+                  </form>
 
-                  <div>
-                    <div class="cell-muted">Expire Date</div>
-                    <div style="font-weight:700">{{ sub.expires_at.strftime('%d %B %Y') }}</div>
-                  </div>
-
-                  <div class="days-left">
-                    {% if days < 0 %}
-                      <span class="days-num expired">{{ days }}</span>
-                      <span class="badge expired">EXPIRED</span>
-                    {% elif days <= 1 %}
-                      <span class="days-num expired">{{ days }}</span>
-                      <span class="badge h1">H-1/TODAY</span>
-                    {% elif days == 2 %}
-                      <span class="days-num soon">{{ days }}</span>
-                      <span class="badge h2">H-2</span>
-                    {% elif days == 3 %}
-                      <span class="days-num soon">{{ days }}</span>
-                      <span class="badge h3">H-3</span>
-                    {% elif days <= 7 %}
-                      <span class="days-num soon">{{ days }}</span>
-                      <span class="badge soon">SOON</span>
-                    {% else %}
-                      <span class="days-num safe">{{ days }}</span>
-                      <span class="badge safe">SAFE</span>
-                    {% endif %}
-                  </div>
-
-                  <div class="actions">
-                    <button class="btn btn-icon" type="button" onclick="toggleEdit({{ sub.id }})" title="Edit">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4 12.5-12.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      Edit
-                    </button>
-
-                    <!-- quick extend 30d -->
-                    <form action="/update/{{ sub.id }}" method="post" class="extendForm" data-days="30">
-                      <input type="hidden" name="name" value="{{ sub.name }}">
-                      <input type="hidden" name="url" value="{{ sub.url }}">
-                      <input type="hidden" name="brand" value="{{ sub.brand or '' }}">
-                      <input type="hidden" name="expires_at" value="">
-                      <button class="btn btn-icon" type="submit" title="+30 days">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                        +30d
-                      </button>
-                    </form>
-
-                    <!-- quick extend 1y -->
-                    <form action="/update/{{ sub.id }}" method="post" class="extendForm" data-days="365">
-                      <input type="hidden" name="name" value="{{ sub.name }}">
-                      <input type="hidden" name="url" value="{{ sub.url }}">
-                      <input type="hidden" name="brand" value="{{ sub.brand or '' }}">
-                      <input type="hidden" name="expires_at" value="">
-                      <button class="btn btn-icon" type="submit" title="+1 year">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                        +1y
-                      </button>
-                    </form>
-
-                    <form action="/delete/{{ sub.id }}" method="post" onsubmit="return confirm('Delete subscription ini?')">
-                      <button class="btn btn-danger btn-icon" type="submit" title="Delete">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18" stroke="currentColor" stroke-width="2"/><path d="M8 6V4h8v2M6 6l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                        Delete
-                      </button>
-                    </form>
-
-                    <div class="mini">Quick extend via +30d / +1y</div>
-                  </div>
-
-                  <!-- inline edit -->
-                  <div class="edit-panel" id="edit-{{ sub.id }}">
-                    <form action="/update/{{ sub.id }}" method="post" class="edit-grid editForm">
-                      <input class="input" name="name" value="{{ sub.name }}" required>
-                      <input class="input" name="url" value="{{ sub.url }}" required>
-                      <input class="input" name="brand" value="{{ sub.brand or '' }}">
-                      <div class="date-wrap">
-                        <input class="input editDate" type="date" value="{{ sub.expires_at.strftime('%Y-%m-%d') }}" required>
-                        <input type="hidden" name="expires_at" class="editHidden">
-                      </div>
-                      <button class="btn btn-primary" type="submit">Save</button>
-                    </form>
-                  </div>
-
+                  <form action="/delete/{{ sub.id }}" method="post" onsubmit="return confirm('Delete {{ sub.name }} ?')">
+                    <button class="btn-sm delete" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
+                  </form>
                 </div>
-              {% endfor %}
+              </div>
+
             </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="card-sub">Belum ada subscription.</div>
-      {% endif %}
-    </section>
-
-    <!-- ======= LOGS ======= -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Logs Terbaru</div>
-          <div class="card-sub">Last 200 events</div>
+          {% endfor %}
         </div>
+      {% endfor %}
+    {% else %}
+      <div class="panel" style="text-align:center;color:var(--muted);font-weight:700;">
+        Belum ada subscription.
       </div>
+    {% endif %}
+  </section>
 
+  <!-- ===== LOGS ===== -->
+  <section class="panel" style="margin-top:16px">
+    <div class="logs-head">
+      <h3 style="margin:0">Logs Terbaru</h3>
+      <div style="font-size:12px;color:var(--muted);font-weight:800;">Last 200 events</div>
+    </div>
+
+    {% set logs_safe = logs|default([]) %}
+    {% if logs_safe and logs_safe|length > 0 %}
       <table class="logs-table">
         <thead>
           <tr>
-            <th style="width:170px;">WAKTU</th>
-            <th style="width:110px;">LEVEL</th>
-            <th>PESAN</th>
+            <th style="width:180px">Waktu</th>
+            <th style="width:90px">Level</th>
+            <th>Pesan</th>
           </tr>
         </thead>
         <tbody>
-        {% if logs %}
-          {% for log in logs %}
-            <tr class="log-row">
-              <td>{{ log.created_at.strftime('%d %b %Y %H:%M') if log.created_at else '-' }}</td>
-              <td><span class="level {{ log.level }}">{{ log.level }}</span></td>
-              <td>{{ log.message }}</td>
+          {% for lg in logs_safe %}
+            {% set lvl = (lg.level or "INFO")|upper %}
+            <tr>
+              <td>{{ lg.created_at.strftime('%d %b %Y %H:%M') if lg.created_at else "-" }}</td>
+              <td>
+                <span class="level {% if lvl=='ERROR' %}lvl-error{% elif lvl=='WARN' %}lvl-warn{% else %}lvl-info{% endif %}">
+                  {{ lvl }}
+                </span>
+              </td>
+              <td>{{ lg.message }}</td>
             </tr>
           {% endfor %}
-        {% else %}
-          <tr class="log-row">
-            <td colspan="3" style="text-align:center; color:var(--muted); font-weight:600;">
-              Belum ada log.
-            </td>
-          </tr>
-        {% endif %}
         </tbody>
       </table>
-    </section>
-
-    <!-- ======= Footer ======= -->
-    <footer>
-      <div>© {{ now.strftime('%Y') if now else '2025' }} RDR Hosting Reminder • All rights reserved.</div>
-      <div class="foot-links">
-        <a href="/docs" target="_blank">API Docs</a>
-        <a href="/openapi.json" target="_blank">OpenAPI</a>
-        <a href="/keep-alive" target="_blank">Health</a>
+    {% else %}
+      <div style="padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:700;">
+        Belum ada log.
       </div>
-    </footer>
+    {% endif %}
+  </section>
 
-  </div>
+  <footer>
+    <div>© {{ now.year if now else "2025" }} RDR Hosting Reminder. All rights reserved.</div>
+    <div style="font-weight:700;">System timezone: WIB (Asia/Jakarta)</div>
+  </footer>
 
-  <script>
-    // ===== Dropdown =====
-    const dd = document.getElementById('actionsDropdown');
-    const ddBtn = document.getElementById('dropdownBtn');
-    ddBtn?.addEventListener('click', () => dd.classList.toggle('open'));
-    document.addEventListener('click', (e)=>{
-      if(!dd.contains(e.target)) dd.classList.remove('open');
+</div>
+
+<script>
+  // ===== Actions dropdown =====
+  const toggle = document.getElementById("actionsToggle");
+  const menu = document.getElementById("actionsMenu");
+  toggle?.addEventListener("click", () => menu.classList.toggle("show"));
+  document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");
+  });
+
+  // ===== Quick add date utilities (for add form) =====
+  const expiresInput = document.getElementById("expiresInput");
+  // default to native date picker where supported
+  expiresInput.type = "date";
+
+  function toMMDDYYYY(d){
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const yy = d.getFullYear();
+    return `${mm}/${dd}/${yy}`;
+  }
+  function toYYYYMMDD(d){
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const yy = d.getFullYear();
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  document.querySelectorAll(".chip").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const now = new Date();
+      const addDays = btn.dataset.addDays ? parseInt(btn.dataset.addDays) : 0;
+      const addYears = btn.dataset.addYears ? parseInt(btn.dataset.addYears) : 0;
+
+      if (addDays){
+        now.setDate(now.getDate() + addDays);
+      }
+      if (addYears){
+        now.setFullYear(now.getFullYear() + addYears);
+      }
+      // use yyyy-mm-dd for input[type=date]
+      expiresInput.value = toYYYYMMDD(now);
+    })
+  });
+
+  // ===== Search + filter =====
+  const searchInput = document.getElementById("searchInput");
+  const items = Array.from(document.querySelectorAll(".item"));
+  let activeFilter = "all";
+
+  function applyFilters(){
+    const q = (searchInput.value || "").trim().toLowerCase();
+    items.forEach(it=>{
+      const byFilter = (activeFilter==="all") || (it.dataset.filter===activeFilter);
+      const bySearch = !q || (it.dataset.search || "").includes(q);
+      it.style.display = (byFilter && bySearch) ? "grid" : "none";
+    })
+  }
+  searchInput?.addEventListener("input", applyFilters);
+
+  document.querySelectorAll(".filter-pill").forEach(p=>{
+    p.addEventListener("click", ()=>{
+      document.querySelectorAll(".filter-pill").forEach(x=>x.classList.remove("active"));
+      p.classList.add("active");
+      activeFilter = p.dataset.filter;
+      applyFilters();
+    })
+  });
+
+  // ===== Extend (+30d / +1y) without timedelta in Jinja =====
+  function addDays(dateStr, n){
+    const d = new Date(dateStr+"T00:00:00");
+    d.setDate(d.getDate()+n);
+    return d;
+  }
+  function addYears(dateStr, n){
+    const d = new Date(dateStr+"T00:00:00");
+    d.setFullYear(d.getFullYear()+n);
+    return d;
+  }
+
+  document.querySelectorAll(".extend-form").forEach(form=>{
+    form.addEventListener("submit", (e)=>{
+      const row = form.closest(".item");
+      const expiresISO = row.dataset.expires; // yyyy-mm-dd
+      let d;
+
+      if (form.dataset.days){
+        d = addDays(expiresISO, parseInt(form.dataset.days));
+      } else if (form.dataset.years){
+        d = addYears(expiresISO, parseInt(form.dataset.years));
+      } else {
+        return; // no change
+      }
+      // server expects mm/dd/yyyy
+      form.querySelector("input[name='expires_at']").value = toMMDDYYYY(d);
     });
+  });
 
-    // ===== Theme toggle =====
-    const toggleTheme = document.getElementById('toggleTheme');
-    toggleTheme?.addEventListener('click', ()=>{
-      const html = document.documentElement;
-      const nowTheme = html.getAttribute('data-theme') || 'light';
-      html.setAttribute('data-theme', nowTheme === 'light' ? 'dark' : 'light');
-      localStorage.setItem('rdr-theme', html.getAttribute('data-theme'));
-    });
-    const savedTheme = localStorage.getItem('rdr-theme');
-    if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-
-    // ===== Add form date formatting (YYYY-MM-DD -> mm/dd/yyyy) =====
-    function ymdToMDY(ymd){
-      const [y,m,d] = ymd.split('-');
-      return `${m}/${d}/${y}`;
-    }
-    const dateInput = document.getElementById('expires_at_date');
-    const hiddenInput = document.getElementById('expires_at_hidden');
-    if(dateInput && hiddenInput){
-      dateInput.addEventListener('change', ()=>{
-        hiddenInput.value = ymdToMDY(dateInput.value);
-      });
-      // init default hidden if already set
-      if(dateInput.value) hiddenInput.value = ymdToMDY(dateInput.value);
-    }
-
-    // quick date buttons
-    document.querySelectorAll('[data-add-days]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const days = Number(btn.getAttribute('data-add-days'));
-        const base = dateInput.value ? new Date(dateInput.value) : new Date();
-        base.setDate(base.getDate() + days);
-        const y = base.getFullYear();
-        const m = String(base.getMonth()+1).padStart(2,'0');
-        const d = String(base.getDate()).padStart(2,'0');
-        dateInput.value = `${y}-${m}-${d}`;
-        hiddenInput.value = ymdToMDY(dateInput.value);
-      });
-    });
-
-    // ===== Inline edit toggle =====
-    function toggleEdit(id){
-      const el = document.getElementById(`edit-${id}`);
-      if(el) el.classList.toggle('open');
-    }
-
-    // ===== Edit forms: fill hidden expires_at =====
-    document.querySelectorAll('.editForm').forEach(form=>{
-      const date = form.querySelector('.editDate');
-      const hidden = form.querySelector('.editHidden');
-      const sync = ()=> hidden.value = ymdToMDY(date.value);
-      date.addEventListener('change', sync);
-      sync();
-    });
-
-    // ===== Extend forms: compute new expiry based on current expiry =====
-    // find current expiry date text from row
-    function parseDateFromRow(row){
-      // we stored iso in editDate value
-      const editDate = row.querySelector('.editDate');
-      if(editDate && editDate.value) return new Date(editDate.value);
-      return null;
-    }
-
-    document.querySelectorAll('.extendForm').forEach(form=>{
-      form.addEventListener('submit', (e)=>{
-        const row = form.closest('.subscription-row');
-        const baseDate = parseDateFromRow(row) || new Date();
-        const addDays = Number(form.dataset.days || '0');
-        baseDate.setDate(baseDate.getDate() + addDays);
-        const y = baseDate.getFullYear();
-        const m = String(baseDate.getMonth()+1).padStart(2,'0');
-        const d = String(baseDate.getDate()).padStart(2,'0');
-        const mdy = `${m}/${d}/${y}`;
-        form.querySelector('input[name="expires_at"]').value = mdy;
-      });
-    });
-
-    // ===== Search =====
-    const searchInput = document.getElementById('searchInput');
-    const rows = Array.from(document.querySelectorAll('.subscription-row'));
-    searchInput?.addEventListener('input', ()=>{
-      const q = searchInput.value.trim().toLowerCase();
-      rows.forEach(r=>{
-        const hay = r.dataset.search || '';
-        r.style.display = hay.includes(q) ? '' : 'none';
-      });
-    });
-
-    // ===== Filters =====
-    const filterWrap = document.getElementById('filters');
-    filterWrap?.addEventListener('click', (e)=>{
-      const chip = e.target.closest('.filter-chip');
-      if(!chip) return;
-      filterWrap.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-
-      const f = chip.dataset.filter;
-      rows.forEach(r=>{
-        if(f === 'all') { r.style.display = ''; return; }
-        r.style.display = (r.dataset.status === f) ? '' : 'none';
-      });
-    });
-  </script>
+</script>
 </body>
 </html>
