@@ -9,185 +9,287 @@
 
   <style>
     :root{
-      --bg:#f9fafb;
+      --bg:#f8fafc;
       --surface:#ffffff;
-      --surface2:#f3f4f6;
-      --text:#111827;
-      --text-secondary:#374151;
+      --surface2:#f1f5f9;
+      --text:#0f172a;
+      --text-secondary:#475569;
       --primary:#8b5cf6;
       --primary-hover:#7c3aed;
       --success:#10b981;
       --warning:#f59e0b;
       --danger:#ef4444;
-      --border:#e5e7eb
+      --border:#e2e8f0;
+      --radius:14px;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{
       font-family:'Inter',sans-serif;
       background:var(--bg);
       color:var(--text);
-      line-height:1.6;
+      line-height:1.55;
       min-height:100vh;
-      padding-bottom:110px;
+      padding-bottom:105px;
     }
-    .container{max-width:1280px;margin:0 auto;padding:1.4rem 1rem}
+    .container{max-width:1240px;margin:0 auto;padding:1.1rem 1rem}
 
     /* ===== Topbar ===== */
     .topbar{
       display:flex;align-items:center;justify-content:space-between;
-      gap:12px;
+      gap:10px;
       background:var(--surface);
       border:1px solid var(--border);
       border-radius:16px;
-      padding:0.9rem 1rem;
-      box-shadow:0 4px 18px rgba(0,0,0,0.05);
-      position:sticky; top:12px; z-index:50;
+      padding:0.75rem 0.9rem;
+      box-shadow:0 4px 16px rgba(15,23,42,0.05);
+      position:sticky; top:10px; z-index:50;
       backdrop-filter: blur(4px);
     }
     .top-left{display:flex;align-items:center;gap:10px}
     .logo{
-      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+      width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
       background:linear-gradient(135deg,#8b5cf6,#ec4899);
       color:white;font-weight:800;
-      box-shadow:0 8px 20px rgba(139,92,246,.35);
+      box-shadow:0 7px 18px rgba(139,92,246,.30);
+      font-size:0.95rem;
     }
     .title-wrap h1{
-      font-size:1.35rem;font-weight:700;line-height:1.1;
+      font-size:1.25rem;font-weight:700;line-height:1.1;
       background:linear-gradient(to right,#8b5cf6,#ec4899);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
     .title-wrap .subtitle{
-      font-size:0.85rem;color:var(--text-secondary);
+      font-size:0.8rem;color:var(--text-secondary);
     }
 
-    .top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .top-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .badge{
       display:inline-flex;align-items:center;gap:6px;
       background:var(--surface2);
       border:1px solid var(--border);
-      padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600;
+      padding:5px 9px;border-radius:999px;font-size:12px;font-weight:600;
       color:var(--text-secondary);
+      white-space:nowrap;
     }
     .logout{
-      background:var(--danger);color:white;border:none;cursor:pointer;
-      padding:7px 12px;border-radius:10px;font-weight:700;font-size:12px;
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+      color:white;border:none;cursor:pointer;
+      padding:6px 10px;border-radius:10px;font-weight:700;font-size:12px;
       text-decoration:none;
+      transition:.12s ease;
+      display:inline-flex;align-items:center;gap:6px;
+      box-shadow:0 6px 12px rgba(239,68,68,.18);
     }
+    .logout:hover{filter:brightness(1.05);transform:translateY(-1px)}
 
-    header{text-align:center;margin:1.8rem 0 1.3rem}
-    header .subtitle{color:var(--text-secondary);font-size:0.95rem;margin-top:6px}
+    header{text-align:center;margin:1.4rem 0 1rem}
+    header .subtitle{color:var(--text-secondary);font-size:0.92rem;margin-top:4px}
 
     .stats-grid{
       display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:1rem;margin:1.5rem 0 2rem;
+      gap:.8rem;margin:1.1rem 0 1.7rem;
     }
     .stat-card{
-      background:var(--surface);border-radius:14px;padding:1.4rem 1rem;
-      border:1px solid var(--border);box-shadow:0 4px 15px rgba(0,0,0,0.05);
+      background:var(--surface);border-radius:14px;padding:1.05rem .9rem;
+      border:1px solid var(--border);box-shadow:0 3px 12px rgba(15,23,42,0.05);
       text-align:center;
     }
-    .stat-value{font-size:2.2rem;font-weight:700;color:var(--primary)}
-    .stat-label{color:var(--text-secondary);font-size:0.85rem;margin-top:0.4rem}
+    .stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
+    .stat-label{color:var(--text-secondary);font-size:0.82rem;margin-top:0.25rem}
 
     .card{
-      background:var(--surface);border-radius:16px;padding:1.7rem;margin-bottom:1.6rem;
-      border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.05);
+      background:var(--surface);border-radius:16px;padding:1.25rem;margin-bottom:1.1rem;
+      border:1px solid var(--border);box-shadow:0 3px 14px rgba(15,23,42,0.05);
     }
 
     .card-head{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-      margin-bottom:1rem;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      margin-bottom:.8rem;
     }
+    .card-head h2{font-size:1.1rem}
 
-    .form-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1.2rem}
+    .form-grid{
+      display:grid;grid-template-columns:1fr;gap:.7rem;margin-bottom:1rem
+    }
     input{
-      width:100%;padding:0.95rem;background:#fff;border:1px solid var(--border);
-      border-radius:12px;font-size:1rem;
+      width:100%;padding:0.8rem 0.85rem;background:#fff;border:1px solid var(--border);
+      border-radius:12px;font-size:0.95rem;
     }
     input:focus{
       outline:none;border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(139,92,246,0.15)
+      box-shadow:0 0 0 4px rgba(139,92,246,0.12)
     }
 
+    /* ===== Buttons (pro + icons) ===== */
     .btn{
-      background:var(--primary);color:white;padding:0.95rem 1.2rem;border:none;border-radius:12px;
-      font-weight:600;cursor:pointer;
+      appearance:none;border:none;cursor:pointer;
+      font-weight:700;letter-spacing:.2px;
+      padding:0.7rem 1rem;border-radius:11px;
+      transition:.15s ease;
+      display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      box-shadow:0 6px 14px rgba(15,23,42,0.06);
+      background: linear-gradient(135deg,#8b5cf6,#7c3aed);
+      color:#fff;font-size:0.92rem;
+      white-space:nowrap;
     }
-    .btn:hover{background:var(--primary-hover)}
-    .btn-cancel{background:var(--surface2);color:var(--text-secondary)}
+    .btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 10px 18px rgba(139,92,246,0.25);
+    }
+    .btn:active{ transform: translateY(0); }
+    .btn svg{width:15px;height:15px}
 
-    .brand-title{
-      font-size:1.4rem;font-weight:700;color:var(--primary);
-      margin:2.1rem 0 0.9rem;padding-bottom:0.5rem;border-bottom:3px solid var(--primary)
+    .btn-cancel{
+      background:#f1f5f9;color:#334155;
     }
-
-    table{width:100%;border-collapse:separate;border-spacing:0 0.8rem}
-    th{display:none}
-    td{
-      display:block;width:100%;padding:1rem;background:var(--surface);border-radius:12px;
-      box-shadow:0 2px 10px rgba(0,0,0,0.05);position:relative;padding-left:90px;font-size:0.95rem
+    .btn-cancel:hover{
+      background:#e2e8f0;
+      box-shadow:0 8px 12px rgba(15,23,42,0.07);
     }
-    td::before{
-      content:attr(data-label);position:absolute;left:1rem;top:1rem;font-weight:600;
-      color:var(--text-secondary);font-size:0.8rem;text-transform:uppercase;letter-spacing:.05em
-    }
-    .days{font-weight:700;font-size:1.05rem!important}
 
     .action-btn{
-      padding:0.6rem 1rem;font-size:0.85rem;margin:0.4rem 0.3rem;border-radius:8px;
-      width:calc(50% - 0.6rem)
+      padding:0.52rem 0.8rem;font-size:0.82rem;border-radius:10px;
+      margin:0.18rem 0.12rem;min-width:76px;
     }
-    .btn-edit{background:#8b5cf6;color:white}
-    .btn-delete{background:var(--danger);color:white}
+    .btn-edit{
+      background:linear-gradient(135deg,#8b5cf6,#ec4899);
+    }
+    .btn-delete{
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+    }
 
+    .brand-title{
+      font-size:1.12rem;font-weight:800;color:var(--primary);
+      margin:1.4rem 0 .6rem;padding-bottom:.35rem;border-bottom:3px solid var(--primary);
+      letter-spacing:.2px;
+    }
+
+    /* ===== Table responsive ===== */
+    table{width:100%;border-collapse:separate;border-spacing:0 .6rem}
+    th{display:none}
+    td{
+      display:block;width:100%;padding:.9rem;background:var(--surface);
+      border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,0.05);
+      position:relative;padding-left:86px;font-size:0.93rem
+    }
+    td::before{
+      content:attr(data-label);position:absolute;left:.9rem;top:.9rem;font-weight:700;
+      color:var(--text-secondary);font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em
+    }
+    .days{
+      font-weight:800;font-size:1rem!important;display:flex;align-items:center;gap:8px;
+    }
+
+    /* Status badge */
+    .status-pill{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:3px 7px;border-radius:999px;
+      font-size:11px;font-weight:800;letter-spacing:.02em;
+      border:1px solid var(--border);
+      background:#fff;white-space:nowrap;
+    }
+    .st-expired{color:#b91c1c;border-color:#fecaca;background:#fff1f2;}
+    .st-h1{color:#7c2d12;border-color:#fed7aa;background:#fff7ed;}
+    .st-h2{color:#92400e;border-color:#fde68a;background:#fffbeb;}
+    .st-h3{color:#b45309;border-color:#fcd34d;background:#fffbeb;}
+    .st-soon{color:#1d4ed8;border-color:#bfdbfe;background:#eff6ff;}
+    .st-safe{color:#065f46;border-color:#bbf7d0;background:#ecfdf5;}
+
+    /* Trigger button fixed */
     .trigger-fixed{
-      position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-      width:90%;max-width:400px;background:linear-gradient(135deg,#8b5cf6,#ec4899);
-      color:white;padding:1rem 2rem;border-radius:50px;font-weight:600;
-      box-shadow:0 10px 30px rgba(139,92,246,0.4);z-index:1000;text-decoration:none;
-      text-align:center;font-size:1.05rem
+      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+      width:92%;max-width:420px;
+      background:linear-gradient(135deg,#8b5cf6,#ec4899);
+      color:white;padding:0.9rem 1.2rem;border-radius:50px;font-weight:800;
+      box-shadow:0 12px 28px rgba(139,92,246,0.35);
+      z-index:1000;text-decoration:none;text-align:center;font-size:1rem;
+      display:flex;justify-content:center;align-items:center;gap:8px;
+      transition:.15s ease;
     }
-
-    footer{text-align:center;margin-top:3rem;padding:2rem 0;color:var(--text-secondary);font-size:0.9rem}
-    .k39{font-family:'Courier New',monospace;font-weight:bold;color:var(--primary);letter-spacing:0.2em}
+    .trigger-fixed svg{width:16px;height:16px}
+    .trigger-fixed:hover{filter:brightness(1.04);transform:translateX(-50%) translateY(-1px)}
 
     /* Logs */
     .logs-wrap{
-      max-height:420px; overflow:auto; border:1px solid var(--border);
+      max-height:360px; overflow:auto; border:1px solid var(--border);
       border-radius:12px; background:var(--surface2);
     }
-    .logs{
-      width:100%; border-collapse:collapse; font-size:0.92rem;
-    }
-    .logs th, .logs td{
-      padding:0.75rem 0.9rem; text-align:left; border-bottom:1px solid var(--border);
+    .logs{width:100%;border-collapse:collapse;font-size:0.9rem}
+    .logs th,.logs td{
+      padding:.65rem .8rem;text-align:left;border-bottom:1px solid var(--border);
       background:transparent;
     }
     .logs th{
-      position:sticky; top:0; background:var(--surface);
-      font-size:0.8rem; text-transform:uppercase; letter-spacing:.05em;
-      color:var(--text-secondary);
+      position:sticky;top:0;background:var(--surface);
+      font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;
+      color:var(--text-secondary);font-weight:800;
+    }
+    .logs th:nth-child(1),.logs td:nth-child(1){
+      width:160px;white-space:nowrap;
+    }
+    .logs th:nth-child(2),.logs td:nth-child(2){
+      width:90px;text-align:center;
     }
     .log-pill{
-      display:inline-flex; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700;
-      border:1px solid var(--border); background:white;
+      display:inline-flex;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;
+      border:1px solid var(--border);background:white;
     }
-    .pill-INFO{ color:#2563eb; }
-    .pill-WARN{ color:#b45309; }
-    .pill-ERROR{ color:#b91c1c; }
+    .pill-INFO{color:#2563eb;}
+    .pill-WARN{color:#b45309;}
+    .pill-ERROR{color:#b91c1c;}
 
-    @media(min-width:640px){
-      .form-grid{grid-template-columns:repeat(2,1fr)}
-      .btn{width:auto;margin:0 0.5rem}
-    }
-    @media(min-width:768px){
+    /* ===== Desktop: one row card ===== */
+    @media (min-width: 768px){
       .form-grid{grid-template-columns:repeat(4,1fr)}
-      .stats-grid{grid-template-columns:repeat(4,1fr);gap:1.2rem}
-      th{display:table-cell;padding:1.2rem 1.5rem;background:var(--surface2)}
-      td{display:table-cell;padding:1.5rem;padding-left:1.5rem}
+      .stats-grid{grid-template-columns:repeat(4,1fr);gap:1rem}
+      th{
+        display:table-cell;padding:0.95rem 1rem;background:var(--surface2);
+        color:#0f172a;font-weight:800;font-size:.9rem;
+      }
+      td{
+        display:table-cell;padding:0.95rem 1rem;padding-left:1rem;
+      }
       td::before{display:none}
-      .action-btn{width:auto}
-      .trigger-fixed{bottom:30px;right:30px;left:auto;transform:none;width:auto}
+      .trigger-fixed{bottom:26px;right:26px;left:auto;transform:none;width:auto}
+
+      table.subs-table{border-spacing:0 9px;}
+      table.subs-table tbody tr{
+        background:var(--surface);
+        box-shadow:0 6px 14px rgba(15,23,42,0.06);
+        border-radius:14px;overflow:hidden;
+      }
+      table.subs-table td{
+        background:transparent!important;box-shadow:none!important;border-bottom:none!important;
+        vertical-align:middle;
+      }
+      table.subs-table td:first-child{
+        font-weight:800;color:#0f172a;
+      }
+      table.subs-table td:last-child{
+        white-space:nowrap;
+      }
+    }
+
+    /* ===== Footer pro ===== */
+    .footer{
+      margin-top:1.6rem;padding:1.2rem 0 1.6rem;color:var(--text-secondary);font-size:0.9rem;
+    }
+    .footer-inner{
+      background:var(--surface);border:1px solid var(--border);border-radius:16px;
+      padding:1rem 1.1rem;display:flex;justify-content:space-between;align-items:center;
+      flex-wrap:wrap;gap:10px;box-shadow:0 6px 18px rgba(15,23,42,0.05);
+    }
+    .footer-brand{display:flex;align-items:center;gap:10px;}
+    .footer-logo{
+      width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;font-weight:900;
+      box-shadow:0 8px 14px rgba(139,92,246,.25);font-size:.9rem;
+    }
+    .footer-title{font-weight:800;color:#0f172a}
+    .footer-subtitle{font-size:12px}
+    .footer-meta{
+      display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;font-weight:600;
     }
   </style>
 </head>
@@ -207,7 +309,15 @@
       <div class="top-right">
         <span class="badge">👤 {{ username }}</span>
         <span class="badge">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
-        <a class="logout" href="/logout">Logout</a>
+        <a class="logout" href="/logout">
+          <!-- logout icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </a>
       </div>
     </div>
 
@@ -228,7 +338,7 @@
     <div class="card">
       <div class="card-head">
         <h2 id="form-title">Add New Subscription</h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
           <span class="badge">Timezone: Asia/Jakarta</span>
           <span class="badge">Telegram Alerts: ON</span>
         </div>
@@ -241,40 +351,76 @@
           <input type="text" id="brand" name="brand" placeholder="Brand Domain (contoh: RADAR138, K39, USR)" required>
           <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
         </div>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap">
-          <button type="submit" class="btn">Save Subscription</button>
-          <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <button type="submit" class="btn">
+            <!-- save icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Save Subscription
+          </button>
+          <button type="button" class="btn btn-cancel" onclick="resetForm()">
+            <!-- x icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Cancel Edit
+          </button>
         </div>
       </form>
     </div>
 
     <!-- ACTIVE SUBS -->
     <div class="card">
-      <div class="cta card-head">
+      <div class="card-head">
         <h2>Active Subscriptions</h2>
-        <input id="search" type="text" placeholder="Search service / brand..." style="max-width:260px">
+        <input id="search" type="text" placeholder="Search service / brand..." style="max-width:240px">
       </div>
 
       {% if subs %}
         {% for brand, items in grouped.items() %}
           <div class="brand-title">{{ brand or "No Brand" }}</div>
+
           <table class="subs-table">
             <thead>
               <tr>
-                <th>No</th><th>Service</th><th>Brand</th><th>URL</th><th>Expire Date</th><th>Days Left</th><th>Action</th>
+                <th>No</th>
+                <th>Service</th>
+                <th>Brand</th>
+                <th>URL</th>
+                <th>Expire Date</th>
+                <th>Days Left</th>
+                <th>Action</th>
               </tr>
             </thead>
+
             <tbody>
               {% for sub in items %}
                 {% set days = (sub.expires_at - today).days %}
                 <tr class="row">
                   <td data-label="No">{{ loop.index }}</td>
-                  <td data-label="Service"><strong>{{ sub.name }}</strong></td>
-                  <td data-label="Brand"><strong>{{ sub.brand or "–" }}</strong></td>
-                  <td data-label="URL">
-                    <a href="{{ sub.url }}" target="_blank" style="color:var(--primary)">{{ sub.url }}</a>
+
+                  <td data-label="Service">
+                    <strong>{{ sub.name }}</strong>
                   </td>
-                  <td data-label="Expire">{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+
+                  <td data-label="Brand">
+                    <strong>{{ sub.brand or "–" }}</strong>
+                  </td>
+
+                  <td data-label="URL">
+                    <a href="{{ sub.url }}" target="_blank" style="color:var(--primary);font-weight:650">
+                      {{ sub.url }}
+                    </a>
+                  </td>
+
+                  <td data-label="Expire">
+                    {{ sub.expires_at.strftime('%d %B %Y') }}
+                  </td>
+
                   <td data-label="Days Left" class="days"
                       style="color:
                         {% if days <= 3 %}var(--danger)
@@ -282,15 +428,47 @@
                         {% else %}var(--success)
                         {% endif %}">
                     {{ days }} day{{ '' if days == 1 else 's' }}
+
+                    {# ===== status badge ===== #}
+                    {% if days < 0 %}
+                      <span class="status-pill st-expired">EXPIRED</span>
+                    {% elif days == 0 %}
+                      <span class="status-pill st-expired">DUE TODAY</span>
+                    {% elif days == 1 %}
+                      <span class="status-pill st-h1">H-1</span>
+                    {% elif days == 2 %}
+                      <span class="status-pill st-h2">H-2</span>
+                    {% elif days == 3 %}
+                      <span class="status-pill st-h3">H-3</span>
+                    {% elif days <= 7 %}
+                      <span class="status-pill st-soon">SOON</span>
+                    {% else %}
+                      <span class="status-pill st-safe">SAFE</span>
+                    {% endif %}
                   </td>
+
                   <td data-label="Action">
                     <button class="btn action-btn btn-edit"
                       onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ""|e }}", "{{ sub.expires_at.strftime("%m/%d/%Y") }}")'>
+                      <!-- edit icon -->
+                      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                      </svg>
                       Edit
                     </button>
+
                     <form method="post" action="/delete/{{ sub.id }}" style="display:inline">
                       <button type="submit" class="btn action-btn btn-delete"
                         onclick="return confirm('Delete this subscription?')">
+                        <!-- trash icon -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/>
+                          <path d="M14 11v6"/>
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
                         Delete
                       </button>
                     </form>
@@ -301,7 +479,7 @@
           </table>
         {% endfor %}
       {% else %}
-        <p style="text-align:center;color:var(--text-secondary);padding:4rem 0">
+        <p style="text-align:center;color:var(--text-secondary);padding:3.2rem 0">
           No active subscriptions yet. Add your first one above.
         </p>
       {% endif %}
@@ -327,12 +505,8 @@
             <tbody>
               {% for log in logs %}
                 <tr>
-                  <td style="white-space:nowrap">
-                    {{ log.created_at.strftime('%d %b %Y %H:%M') }}
-                  </td>
-                  <td>
-                    <span class="log-pill pill-{{ log.level }}">{{ log.level }}</span>
-                  </td>
+                  <td>{{ log.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                  <td><span class="log-pill pill-{{ log.level }}">{{ log.level }}</span></td>
                   <td>{{ log.message }}</td>
                 </tr>
               {% endfor %}
@@ -344,9 +518,36 @@
       {% endif %}
     </div>
 
-    <a href="/trigger" class="trigger-fixed">Send List to Telegram</a>
+    <a href="/trigger" class="trigger-fixed">
+      <!-- send icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+      Send List to Telegram
+    </a>
 
-    <footer><div class="k39">K39</div></footer>
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">R</div>
+          <div>
+            <div class="footer-title">RDR Hosting Reminder</div>
+            <div class="footer-subtitle">Monitoring & reminder system</div>
+          </div>
+        </div>
+
+        <div class="footer-meta">
+          <span>Timezone: Asia/Jakarta</span>
+          <span>•</span>
+          <span>Telegram Alerts Active</span>
+          <span>•</span>
+          <span>Build: 03 Dec 2025</span>
+        </div>
+      </div>
+    </footer>
+
   </div>
 
   <script>
@@ -359,13 +560,13 @@
       document.getElementById('subscription-form').action = `/update/${id}`;
       window.scrollTo({top:0,behavior:'smooth'});
     }
+
     function resetForm(){
       document.getElementById('form-title').innerText='Add New Subscription';
       document.getElementById('subscription-form').reset();
       document.getElementById('subscription-form').action='/add';
     }
 
-    // Simple client-side search (optional)
     const search = document.getElementById("search");
     if(search){
       search.addEventListener("input", () => {
