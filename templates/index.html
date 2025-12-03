@@ -6,331 +6,126 @@
     <title>RDR Hosting Reminder</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #f9fafb;
-            --surface: #ffffff;
-            --surface2: #f3f4f6;
-            --text: #111827;
-            --text-secondary: #374151;
-            --primary: #8b5cf6;
-            --primary-hover: #7c3aed;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --border: #e5e7eb;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding-bottom: 100px; /* space for floating button */
-        }
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 1.5rem 1rem;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        .stat-card {
-            background: var(--surface);
-            border-radius: 14px;
-            padding: 1.5rem 1rem;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 2.4rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 0.4rem;
-        }
-        .card {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border);
-            box-shadow: 0...
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        input {
-            width: 100%;
-            padding: 1rem;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 1rem;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
-        }
-        .btn {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-            margin: 0.5rem 0;
-        }
-        .btn-cancel {
-            background: var(--surface2);
-            color: var(--text-secondary);
-        }
-        .brand-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 2.5rem 0 1rem 0;
-            padding-bottom: 0.6rem;
-            border-bottom: 3px solid var(--primary);
-        }
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 0.8rem;
-            margin-bottom: 1rem;
-        }
-        th {
-            display: none; /* hidden on mobile */
-        }
-        td {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
-            padding-left: 90px;
-            font-size: 0.95rem;
-        }
-        td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 1rem;
-            top: 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        tr:hover td {
-            background: #f8f5ff;
-            transform: translateY(-2px);
-        }
-        .days {
-            font-weight: 700;
-            font-size: 1.1rem !important;
-        }
-        .action-btn {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
-            margin: 0.4rem 0.3rem;
-            border-radius: 8px;
-            width: calc(50% - 0.6rem);
-        }
-        .btn-delete { background: var(--danger); }
-        .btn-edit { background: #8b5cf6; color: white; }
-        footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 2rem 0;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .k39 {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: var(--primary);
-            letter-spacing: 0.2em;
-        }
-        .trigger-fixed {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-            z-index: 1000;
-            text-decoration: none;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        /* Tablet & Desktop */
-        @media (min-width: 640px) {
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .btn, .btn-cancel {
-                width: auto;
-                margin: 0 0.5rem;
-            }
-        }
-        @media (min-width: 768px) {
-            h1 { font-size: 2.8rem; }
-            .form-grid { grid-template-columns: repeat(4, 1fr); }
-            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-            th { display: table-cell; padding: 1.2rem 1.5rem; background: var(--surface2); }
-            td { display: table-cell; padding: 1.5rem; padding-left: 1.5rem; }
-            td::before { display: none; }
-            .action-btn { width: auto; }
-            .trigger-fixed {
-                bottom: 30px;
-                right: 30px;
-                left: auto;
-                transform: none;
-                width: auto;
-            }
-        }
-        @media (min-width: 1024px) {
-            .container { padding: 2rem 1rem; }
+        :root{--bg:#f9fafb;--surface:#ffffff;--surface2:#f3f4f6;--text:#111827;--text-secondary:#374151;--primary:#8b5cf6;--primary-hover:#7c3aed;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--border:#e5e7eb}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;padding-bottom:100px}
+        .container{max-width:1280px;margin:0 auto;padding:1.5rem 1rem}
+        header{text-align:center;margin-bottom:2rem}
+        h1{font-size:2.4rem;font-weight:700;background:linear-gradient(to right,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin:2rem 0}
+        .stat-card{background:var(--surface);border-radius:14px;padding:1.5rem 1rem;border:1px solid var(--border);box-shadow:0 4px 15px rgba(0,0,0,0.05);text-align:center}
+        .stat-value{font-size:2.4rem;font-weight:700;color:var(--primary)}
+        .stat-label{color:var(--text-secondary);font-size:0.85rem;margin-top:0.4rem}
+        .card{background:var(--surface);border-radius:16px;padding:1.8rem;margin-bottom:2rem;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.05)}
+        .form-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1.5rem}
+        input{width:100%;padding:1rem;background:#fff;border:1px solid var(--border);border-radius:12px;font-size:1rem}
+        input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(139,92,246,0.15)}
+        .btn{background:var(--primary);color:white;padding:1rem;border:none;border-radius:12px;font-weight:600;cursor:pointer;width:100%;margin:0.5rem 0}
+        .btn-cancel{background:var(--surface2);color:var(--text-secondary)}
+        .brand-title{font-size:1.6rem;font-weight:700;color:var(--primary);margin:2.5rem 0 1rem;padding-bottom:0.6rem;border-bottom:3px solid var(--primary)}
+        table{width:100%;border-collapse:separate;border-spacing:0 0.8rem}
+        th{display:none}
+        td{display:block;width:100%;padding:1rem;background:var(--surface);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);position:relative;padding-left:90px;font-size:0.95rem}
+        td::before{content:attr(data-label);position:absolute;left:1rem;top:1rem;font-weight:600;color:var(--text-secondary);font-size:0.8rem;text-transform:uppercase;letter-spacing:.05em}
+        .days{font-weight:700;font-size:1.1rem!important}
+        .action-btn{padding:0.6rem 1rem;font-size:0.85rem;margin:0.4rem 0.3rem;border-radius:8px;width:calc(50% - 0.6rem)}
+        .btn-edit{background:#8b5cf6;color:white}
+        .btn-delete{background:var(--danger);color:white}
+        .trigger-fixed{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:90%;max-width:400px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;padding:1rem 2rem;border-radius:50px;font-weight:600;box-shadow:0 10px 30px rgba(139,92,246,0.4);z-index:1000;text-decoration:none;text-align:center;font-size:1.1rem}
+        footer{text-align:center;margin-top:4rem;padding:2rem 0;color:var(--text-secondary);font-size:0.9rem}
+        .k39{font-family:'Courier New',monospace;font-weight:bold;color:var(--primary);letter-spacing:0.2em}
+        @media(min-width:640px){.form-grid{grid-template-columns:repeat(2,1fr)}.btn{width:auto;margin:0 0.5rem}}
+        @media(min-width:768px){
+            h1{font-size:2.8rem}
+            .form-grid{grid-template-columns:repeat(4,1fr)}
+            .stats-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
+            th{display:table-cell;padding:1.2rem 1.5rem;background:var(--surface2)}
+            td{display:table-cell;padding:1.5rem;padding-left:1.5rem}
+            td::before{display:none}
+            .action-btn{width:auto}
+            .trigger-fixed{bottom:30px;right:30px;left:auto;transform:none;width:auto}
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>RDR Hosting Reminder</h1>
-            <p class="subtitle">Professional subscription & hosting expiration management system</p>
-            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.95rem;">
-                Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }} • {{ now.strftime('%d %B %Y - %H:%M WIB') }}
-            </p>
-        </header>
+<div class="container">
+    <header>
+        <h1>RDR Hosting Reminder</h1>
+        <p class="subtitle">Professional subscription & hosting expiration management system</p>
+        <p style="margin-top:1rem;color:var(--text-secondary);font-size:0.95rem;">
+            Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }} • {{ now.strftime('%d %B %Y - %H:%M WIB') }}
+        </p>
+    </header>
 
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">{{ subs|length }}</div><div class="stat-label">Total</div></div>
-            <div class="stat-card"><div class="stat-value">{{ grouped|length }}</div><div class="stat-label">Brands</div></div>
-            <div class="stat-card"><div class="stat-value">{{ expiring_soon }}</div><div class="stat-label">Expiring Soon</div></div>
-            <div class="stat-card"><div class="stat-value">{{ expired_count }}</div><div class="stat-label">Expired</div></div>
-        </div>
-
-        <div class="card">
-            <h2 style="margin-bottom: 1.5rem; color: var(--text);" id="form-title">Add New Subscription</h2>
-            <form id="subscription-form" method="post" action="/add">
-                <div class="form-grid">
-                    <input type="text" id="name" name="name" placeholder="Service Name" required>
-                    <input type="url" id="url" name="url" placeholder="URL" required>
-                    <input type="text" id="brand" name="brand" placeholder="Brand / Provider">
-                    <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
-                </div>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button type="submit" class="btn">Save Subscription</button>
-                    <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2 style="margin-bottom: 1.5rem; color: var(--text);">Active Subscriptions</h2>
-            {% if subs %}
-                {% for brand, items in grouped.items() %}
-                    <div class="brand-title">{{ brand or "No Brand" }}</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>No</th><th>Service</th><th>URL</th><th>Expire Date</th><th>Days Left</th><th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sub in items %}
-                                {% set days = (sub.expires_at - today).days %}
-                                <tr>
-                                    <td data-label="No">{{ loop.index }}</td>
-                                    <td data-label="Service"><strong>{{ sub.name }}</strong></td>
-                                    <td data-label="URL"><a href="{{ sub.url }}" target="_blank" style="color: var(--primary);">{{ sub.url }}</a></td>
-                                    <td data-label="Expire">{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-                                    <td data-label="Days Left" class="days {% if days <= 3 %}days-critical{% elif days <= 7 %}days-warning{% else %}days-safe{% endif %}">
-                                        {{ days }} day{{ '' if days == 1 else 's' }}
-                                    </td>
-                                    <td data-label="Action">
-                                        <button class="btn action-btn btn-edit" onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ''|e }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>Edit</button>
-                                        <form method="post" action="/delete/{{ sub.id }}" style="display:inline;">
-                                            <button type="submit" class="btn action-btn btn-delete" onclick="return confirm('Delete this subscription?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endfor %}
-            {% else %}
-                <p style="text-align: center; color: var(--text-secondary); padding: 4rem 0;">No active subscriptions yet. Add your first one above.</p>
-            {% endif %}
-        </div>
-
-        <a href="/trigger" class="trigger-fixed">
-            Send List to Telegram
-        </a>
-
-        <footer>
-            <div class="k39">K39</div>
-        </footer>
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">{{ subs|length }}</div><div class="stat-label">Total</div></div>
+        <div class="stat-card"><div class="stat-value">{{ grouped|length }}</div><div class="stat-label">Brands</div></div>
+        <div class="stat-card"><div class="stat-value">{{ expiring_soon }}</div><div class="stat-label">Expiring Soon</div></div>
+        <div class="stat-card"><div class="stat-value">{{ expired_count }}</div><div class="stat-label">Expired</div></div>
     </div>
 
-    <script>
-        function editSubscription(id, name, url, brand, expires_at) {
-            document.getElementById('form-title').innerText = 'Edit Subscription';
-            document.getElementById('name').value = name;
-            document.getElementById('url').value = url;
-            document.getElementById('brand').value = brand || '';
-            document.getElementById('expires_at').value = expires_at;
-            document.getElementById('subscription-form').action = `/update/${id}`;
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-        function resetForm() {
-            document.getElementById('form-title').innerText = 'Add New Subscription';
-            document.getElementById('subscription-form').reset();
-            document.getElementById('subscription-form').action = '/add';
-        }
-    </script>
+    <div class="card">
+        <h2 style="margin-bottom:1.5rem;color:var(--text)" id="form-title">Add New Subscription</h2>
+        <form id="subscription-form" method="post" action="/add">
+            <div class="form-grid">
+                <input type="text" id="name" name="name" placeholder="Service Name" required>
+                <input type="url" id="url" name="url" placeholder="URL" required>
+                <input type="text" id="brand" name="brand" placeholder="Brand Domain (contoh: RADAR138, K39, USR)" required>
+                <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
+            </div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap">
+                <button type="submit" class="btn">Save Subscription</button>
+                <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-bottom:1.5rem;color:var(--text)">Active Subscriptions</h2>
+        {% if subs %}
+            {% for brand, items in grouped.items() %}
+                <div class="brand-title">{{ brand or "No Brand" }}</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th><th>Service</th><th>Brand</th><th>URL</th><th>Expire Date</th><th>Days Left</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in items %}
+                            {% set days = (sub.expires_at - today).days %}
+                            <tr>
+                                <td data-label="No">{{ loop.index }}</td>
+                                <td data-ons="Service"><strong>{{ sub.name }}</strong></td>
+                                <td data-label="Brand"><strong>{{ sub.brand or "–" }}</strong></td>
+                                <td data-label="URL"><a href="{{ sub.url }}" target="_blank" style="color:var(--primary)">{{ sub.url }}</a></td>
+                                <td data-label="Expire">{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+                                <td data-label="Days Left" class="days {% if days <= 3 %}text-red-600{% elif days <= 7 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                                    {{ days }} day{{ '' if days == 1 else 's' }}
+                                </td>
+                                <td data-label="Action">
+                                    <button class="btn action-btn btn-edit" onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ''|e }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>Edit</button>
+                                    <form method="post" action="/delete/{{ sub.id }}" style="display:inline">
+                                        <button type="submit" class="btn action-btn btn-delete" onclick="return confirm('Delete this subscription?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center;color:var(--text-secondary);padding:4rem 0">No active subscriptions yet. Add your first one above.</p>
+        {% endif %}
+    </div>
+
+    <a href="/trigger" class="trigger-fixed">Send List to Telegram</a>
+    <footer><div class="k39">K39</div></footer>
+</div>
+
+<script>
+function editSubscription(id,name,url,brand,expires_at){document.getElementById('form-title').innerText='Edit Subscription';document.getElementById('name').value=name;document.getElementById('url').value=url;document.getElementById('brand').value=brand;document.getElementById('expires_at').value=expires_at;document.getElementById('subscription-form').action=`/update/${id}`;window.scrollTo({top:0,behavior:'smooth'})}
+function resetForm(){document.getElementById('form-title').innerText='Add New Subscription';document.getElementById('subscription-form').reset();document.getElementById('subscription-form').action='/add'}
+</script>
 </body>
 </html>
