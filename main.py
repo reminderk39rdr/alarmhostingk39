@@ -16,7 +16,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from sqlalchemy import inspect, text
-from sqlalchemy.orm import Session
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
@@ -32,6 +31,7 @@ from crud import (
 )
 
 from telegram_bot import (
+    send_telegram_message,          # dipakai buat notif "sudah diperpanjang"
     send_full_list_trigger,
     send_daily_summary,
     send_reminders_3days,
@@ -63,6 +63,7 @@ try:
     logger.info("[BOOT] Database terkoneksi — semua data aman selamanya!")
     Base.metadata.create_all(bind=engine)
 
+    # migrasi kolom reminder kalau belum ada
     with engine.begin() as conn:
         inspector = inspect(engine)
         columns = [col["name"] for col in inspector.get_columns("subscription")]
@@ -178,7 +179,10 @@ async def add(
     name, url, exp_date, brand = validate_input(name, url, expires_at, brand)
     db = SessionLocal()
     try:
-        create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
+        create_subscription(
+            db,
+            SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand),
+        )
         db.commit()
     finally:
         db.close()
@@ -196,12 +200,33 @@ async def update(
     name, url, exp_date, brand = validate_input(name, url, expires_at, brand)
     db = SessionLocal()
     try:
-        result = update_subscription(db, sub_id, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
+        # ambil data lama dulu
+        old_sub = db.query(Subscription).filter(Subscription.id == sub_id).first()
+        if not old_sub:
+            raise HTTPException(status_code=404, detail="Subscription tidak ditemukan")
+
+        old_exp = old_sub.expires_at
+
+        # update pakai crud kamu
+        result = update_subscription(
+            db,
+            sub_id,
+            SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand),
+        )
         db.commit()
         if not result:
             raise HTTPException(status_code=404, detail="Subscription tidak ditemukan")
+
+        # notif kalau diperpanjang (tanggal baru > tanggal lama)
+        if exp_date and old_exp and exp_date > old_exp:
+            new_str = exp_date.strftime("%d %B %Y")
+            await send_telegram_message(
+                f"✅ <b>{name}</b> sudah diperpanjang sampai <b>{new_str}</b>."
+            )
+
     finally:
         db.close()
+
     return RedirectResponse("/", status_code=303)
 
 @app.post("/delete/{sub_id}")
