@@ -78,6 +78,37 @@ def _allowed_minute(windows: set[int]) -> bool:
     return now_minute in windows
 
 
+def _format_remaining(days_left: int) -> tuple[str, str]:
+    """
+    Return (remaining_text, emoji_override_optional)
+    - expired: (<b>Sudah Expired X Hari</b>)
+    - hari ini: (<b>Jatuh Tempo Hari Ini</b>)
+    - besok: (<b>Besok Jatuh Tempo</b>)
+    - lainnya: (X hari lagi)
+    """
+    if days_left < 0:
+        expired_days = abs(days_left)
+        return f"(<b>Sudah Expired {expired_days} Hari</b>)", "💀"
+    if days_left == 0:
+        return "(<b>Jatuh Tempo Hari Ini</b>)", "💀"
+    if days_left == 1:
+        return "(<b>Besok Jatuh Tempo</b>)", "⏳"
+    return f"({days_left} hari lagi)", ""
+
+
+def _default_emoji(days_left: int) -> str:
+    """Emoji default kalau tidak dioverride oleh _format_remaining."""
+    if days_left <= 1:
+        return "💀"
+    if days_left == 2:
+        return "⚠️"
+    if days_left == 3:
+        return "🔥"
+    if days_left <= 7:
+        return "⚠️"
+    return "✅"
+
+
 # =========================================================
 # 1) FULL LIST / DAILY SUMMARY
 # =========================================================
@@ -114,19 +145,7 @@ async def send_full_list_trigger():
                 else:
                     days_left = (expires_date - today_date).days
 
-                if days_left < 0:
-                    emoji = "💀"
-                elif days_left == 0:
-                    emoji = "💀"
-                elif days_left <= 3:
-                    emoji = "🔥"
-                elif days_left <= 7:
-                    emoji = "⚠️"
-                else:
-                    emoji = "✅"
-
                 safe_name = html_escape(sub.name or "Tanpa Nama")
-
                 message += f"{i}. <b>{safe_name}</b>\n"
 
                 if getattr(sub, "url", None):
@@ -134,12 +153,15 @@ async def send_full_list_trigger():
                     message += f"🔗 <a href='{safe_url}'>{safe_url}</a>\n"
 
                 if expires_date:
+                    remaining_text, emoji_override = _format_remaining(days_left)
+                    emoji = emoji_override or _default_emoji(days_left)
+
                     message += (
                         f"Expire: {expires_date.strftime('%d %B %Y')} "
-                        f"({days_left} hari lagi) {emoji}\n\n"
+                        f"{remaining_text} {emoji}\n\n"
                     )
                 else:
-                    message += f"Expire: - (unknown) {emoji}\n\n"
+                    message += f"Expire: - (unknown) ✅\n\n"
 
             message += "—" * 30 + "\n\n"
 
@@ -167,9 +189,7 @@ async def send_daily_summary():
 # 2) REMINDER BERTINGKAT
 # =========================================================
 async def _send_filtered_reminders(target_days: list[int], title: str):
-    """
-    Kirim reminder hanya untuk subscription yang days_left ada di target_days.
-    """
+    """Kirim reminder hanya untuk subscription yang days_left ada di target_days."""
     db = SessionLocal()
     try:
         subs = get_all_subscriptions(db)
@@ -200,27 +220,19 @@ async def _send_filtered_reminders(target_days: list[int], title: str):
             msg += f"<b>{html_escape(brand)}</b>\n"
 
             for i, (sub, expires_date, days_left) in enumerate(items, 1):
-
-                if days_left <= 0:
-                    emoji = "💀"
-                elif days_left == 1:
-                    emoji = "💀"
-                elif days_left == 2:
-                    emoji = "⚠️"
-                elif days_left == 3:
-                    emoji = "🔥"
-                else:
-                    emoji = "✅"
-
                 safe_name = html_escape(sub.name or "Tanpa Nama")
-
                 msg += f"{i}. <b>{safe_name}</b>\n"
+
                 if sub.url:
                     safe_url = html_escape(sub.url)
                     msg += f"🔗 <a href='{safe_url}'>{safe_url}</a>\n"
+
+                remaining_text, emoji_override = _format_remaining(days_left)
+                emoji = emoji_override or _default_emoji(days_left)
+
                 msg += (
                     f"Expire: {expires_date.strftime('%d %B %Y')} "
-                    f"({days_left} hari lagi) {emoji}\n\n"
+                    f"{remaining_text} {emoji}\n\n"
                 )
 
             msg += "—" * 30 + "\n\n"
