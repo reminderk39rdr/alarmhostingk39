@@ -11,7 +11,7 @@ from html import escape as html_escape
 from typing import Optional, Any, Iterable
 
 from database import SessionLocal
-from crud import get_all_subscriptions
+from crud import get_all_subscriptions, add_log
 
 logger = logging.getLogger(__name__)
 timezone_wib = ZoneInfo("Asia/Jakarta")
@@ -66,7 +66,7 @@ def _to_date(value: Any) -> Optional[date]:
 def _chunks(text: str, size: int = TELEGRAM_MAX_LEN) -> Iterable[str]:
     """Split text jadi beberapa chunk biar gak kena limit Telegram."""
     for i in range(0, len(text), size):
-        yield text[i: i + size]
+        yield text[i : i + size]
 
 
 def _allowed_minute(windows: set[int]) -> bool:
@@ -123,9 +123,9 @@ async def send_full_list_trigger():
         now_str = now_dt.strftime("%d %B %Y - %H:%M WIB")
 
         if not subs:
-            await send_telegram_message(
-                "<b>Our Hosting List</b>\n\nBelum ada subscription bro! 🚀"
-            )
+            msg = "<b>Our Hosting List</b>\n\nBelum ada subscription bro! 🚀"
+            await send_telegram_message(msg)
+            add_log(db, "Send full list: kosong", "INFO")
             return
 
         grouped = defaultdict(list)
@@ -161,7 +161,7 @@ async def send_full_list_trigger():
                         f"{remaining_text} {emoji}\n\n"
                     )
                 else:
-                    message += f"Expire: - (unknown) ✅\n\n"
+                    message += "Expire: - (unknown) ✅\n\n"
 
             message += "—" * 30 + "\n\n"
 
@@ -171,9 +171,12 @@ async def send_full_list_trigger():
         for ch in _chunks(message):
             await send_telegram_message(ch)
 
+        add_log(db, f"Send full list: {total} item", "INFO")
+
     except Exception as e:
         logger.error(f"Error di send_full_list_trigger: {e}")
         await send_telegram_message("Error bro! Gagal generate list.")
+        add_log(db, f"Send full list error: {e}", "ERROR")
     finally:
         db.close()
 
@@ -238,6 +241,7 @@ async def _send_filtered_reminders(target_days: list[int], title: str):
             msg += "—" * 30 + "\n\n"
 
         await send_telegram_message(msg)
+        add_log(db, f"Reminder sent: {title} ({len(matched)} item)", "WARN")
 
     finally:
         db.close()
@@ -280,7 +284,7 @@ async def send_reminders_1day_or_expired():
         if targets:
             await _send_filtered_reminders(
                 sorted(targets),
-                "💀 URGENT! 1 Hari / Expired"
+                "💀 URGENT! 1 Hari / Expired",
             )
 
     finally:
