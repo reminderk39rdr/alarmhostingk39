@@ -1,8 +1,10 @@
+# telegram_bot.py — RDR Hosting Reminder Telegram Integration — FINAL & ABADI
 import os
 import httpx
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from collections import defaultdict
 from database import SessionLocal
 from crud import get_all_subscriptions
 
@@ -23,11 +25,11 @@ async def send_telegram_message(text: str):
         "parse_mode": "HTML",
         "disable_web_page_preview": True
     }
-
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             r = await client.post(url, json=payload)
             if r.json().get("ok"):
+                logger.info("[TELEGRAM] Pesan terkirim!")
                 return True
             else:
                 logger.error(f"[TELEGRAM] Gagal: {r.text}")
@@ -35,46 +37,62 @@ async def send_telegram_message(text: str):
         logger.error(f"[TELEGRAM] Error: {e}")
     return False
 
+
 async def send_full_list_trigger():
     db = SessionLocal()
     try:
         subs = get_all_subscriptions(db)
+        today = datetime.now(timezone_wib)
+        now_str = today.strftime('%d %B %Y - %H:%M WIB')
+
         if not subs:
-            await send_telegram_message("📋 <b>K39 List</b>\n\nBelum ada subscription bro! 🚀")
+            await send_telegram_message("Our Hosting List\n\nBelum ada subscription bro! Rocket")
             return
 
-        today = datetime.now(timezone_wib)
-        message = f"📋 <b>K39 SUBSCRIPTION LIST</b>\n{today.strftime('%d %B %Y - %H:%M WIB')}\n\n"
-
-        from collections import defaultdict
+        # Grouping berdasarkan brand
         grouped = defaultdict(list)
         for sub in subs:
             brand = (sub.brand or "Tanpa Brand").strip().upper()
             grouped[brand].append(sub)
 
+        message = f"<b>Our Hosting List</b>\n{now_str}\n\n"
+
         for brand, items in sorted(grouped.items()):
             message += f"<b>{brand}</b>\n"
             for i, sub in enumerate(items, 1):
                 days_left = (sub.expires_at - today.date()).days
-                if days_left <= 0:
-                    emoji = "💀"
+
+                # Pilih emoji sesuai hari
+                if days_left < 0:
+                    emoji = "Skull"
+                elif days_left == 0:
+                    emoji = "Skull"  # hari ini mati
                 elif days_left <= 3:
-                    emoji = "🔴"
+                    emoji = "Red Circle"
                 elif days_left <= 7:
-                    emoji = "🟠"
+                    emoji = "Orange Circle"
                 else:
-                    emoji = "✅"
+                    emoji = "Green Checkmark"
 
-                message += f"{i}. <b>{sub.name}</b>\n   {sub.url}\n   Expire: {sub.expires_at.strftime('%d %B %Y')} ({days_left} hari lagi) {emoji}\n\n"
+                message += f"{i}. <b>{sub.name}</b>\n"
+                message += f"   <a href='{sub.url}'>{sub.url}</a>\n"
+                message += f"   Expire: {sub.expires_at.strftime('%d %B %Y')} ({days_left} hari lagi) {emoji}\n\n"
 
-        message += f"<b>TOTAL: {len(subs)} SUBSCRIPTION</b>"
+            message += "—" * 30 + "\n\n"
+
+        total = len(subs)
+        message += f"<b>TOTAL: {total} SUBSCRIPTION{'S' if total != 1 else ''}</b>"
+
         await send_telegram_message(message)
+
     except Exception as e:
-        await send_telegram_message(f"Error generate list: {str(e)}")
+        logger.error(f"Error di send_full_list_trigger: {e}")
+        await send_telegram_message("Error bro! Gagal generate list.")
     finally:
         db.close()
 
-async def send_daily_summary(subs):
-    # tetap jalan jam 08:30 dengan pesan ganas
-    # ... kode lama kamu atau biarin kosong kalau ga butuh
+
+async def send_daily_summary():
+    # Biarin kosong dulu kalau kamu ga butuh daily summary
+    # Atau nanti kita tambah kalau mau
     pass
