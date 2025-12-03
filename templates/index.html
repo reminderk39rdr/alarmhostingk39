@@ -1,679 +1,79 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RDR Hosting Reminder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login — RDR Hosting Reminder</title>
+
   <style>
     :root{
-      --bg:#f8fafc; --surface:#ffffff; --surface2:#f1f5f9;
-      --text:#0f172a; --text-secondary:#475569;
-      --primary:#8b5cf6; --primary-hover:#7c3aed;
-      --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
-      --border:#e2e8f0;
+      --bg:#0a0c12;
+      --surface:#111827;
+      --surface2:#0f172a;
+      --text:#e5e7eb;
+      --text-secondary:#94a3b8;
+      --border:#1f2937;
+      --ring:#8b5cf6;
     }
-    body.dark{
-      --bg:#0b1020; --surface:#121833; --surface2:#0f1430;
-      --text:#e5e7eb; --text-secondary:#9ca3af;
-      --border:#232a4a;
-    }
-    *{margin:0;padding:0;box-sizing:border-box}
     body{
-      font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
-      line-height:1.55;min-height:100vh;padding-bottom:105px;transition:.15s ease;
+      margin:0;background:radial-gradient(900px circle at 10% -10%, #7c3aed40, transparent),
+                          radial-gradient(900px circle at 100% 10%, #ec489930, transparent),
+                          var(--bg);
+      min-height:100vh;display:grid;place-items:center;font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;color:var(--text);
     }
-    .container{max-width:1240px;margin:0 auto;padding:1.1rem 1rem}
-
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      background:var(--surface);border:1px solid var(--border);border-radius:16px;
-      padding:0.75rem 0.9rem;box-shadow:0 4px 16px rgba(15,23,42,0.05);
-      position:sticky;top:10px;z-index:50;backdrop-filter:blur(4px);
-    }
-    .top-left{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;font-weight:800;
-      box-shadow:0 7px 18px rgba(139,92,246,.30);font-size:0.95rem;
-    }
-    .title-wrap h1{
-      font-size:1.25rem;font-weight:700;line-height:1.1;
-      background:linear-gradient(to right,#8b5cf6,#ec4899);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    }
-    .subtitle{font-size:0.8rem;color:var(--text-secondary)}
-    .top-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-
-    .badge{
-      display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
-      border:1px solid var(--border);padding:5px 9px;border-radius:999px;
-      font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap;
-    }
-    .tiny-btn{
-      display:inline-flex;align-items:center;gap:6px;
-      background:var(--surface2);border:1px solid var(--border);
-      padding:6px 9px;border-radius:10px;font-size:12px;font-weight:700;
-      cursor:pointer;text-decoration:none;color:var(--text);
-      transition:.12s ease;
-    }
-    .tiny-btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
-    .logout{
-      background:linear-gradient(135deg,#ef4444,#dc2626);
-      color:white;border:none;cursor:pointer;padding:6px 10px;border-radius:10px;
-      font-weight:700;font-size:12px;text-decoration:none;display:inline-flex;gap:6px;
-      box-shadow:0 6px 12px rgba(239,68,68,.18);white-space:nowrap;
-    }
-
-    .stats-grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:.8rem;margin:1.1rem 0 1.2rem;
-    }
-    .stat-card{
-      background:var(--surface);border-radius:14px;padding:1.05rem .9rem;
-      border:1px solid var(--border);box-shadow:0 3px 12px rgba(15,23,42,0.05);
-      text-align:center;
-    }
-    .stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
-    .stat-label{color:var(--text-secondary);font-size:0.82rem;margin-top:0.25rem}
-
     .card{
-      background:var(--surface);border-radius:16px;padding:1.25rem;margin-bottom:1.1rem;
-      border:1px solid var(--border);box-shadow:0 3px 14px rgba(15,23,42,0.05);
-    }
-    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:.8rem}
-    .card-head h2{font-size:1.1rem}
-
-    .form-grid{display:grid;grid-template-columns:1fr;gap:.7rem;margin-bottom:1rem}
-    input,select{
-      width:100%;padding:0.8rem 0.85rem;background:var(--surface);
-      border:1px solid var(--border);border-radius:12px;font-size:0.95rem;color:var(--text);
-    }
-    input:focus,select:focus{
-      outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(139,92,246,0.12)
-    }
-
-    .btn{
-      appearance:none;border:none;cursor:pointer;font-weight:700;
-      padding:0.7rem 1rem;border-radius:11px;transition:.15s ease;
-      display:inline-flex;align-items:center;justify-content:center;gap:7px;
-      box-shadow:0 6px 14px rgba(15,23,42,0.06);
-      background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:0.92rem;
-      white-space:nowrap;
-    }
-    .btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
-    .btn-cancel{background:var(--surface2);color:var(--text)}
-
-    .action-btn{padding:0.52rem 0.8rem;font-size:0.82rem;border-radius:10px;margin:0.18rem 0.12rem}
-    .btn-edit{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
-    .btn-delete{background:linear-gradient(135deg,#ef4444,#dc2626)}
-    .btn-archive{background:linear-gradient(135deg,#0ea5e9,#2563eb)}
-    .btn-renew{background:linear-gradient(135deg,#10b981,#22c55e)}
-    .btn-restore{background:linear-gradient(135deg,#22c55e,#16a34a)}
-
-    .brand-title{
-      font-size:1.12rem;font-weight:800;color:var(--primary);
-      margin:1.4rem 0 .6rem;padding-bottom:.35rem;border-bottom:3px solid var(--primary);
-    }
-
-    table.subs-table{width:100%;border-collapse:separate;border-spacing:0 10px;}
-    table.subs-table thead th{
-      padding:0.9rem 1rem;background:linear-gradient(#f8fafc,#f1f5f9);
-      border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-      font-size:0.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0f172a;
-    }
-    body.dark table.subs-table thead th{color:#e5e7eb; background:linear-gradient(#121833,#0f1430);}
-    table.subs-table thead th:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px;}
-    table.subs-table thead th:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0;}
-
-    table.subs-table tbody tr{
-      background:var(--surface);box-shadow:0 8px 20px rgba(15,23,42,0.06);
-      border-radius:14px;overflow:hidden;transition:.12s ease;
-    }
-    table.subs-table tbody tr:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(15,23,42,0.08);}
-    table.subs-table td{padding:1rem 1rem;vertical-align:middle;font-size:0.95rem;border:none !important;}
-    table.subs-table td:first-child{font-weight:800;width:70px}
-
-    td[data-label="Brand"] strong{
-      display:inline-flex;padding:4px 8px;border-radius:999px;background:var(--surface2);
-      border:1px solid var(--border);font-size:0.8rem;font-weight:800;
-    }
-    td[data-label="URL"] a{
-      color:var(--primary)!important;font-weight:700!important;text-decoration:none;
-      border-bottom:1px dashed rgba(124,58,237,.35);
-    }
-
-    .days{font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:8px;white-space:nowrap}
-    .days .num{font-size:1.2rem}
-
-    .status-pill{
-      display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;
-      font-size:11px;font-weight:900;letter-spacing:.08em;background:#fff;
-      box-shadow: inset 0 0 0 1px var(--border);white-space:nowrap;
-    }
-    .st-expired{ color:#b91c1c; background:#fff1f2; box-shadow: inset 0 0 0 1px #fecaca; }
-    .st-h1{ color:#7c2d12; background:#fff7ed; box-shadow: inset 0 0 0 1px #fed7aa; }
-    .st-h2{ color:#92400e; background:#fffbeb; box-shadow: inset 0 0 0 1px #fde68a; }
-    .st-h3{ color:#b45309; background:#fffbeb; box-shadow: inset 0 0 0 1px #fcd34d; }
-    .st-soon{ color:#1d4ed8; background:#eff6ff; box-shadow: inset 0 0 0 1px #bfdbfe; }
-    .st-safe{ color:#065f46; background:#ecfdf5; box-shadow: inset 0 0 0 1px #bbf7d0; }
-
-    .bulkbar{
-      display:none;align-items:center;gap:6px;flex-wrap:wrap;
-      padding:8px;border:1px dashed var(--border);border-radius:12px;background:var(--surface2);
-    }
-    .bulkbar.show{display:flex}
-
-    .filterbar{display:flex;gap:6px;flex-wrap:wrap}
-    .filterbar .badge{cursor:pointer}
-    .filterbar .badge.active{background:var(--primary);color:#fff;border-color:transparent}
-
-    .logs-wrap{max-height:360px;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface2);}
-    .logs{width:100%;border-collapse:collapse;font-size:0.9rem}
-    .logs th,.logs td{padding:.65rem .8rem;text-align:left;border-bottom:1px solid var(--border);}
-    .logs th{position:sticky;top:0;background:var(--surface);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);font-weight:800;}
-    .log-pill{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid var(--border);background:white;}
-    .pill-INFO{color:#2563eb}.pill-WARN{color:#b45309}.pill-ERROR{color:#b91c1c}
-
-    details.archived{border:1px dashed var(--border);padding:10px;border-radius:12px;background:var(--surface2)}
-
-    .trigger-fixed{
-      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
-      width:92%;max-width:420px;background:linear-gradient(135deg,#8b5cf6,#ec4899);
-      color:white;padding:0.9rem 1.2rem;border-radius:50px;font-weight:800;
-      box-shadow:0 12px 28px rgba(139,92,246,0.35);z-index:1000;text-decoration:none;text-align:center;font-size:1rem;
-    }
-    @media (min-width:768px){
-      .form-grid{grid-template-columns:repeat(4,1fr)}
-      .trigger-fixed{bottom:26px;right:26px;left:auto;transform:none;width:auto}
-    }
-
-    /* ===== Footer ===== */
-    .footer{
-      margin-top:1.2rem;
+      width:min(440px, 92vw);
       background:var(--surface);
       border:1px solid var(--border);
-      border-radius:16px;
-      padding:1rem 1.1rem;
-      display:flex;
-      flex-direction:column;
-      gap:.8rem;
-      box-shadow:0 3px 14px rgba(15,23,42,0.05);
+      border-radius:18px;padding:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.45);
     }
-    .footer-left{
-      display:flex;align-items:center;gap:10px;
+    .brand{
+      display:flex;align-items:center;gap:10px;margin-bottom:10px;
     }
-    .footer-logo{
-      width:38px;height:38px;border-radius:12px;
-      display:grid;place-items:center;
-      font-weight:900;color:#fff;font-size:.9rem;
+    .logo{
+      width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;
       background:linear-gradient(135deg,#8b5cf6,#ec4899);
-      box-shadow:0 7px 18px rgba(139,92,246,.30);
-      flex:0 0 auto;
+      box-shadow:0 10px 18px rgba(139,92,246,.35);
     }
-    .footer-title{
-      font-weight:800;font-size:1rem;color:var(--text);
+    h1{margin:0;font-size:20px;font-weight:900}
+    .sub{font-size:13px;color:var(--text-secondary);font-weight:700;margin-top:2px}
+
+    form{display:grid;gap:10px;margin-top:12px}
+    input{
+      width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
+      background:var(--surface2);color:var(--text);font-weight:800;font-size:14px;outline:none;
     }
-    .footer-sub{
-      font-size:.82rem;color:var(--text-secondary);
-      margin-top:2px;
+    input:focus{border-color:var(--ring);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+    button{
+      padding:12px;border-radius:12px;border:none;font-weight:900;cursor:pointer;font-size:15px;color:white;
+      background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+      box-shadow:0 10px 18px rgba(139,92,246,.3);
     }
-    .footer-right{
-      display:flex;gap:6px;flex-wrap:wrap;
+    .foot{
+      font-size:12px;color:var(--text-secondary);font-weight:800;margin-top:10px;text-align:center;
     }
-    .footer-chip{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:5px 9px;border-radius:999px;
-      font-size:11px;font-weight:800;letter-spacing:.06em;
-      background:var(--surface2);
-      border:1px solid var(--border);
-      color:var(--text-secondary);
-      white-space:nowrap;
-    }
-    .footer-bottom{
-      display:flex;gap:8px;flex-wrap:wrap;
-      font-size:.82rem;color:var(--text-secondary);
-      border-top:1px dashed var(--border);
-      padding-top:.7rem;margin-top:.2rem;
-      align-items:center;
-    }
-    .footer-bottom a{
-      color:var(--primary);
-      font-weight:700;
-      text-decoration:none;
-    }
-    .footer-bottom a:hover{ text-decoration:underline; }
-    .footer-bottom .dot{opacity:.7}
   </style>
 </head>
-
 <body>
-<div class="container">
-
-  <div class="topbar">
-    <div class="top-left">
+  <div class="card">
+    <div class="brand">
       <div class="logo">R</div>
       <div>
-        <div class="title-wrap"><h1>RDR Hosting Reminder</h1></div>
-        <div class="subtitle">Professional hosting expiration management</div>
+        <h1>RDR Hosting Reminder</h1>
+        <div class="sub">Secure Admin Dashboard</div>
       </div>
     </div>
 
-    <div class="top-right">
-      <span class="badge">👤 {{ username }}</span>
-      <span class="badge">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
-
-      <button class="tiny-btn" onclick="toggleDark()">🌙 Dark</button>
-      <a class="tiny-btn" href="/telegram-test">📨 Test Telegram</a>
-      <a class="tiny-btn" href="/export">⬇️ Export CSV</a>
-
-      <form action="/import" method="post" enctype="multipart/form-data" style="display:inline-flex;gap:6px">
-        <input type="file" name="file" accept=".csv" style="max-width:150px" required>
-        <button class="tiny-btn" type="submit">⬆️ Import</button>
-      </form>
-
-      <a class="logout" href="/logout">Logout</a>
-    </div>
-  </div>
-
-  <!-- Health -->
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-value">{{ subs|length }}</div><div class="stat-label">Active</div></div>
-    <div class="stat-card"><div class="stat-value">{{ expiring_soon }}</div><div class="stat-label">Expiring Soon</div></div>
-    <div class="stat-card"><div class="stat-value">{{ expired_count }}</div><div class="stat-label">Expired</div></div>
-    <div class="stat-card">
-      <div class="stat-value" style="font-size:1rem">
-        Daily: {{ health.last_daily or '-' }}<br>
-        H-3: {{ health.last_h3 or '-' }}<br>
-        H-2: {{ health.last_h2 or '-' }}<br>
-        H-1: {{ health.last_h1 or '-' }}
-      </div>
-      <div class="stat-label">Scheduler Health</div>
-    </div>
-  </div>
-
-  <!-- Form -->
-  <div class="card">
-    <div class="card-head">
-      <h2 id="form-title">Add New Subscription</h2>
-      <div class="filterbar">
-        <span class="badge active" data-filter="all">All</span>
-        <span class="badge" data-filter="safe">Safe</span>
-        <span class="badge" data-filter="soon">Soon ≤7</span>
-        <span class="badge" data-filter="h3">H-3</span>
-        <span class="badge" data-filter="h2">H-2</span>
-        <span class="badge" data-filter="h1">H-1/Today</span>
-        <span class="badge" data-filter="expired">Expired</span>
-      </div>
-    </div>
-
-    <form id="subscription-form" method="post" action="/add">
-      <div class="form-grid">
-        <input type="text" id="name" name="name" placeholder="Service Name" required>
-        <input type="url" id="url" name="url" placeholder="URL" required>
-        <input type="text" id="brand" name="brand" placeholder="Brand Domain" required>
-
-        <input type="date" id="expires_at_picker" required>
-        <input type="hidden" id="expires_at" name="expires_at" required>
-      </div>
-
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 10px">
-        <button type="button" class="badge" onclick="quickAddDays(7)">+7 days</button>
-        <button type="button" class="badge" onclick="quickAddDays(14)">+14 days</button>
-        <button type="button" class="badge" onclick="quickAddDays(30)">+30 days</button>
-        <button type="button" class="badge" onclick="quickAddDays(365)">+1 year</button>
-      </div>
-
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-        <button type="submit" class="btn">Save Subscription</button>
-        <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
-      </div>
+    <form method="post" action="/login">
+      <input type="text" name="username" placeholder="Username" required autofocus />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
     </form>
+
+    <div class="foot">
+      © {{ now.strftime('%Y') }} RDR • All rights reserved
+    </div>
   </div>
-
-  <!-- Bulk bar -->
-  <form id="bulk-form" method="post">
-    <div id="bulkbar" class="bulkbar">
-      <strong id="bulkcount">0 selected</strong>
-      <button class="btn action-btn btn-archive" formaction="/bulk/archive">Archive Selected</button>
-      <button class="btn action-btn btn-delete" formaction="/bulk/delete" onclick="return confirm('Delete selected?')">Delete Selected</button>
-      <button class="btn action-btn btn-renew" formaction="/bulk/renew/30">+30d Renew</button>
-      <button class="btn action-btn btn-renew" formaction="/bulk/renew/365">+1y Renew</button>
-    </div>
-
-    <!-- Active Table -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Active Subscriptions</h2>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input id="search" type="text" placeholder="Search service / brand..." style="max-width:220px">
-          <select id="sort">
-            <option value="expire-asc">Sort: Expire Soonest</option>
-            <option value="expire-desc">Sort: Expire Longest</option>
-            <option value="brand-asc">Sort: Brand A-Z</option>
-          </select>
-        </div>
-      </div>
-
-      {% if subs %}
-        {% for brand, items in grouped.items() %}
-          <div class="brand-title">{{ brand }}</div>
-
-          <table class="subs-table">
-            <thead>
-              <tr>
-                <th style="width:50px"><input type="checkbox" onclick="toggleBrand(this)"></th>
-                <th>No</th>
-                <th>Service</th>
-                <th>Brand</th>
-                <th>URL</th>
-                <th>Expire Date</th>
-                <th>Days Left</th>
-                <th>Last Notified</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for sub in items %}
-                {% set days = (sub.expires_at - today).days %}
-                <tr class="row"
-                    data-days="{{ days }}"
-                    data-brand="{{ (sub.brand or '')|lower }}"
-                    data-expire="{{ sub.expires_at.toordinal() }}">
-
-                  <td><input type="checkbox" name="ids" value="{{ sub.id }}" class="rowcheck" onchange="bulkChanged()"></td>
-                  <td>{{ loop.index }}</td>
-                  <td><strong>{{ sub.name }}</strong></td>
-                  <td><strong>{{ sub.brand or "–" }}</strong></td>
-                  <td><a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></td>
-                  <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-
-                  <td class="days"
-                      style="color:
-                        {% if days <= 3 %}var(--danger)
-                        {% elif days <= 7 %}var(--warning)
-                        {% else %}var(--success)
-                        {% endif %}">
-                    <span class="num">{{ days }}</span>
-                    <span>{{ 'day' if days == 1 else 'days' }}</span>
-
-                    {% if days < 0 %}
-                      <span class="status-pill st-expired">EXPIRED</span>
-                    {% elif days == 0 %}
-                      <span class="status-pill st-expired">DUE TODAY</span>
-                    {% elif days == 1 %}
-                      <span class="status-pill st-h1">H-1</span>
-                    {% elif days == 2 %}
-                      <span class="status-pill st-h2">H-2</span>
-                    {% elif days == 3 %}
-                      <span class="status-pill st-h3">H-3</span>
-                    {% elif days <= 7 %}
-                      <span class="status-pill st-soon">SOON</span>
-                    {% else %}
-                      <span class="status-pill st-safe">SAFE</span>
-                    {% endif %}
-                  </td>
-
-                  <td>
-                    {% if sub.last_notified_at %}
-                      <div style="font-size:12px;font-weight:700">
-                        {{ sub.last_notified_at.strftime('%d %b %H:%M') }}<br>
-                        <span class="badge">{{ sub.last_notified_stage }}</span>
-                      </div>
-                    {% else %}
-                      <span class="badge">Never</span>
-                    {% endif %}
-                  </td>
-
-                  <td>
-                    <button class="btn action-btn btn-edit"
-                      type="button"
-                      onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ""|e }}", "{{ sub.expires_at.strftime("%m/%d/%Y") }}")'>
-                      ✏️ Edit
-                    </button>
-
-                    <form method="post" action="/quick-renew/{{ sub.id }}/30" style="display:inline">
-                      <button class="btn action-btn btn-renew" type="submit">➕30d</button>
-                    </form>
-
-                    <form method="post" action="/quick-renew/{{ sub.id }}/365" style="display:inline">
-                      <button class="btn action-btn btn-renew" type="submit">➕1y</button>
-                    </form>
-
-                    <form method="post" action="/archive/{{ sub.id }}" style="display:inline">
-                      <button class="btn action-btn btn-archive" type="submit">🗂️ Archive</button>
-                    </form>
-
-                    <form method="post" action="/delete/{{ sub.id }}" style="display:inline">
-                      <button type="submit" class="btn action-btn btn-delete"
-                        onclick="return confirm('Delete this subscription?')">
-                        🗑️ Delete
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% endfor %}
-      {% else %}
-        <p style="text-align:center;color:var(--text-secondary);padding:3.2rem 0">No active subscriptions yet.</p>
-      {% endif %}
-    </div>
-  </form>
-
-  <!-- Archived -->
-  <div class="card">
-    <div class="card-head">
-      <h2>Archived Subscriptions</h2>
-      <span class="badge">{{ archived|length }} archived</span>
-    </div>
-
-    <details class="archived" {% if archived %}open{% endif %}>
-      <summary style="cursor:pointer;font-weight:800">Show / Hide Archived</summary>
-      {% if archived %}
-        <table class="subs-table" style="margin-top:10px">
-          <thead>
-            <tr>
-              <th>No</th><th>Service</th><th>Brand</th><th>URL</th><th>Expire</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for sub in archived %}
-              <tr>
-                <td>{{ loop.index }}</td>
-                <td><strong>{{ sub.name }}</strong></td>
-                <td><strong>{{ sub.brand or "–" }}</strong></td>
-                <td><a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a></td>
-                <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-                <td>
-                  <form method="post" action="/unarchive/{{ sub.id }}" style="display:inline">
-                    <button class="btn action-btn btn-restore" type="submit">♻️ Restore</button>
-                  </form>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p style="padding:12px;color:var(--text-secondary)">Belum ada archived item.</p>
-      {% endif %}
-    </details>
-  </div>
-
-  <!-- Logs -->
-  <div class="card">
-    <div class="card-head">
-      <h2>Logs Terbaru</h2>
-      <span class="badge">Last 200 events</span>
-    </div>
-
-    {% if logs %}
-      <div class="logs-wrap">
-        <table class="logs">
-          <thead><tr><th>Waktu</th><th>Level</th><th>Pesan</th></tr></thead>
-          <tbody>
-          {% for log in logs %}
-            <tr>
-              <td>{{ log.created_at.strftime('%d %b %Y %H:%M') }}</td>
-              <td><span class="log-pill pill-{{ log.level }}">{{ log.level }}</span></td>
-              <td>{{ log.message }}</td>
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <p style="color:var(--text-secondary)">Belum ada logs.</p>
-    {% endif %}
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-left">
-      <div class="footer-logo">RDR</div>
-      <div>
-        <div class="footer-title">RDR Hosting Reminder</div>
-        <div class="footer-sub">Automated renewal radar • Asia/Jakarta</div>
-      </div>
-    </div>
-
-    <div class="footer-right">
-      <span class="footer-chip">Daily 09:00 WIB</span>
-      <span class="footer-chip">H-3 / H-2 / H-1 Alerts</span>
-      <span class="footer-chip">Render Ready</span>
-    </div>
-
-    <div class="footer-bottom">
-      <span>© {{ now.strftime('%Y') }} RDR Labs. All rights reserved.</span>
-      <span class="dot">•</span>
-      <a href="/health">System Health</a>
-      <span class="dot">•</span>
-      <a href="/trigger">Manual Trigger</a>
-    </div>
-  </footer>
-
-  <a href="/trigger" class="trigger-fixed">Send List to Telegram</a>
-
-</div>
-
-<script>
-  // ===== Dark mode =====
-  function applyTheme(){
-    const t = localStorage.getItem("theme");
-    if(t==="dark") document.body.classList.add("dark");
-  }
-  function toggleDark(){
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-  }
-  applyTheme();
-
-  // ===== Date Picker -> hidden mm/dd/yyyy =====
-  const picker = document.getElementById("expires_at_picker");
-  const hidden = document.getElementById("expires_at");
-  function toMMDDYYYY(iso){
-    if(!iso) return "";
-    const [y,m,d] = iso.split("-");
-    return `${m}/${d}/${y}`;
-  }
-  function toISO(mmddyyyy){
-    if(!mmddyyyy) return "";
-    const [m,d,y] = mmddyyyy.split("/");
-    return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
-  }
-  picker.addEventListener("change", () => hidden.value = toMMDDYYYY(picker.value));
-  function quickAddDays(n){
-    const now=new Date(); now.setDate(now.getDate()+n);
-    const iso=now.toISOString().slice(0,10);
-    picker.value=iso; hidden.value=toMMDDYYYY(iso);
-  }
-
-  // ===== Edit mode =====
-  function editSubscription(id, name, url, brand, expires_at){
-    document.getElementById('form-title').innerText='Edit Subscription';
-    document.getElementById('name').value=name;
-    document.getElementById('url').value=url;
-    document.getElementById('brand').value=brand;
-    picker.value = toISO(expires_at);
-    hidden.value = expires_at;
-    document.getElementById('subscription-form').action=`/update/${id}`;
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-  function resetForm(){
-    document.getElementById('form-title').innerText='Add New Subscription';
-    document.getElementById('subscription-form').reset();
-    picker.value=""; hidden.value="";
-    document.getElementById('subscription-form').action='/add';
-  }
-
-  // ===== Search / Sort / Filter =====
-  const search = document.getElementById("search");
-  const sortSel = document.getElementById("sort");
-  let activeFilter = "all";
-
-  search.addEventListener("input", filterAndSort);
-  sortSel.addEventListener("change", filterAndSort);
-
-  document.querySelectorAll(".filterbar .badge").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      document.querySelectorAll(".filterbar .badge").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-      activeFilter = b.dataset.filter;
-      filterAndSort();
-    });
-  });
-
-  function passFilter(row){
-    const days = parseInt(row.dataset.days);
-    if(activeFilter==="all") return true;
-    if(activeFilter==="safe") return days>7;
-    if(activeFilter==="soon") return days>3 && days<=7;
-    if(activeFilter==="h3") return days===3;
-    if(activeFilter==="h2") return days===2;
-    if(activeFilter==="h1") return days===1 || days===0;
-    if(activeFilter==="expired") return days<0;
-    return true;
-  }
-
-  function filterAndSort(){
-    const q = search.value.toLowerCase();
-    const rows=[...document.querySelectorAll(".row")];
-
-    rows.forEach(r=>{
-      const okText = r.innerText.toLowerCase().includes(q);
-      const okFilter = passFilter(r);
-      r.style.display = (okText && okFilter) ? "" : "none";
-    });
-
-    const visible = rows.filter(r=>r.style.display!=="none");
-    const mode = sortSel.value;
-
-    visible.sort((a,b)=>{
-      if(mode==="expire-asc") return parseInt(a.dataset.expire)-parseInt(b.dataset.expire);
-      if(mode==="expire-desc") return parseInt(b.dataset.expire)-parseInt(a.dataset.expire);
-      if(mode==="brand-asc") return a.dataset.brand.localeCompare(b.dataset.brand);
-      return 0;
-    });
-
-    visible.forEach(r=>r.parentElement.appendChild(r));
-  }
-  filterAndSort();
-
-  // ===== Bulk =====
-  function bulkChanged(){
-    const checks=[...document.querySelectorAll(".rowcheck")];
-    const selected=checks.filter(c=>c.checked);
-    const bar=document.getElementById("bulkbar");
-    document.getElementById("bulkcount").innerText=`${selected.length} selected`;
-    bar.classList.toggle("show", selected.length>0);
-  }
-  function toggleBrand(master){
-    const tbody = master.closest("table").querySelector("tbody");
-    tbody.querySelectorAll(".rowcheck").forEach(c=>c.checked=master.checked);
-    bulkChanged();
-  }
-</script>
 </body>
 </html>
