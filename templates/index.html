@@ -1,79 +1,660 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Login — RDR Hosting Reminder</title>
+  <title>RDR Hosting Reminder</title>
 
   <style>
     :root{
-      --bg:#0a0c12;
-      --surface:#111827;
-      --surface2:#0f172a;
-      --text:#e5e7eb;
-      --text-secondary:#94a3b8;
-      --border:#1f2937;
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface2:#f2f4f8;
+      --text:#0f172a;
+      --text-secondary:#64748b;
+      --border:#e6e8ef;
       --ring:#8b5cf6;
+      --shadow:0 8px 24px rgba(15,23,42,0.06);
     }
+    body.dark{
+      --bg:#0a0c12;
+      --surface:#101420;
+      --surface2:#151b2a;
+      --text:#e5e7eb;
+      --text-secondary:#9aa3b2;
+      --border:#20283a;
+      --shadow:0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    *{box-sizing:border-box}
     body{
-      margin:0;background:radial-gradient(900px circle at 10% -10%, #7c3aed40, transparent),
-                          radial-gradient(900px circle at 100% 10%, #ec489930, transparent),
-                          var(--bg);
-      min-height:100vh;display:grid;place-items:center;font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;color:var(--text);
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
-    .card{
-      width:min(440px, 92vw);
+    a{color:#6d28d9;text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .container{max-width:1200px;margin:18px auto;padding:0 14px;display:grid;gap:12px}
+
+    /* ===== TOPBAR (DROPDOWN) ===== */
+    .topbar{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;gap:10px;
       background:var(--surface);
       border:1px solid var(--border);
-      border-radius:18px;padding:18px;
-      box-shadow:0 18px 40px rgba(0,0,0,.45);
+      border-radius:16px;
+      padding:.7rem .9rem;
+      box-shadow:var(--shadow);
+      position:sticky;top:10px;z-index:50;backdrop-filter:blur(4px);
     }
-    .brand{
-      display:flex;align-items:center;gap:10px;margin-bottom:10px;
-    }
+    .top-left{display:flex;align-items:center;gap:10px;min-width:max-content;}
     .logo{
-      width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;
+      width:38px;height:38px;border-radius:12px;
+      display:grid;place-items:center;font-weight:900;color:#fff;
       background:linear-gradient(135deg,#8b5cf6,#ec4899);
-      box-shadow:0 10px 18px rgba(139,92,246,.35);
+      box-shadow:0 6px 14px rgba(139,92,246,.35);
     }
-    h1{margin:0;font-size:20px;font-weight:900}
-    .sub{font-size:13px;color:var(--text-secondary);font-weight:700;margin-top:2px}
+    .title-wrap h1{
+      font-size:1.1rem;font-weight:900;line-height:1.05;margin:0;
+      background:linear-gradient(to right,#8b5cf6,#ec4899);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .subtitle{font-size:.78rem;color:var(--text-secondary);margin-top:2px}
 
-    form{display:grid;gap:10px;margin-top:12px}
-    input{
-      width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
-      background:var(--surface2);color:var(--text);font-weight:800;font-size:14px;outline:none;
+    .top-center{
+      display:flex;align-items:center;gap:6px;justify-self:center;
+      flex-wrap:wrap;
     }
-    input:focus{border-color:var(--ring);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
-    button{
-      padding:12px;border-radius:12px;border:none;font-weight:900;cursor:pointer;font-size:15px;color:white;
+
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 9px;border-radius:999px;background:var(--surface2);
+      font-size:12px;font-weight:800;border:1px solid var(--border);
+    }
+
+    .top-right{justify-self:end;display:flex;}
+    .action-group{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+
+    .tiny-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      background:var(--surface2);border:1px solid var(--border);
+      padding:7px 10px;border-radius:10px;font-size:12px;font-weight:800;
+      cursor:pointer;text-decoration:none;color:var(--text);
+      transition:.12s ease;white-space:nowrap;line-height:1;
+    }
+    .tiny-btn:hover{transform:translateY(-1px);filter:brightness(1.03);}
+    .tiny-btn-tools .caret{opacity:.7;font-size:11px;margin-left:2px;}
+
+    .logout{
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+      color:white;border:none;cursor:pointer;padding:7px 12px;border-radius:10px;
+      font-weight:900;font-size:12px;text-decoration:none;display:inline-flex;gap:6px;
+      box-shadow:0 6px 12px rgba(239,68,68,.18);white-space:nowrap;
+    }
+
+    .dropdown{position:relative;}
+    .dropdown-menu{
+      position:absolute;right:0;top:calc(100% + 8px);
+      min-width:220px;background:var(--surface);
+      border:1px solid var(--border);border-radius:12px;
+      box-shadow:0 14px 30px rgba(15,23,42,0.14);
+      padding:6px;display:none;z-index:100;
+    }
+    .dropdown-menu.show{display:block;}
+    .dropdown-item{
+      width:100%;display:flex;align-items:center;justify-content:space-between;
+      gap:8px;padding:8px 9px;border-radius:9px;
+      font-size:13px;font-weight:800;color:var(--text);
+      text-decoration:none;background:transparent;border:none;cursor:pointer;
+    }
+    .dropdown-item:hover{background:var(--surface2);}
+    .dropdown-divider{
+      height:1px;background:var(--border);margin:6px 2px;
+    }
+    .dropdown-form input[type="file"]{display:none;}
+    .file-picker{justify-content:space-between;}
+    .file-name{
+      font-size:11px;font-weight:800;color:var(--text-secondary);
+      margin-left:8px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .dropdown-primary{
       background:linear-gradient(135deg,#8b5cf6,#7c3aed);
-      box-shadow:0 10px 18px rgba(139,92,246,.3);
+      color:#fff;border:none;
     }
-    .foot{
-      font-size:12px;color:var(--text-secondary);font-weight:800;margin-top:10px;text-align:center;
+
+    @media (max-width:820px){
+      .topbar{grid-template-columns:1fr;justify-items:start;}
+      .top-center{justify-self:start;}
+      .top-right{justify-self:start;width:100%;}
+      .action-group{width:100%;}
+      .dropdown-menu{left:0;right:auto;}
+    }
+
+    /* ===== Cards ===== */
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:900px){.row{grid-template-columns:1fr;}}
+
+    /* ===== Scheduler Health ===== */
+    .scheduler-card{max-width:420px}
+    .scheduler-head{
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:8px
+    }
+    .card-title{font-weight:900;font-size:15px}
+    .card-sub{font-size:12px;color:var(--text-secondary);font-weight:700}
+
+    .scheduler-grid{display:grid;gap:6px}
+    .sch-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)
+    }
+    .sch-label{font-weight:800;color:var(--text-secondary);font-size:12px}
+    .sch-value{font-weight:900;font-size:13px}
+
+    /* ===== Pills ===== */
+    .pill{
+      padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid transparent;
+      white-space:nowrap;
+    }
+    .pill-safe{background:#e8fff5;color:#0f766e;border-color:#b7f7df}
+    .pill-soon{background:#eef2ff;color:#1d4ed8;border-color:#c7d2fe}
+    .pill-h3{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+    .pill-h2{background:#fef3c7;color:#92400e;border-color:#fde68a}
+    .pill-expired{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+
+    /* ===== Form section ===== */
+    .form-card{padding:14px}
+    .form-head{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap
+    }
+    .filters{display:flex;gap:6px;flex-wrap:wrap}
+    .filter-pill{
+      padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;
+      border:1px solid var(--border);background:var(--surface2);cursor:pointer;
+      transition:.12s ease;
+    }
+    .filter-pill.active{
+      background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+      color:#fff;border-color:transparent;
+    }
+
+    .form-grid{
+      display:grid;grid-template-columns:1.2fr 1.2fr .9fr .7fr;
+      gap:10px;align-items:center;
+    }
+    .form-grid input{
+      background:var(--surface);border:1px solid var(--border);
+      padding:12px 12px;border-radius:12px;font-size:14px;font-weight:700;
+      outline:none;
+    }
+    .form-grid input:focus{border-color:var(--ring);box-shadow:0 0 0 3px rgba(139,92,246,.15)}
+    .date-wrap{position:relative}
+    .date-hint{
+      position:absolute;top:-7px;left:10px;font-size:10px;font-weight:800;
+      background:var(--surface);padding:0 6px;color:var(--text-secondary)
+    }
+
+    .quick-add{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+    .chip{
+      padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;
+      border:1px solid var(--border);background:var(--surface2);cursor:pointer
+    }
+
+    .form-actions{grid-column:1/-1;display:flex;gap:8px;margin-top:6px}
+    .btn-primary{
+      background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+      color:#fff;border:none;padding:11px 14px;border-radius:12px;font-weight:900;cursor:pointer;
+    }
+    .btn-ghost{
+      background:var(--surface2);border:1px solid var(--border);
+      padding:11px 14px;border-radius:12px;font-weight:900;cursor:pointer;
+    }
+
+    @media(max-width:980px){.form-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+
+    /* ===== Table/List ===== */
+    table{width:100%;border-collapse:separate;border-spacing:0 10px;}
+    thead th{
+      font-size:12px;text-transform:uppercase;letter-spacing:.03em;
+      color:var(--text-secondary);text-align:left;font-weight:900;padding:8px 10px;
+    }
+    tbody tr{
+      background:var(--surface);
+      border:1px solid var(--border);
+    }
+    tbody td{
+      padding:12px 10px;vertical-align:middle;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+      font-weight:800;
+    }
+    tbody tr td:first-child{border-left:1px solid var(--border);border-top-left-radius:12px;border-bottom-left-radius:12px;}
+    tbody tr td:last-child{border-right:1px solid var(--border);border-top-right-radius:12px;border-bottom-right-radius:12px;}
+    tbody tr:hover{background:var(--surface2);}
+    .service-name{font-weight:900}
+    .url-col a{font-weight:800}
+
+    .days-wrap{display:flex;align-items:center;gap:8px}
+    .days-num{font-weight:900}
+    .days-num.neg{color:#ef4444}
+    .days-num.pos{color:#10b981}
+
+    .actions{
+      display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;
+    }
+    .inline{display:inline}
+    .act{
+      padding:7px 10px;border-radius:10px;font-size:12px;font-weight:900;
+      border:1px solid var(--border);background:var(--surface2);cursor:pointer;white-space:nowrap;
+      transition:.12s ease;
+    }
+    .act:hover{transform:translateY(-1px)}
+    .act-edit{
+      background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;
+    }
+    .act-green{background:#10b981;color:white;border:none}
+    .act-blue{background:#3b82f6;color:white;border:none}
+    .act-red{background:#ef4444;color:white;border:none}
+
+    /* ===== Logs ===== */
+    .logs-head{
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap
+    }
+    .logs-table thead th{text-align:left}
+    .level-badge{
+      padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;display:inline-flex;
+    }
+    .level-info{background:#e0f2fe;color:#075985}
+    .level-warn{background:#fff7ed;color:#c2410c}
+    .level-error{background:#fee2e2;color:#b91c1c}
+
+    /* ===== Footer ===== */
+    footer{
+      margin-top:8px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+      font-size:12px;font-weight:800;color:var(--text-secondary);
+      box-shadow:var(--shadow);
+    }
+    footer .foot-right{display:flex;gap:6px;align-items:center}
+    .foot-pill{
+      padding:4px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-weight:900;color:var(--text);
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="brand">
-      <div class="logo">R</div>
-      <div>
-        <h1>RDR Hosting Reminder</h1>
-        <div class="sub">Secure Admin Dashboard</div>
+  <div class="container">
+
+    <!-- ===== TOPBAR ===== -->
+    <div class="topbar">
+      <div class="top-left">
+        <div class="logo">R</div>
+        <div class="title-wrap">
+          <h1>RDR Hosting Reminder</h1>
+          <div class="subtitle">Professional hosting expiration management</div>
+        </div>
+      </div>
+
+      <div class="top-center">
+        <span class="badge">👤 {{ username }}</span>
+        <span class="badge">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</span>
+      </div>
+
+      <div class="top-right">
+        <div class="action-group">
+          <button class="tiny-btn" type="button" onclick="toggleDark()">🌙 Dark</button>
+
+          <div class="dropdown">
+            <button class="tiny-btn tiny-btn-tools" type="button" onclick="toggleDropdown(event)">
+              🧰 Tools <span class="caret">▾</span>
+            </button>
+
+            <div id="toolsMenu" class="dropdown-menu">
+              <a class="dropdown-item" href="/telegram-test">📨 Test Telegram</a>
+              <a class="dropdown-item" href="/trigger">📜 Send Full List</a>
+              <a class="dropdown-item" href="/export">⬇️ Export CSV</a>
+
+              <div class="dropdown-divider"></div>
+
+              <form action="/import" method="post" enctype="multipart/form-data" class="dropdown-form">
+                <input id="csvfile" type="file" name="file" accept=".csv" required onchange="showFileName(this)">
+                <label for="csvfile" class="dropdown-item file-picker">
+                  📁 Choose CSV
+                  <span id="fileName" class="file-name">No file</span>
+                </label>
+                <button class="dropdown-item dropdown-primary" type="submit">⬆️ Import Now</button>
+              </form>
+            </div>
+          </div>
+
+          <a class="logout" href="/logout">Logout</a>
+        </div>
       </div>
     </div>
 
-    <form method="post" action="/login">
-      <input type="text" name="username" placeholder="Username" required autofocus />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
+    <!-- ===== TOP STATS + SCHEDULER ===== -->
+    <div class="row">
+      <div class="card scheduler-card">
+        <div class="scheduler-head">
+          <div>
+            <div class="card-title">Scheduler Health</div>
+            <div class="card-sub">Last run status</div>
+          </div>
+          <span class="pill pill-safe">RUNNING</span>
+        </div>
 
-    <div class="foot">
-      © {{ now.strftime('%Y') }} RDR • All rights reserved
+        <div class="scheduler-grid">
+          <div class="sch-row">
+            <span class="sch-label">Daily</span>
+            <span class="sch-value">{{ scheduler_health.daily or "-" }}</span>
+          </div>
+          <div class="sch-row">
+            <span class="sch-label">H-3</span>
+            <span class="sch-value">{{ scheduler_health.h3 or "-" }}</span>
+          </div>
+          <div class="sch-row">
+            <span class="sch-label">H-2</span>
+            <span class="sch-value">{{ scheduler_health.h2 or "-" }}</span>
+          </div>
+          <div class="sch-row">
+            <span class="sch-label">H-1 / Expired</span>
+            <span class="sch-value">{{ scheduler_health.h1 or "-" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Overview</div>
+        <div class="card-sub" style="margin-top:4px">
+          Total: <b>{{ subs|length }}</b> subscription(s) •
+          Expiring ≤7d: <b>{{ expiring_soon }}</b> •
+          Expired: <b>{{ expired_count }}</b>
+        </div>
+      </div>
     </div>
+
+    <!-- ===== ADD FORM + FILTER ===== -->
+    <div class="card form-card">
+      <div class="form-head">
+        <h2 id="form-title" style="margin:0;font-size:18px;font-weight:900">Add New Subscription</h2>
+
+        <div class="filters">
+          <button class="filter-pill active" type="button" data-filter="all">All</button>
+          <button class="filter-pill" type="button" data-filter="safe">Safe</button>
+          <button class="filter-pill" type="button" data-filter="soon">Soon ≤7</button>
+          <button class="filter-pill" type="button" data-filter="h3">H-3</button>
+          <button class="filter-pill" type="button" data-filter="h2">H-2</button>
+          <button class="filter-pill" type="button" data-filter="h1">H-1/Today</button>
+          <button class="filter-pill" type="button" data-filter="expired">Expired</button>
+        </div>
+      </div>
+
+      <form id="subscription-form" method="post" action="/add" class="form-grid">
+        <input id="name" name="name" type="text" placeholder="Service Name" required>
+        <input id="url" name="url" type="url" placeholder="https://example.com" required>
+        <input id="brand" name="brand" type="text" placeholder="Brand Domain (optional)">
+
+        <div class="date-wrap">
+          <input id="expires_at" name="expires_at" type="date" required>
+          <span class="date-hint">Expire Date</span>
+        </div>
+
+        <div class="quick-add">
+          <button type="button" class="chip" onclick="addDays(7)">+7 days</button>
+          <button type="button" class="chip" onclick="addDays(14)">+14 days</button>
+          <button type="button" class="chip" onclick="addDays(30)">+30 days</button>
+          <button type="button" class="chip" onclick="addYears(1)">+1 year</button>
+        </div>
+
+        <div class="form-actions">
+          <button id="submit-btn" type="submit" class="btn-primary">Save Subscription</button>
+          <button id="cancel-btn" type="button" class="btn-ghost" onclick="resetForm()">Cancel Edit</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ===== LIST BY BRAND ===== -->
+    {% for brand, items in grouped.items() %}
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px">{{ brand }}</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px">No</th>
+            <th>Service</th>
+            <th style="width:140px">Brand</th>
+            <th>URL</th>
+            <th style="width:160px">Expire Date</th>
+            <th style="width:160px">Days Left</th>
+            <th style="width:260px;text-align:right">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for sub in items %}
+          {% set days_left = (sub.expires_at - today).days %}
+          <tr class="sub-row" data-days-left="{{ days_left }}" data-days-left="{{ days_left }}">
+            <td>{{ loop.index }}</td>
+
+            <td>
+              <div class="service-name">{{ sub.name }}</div>
+            </td>
+
+            <td>{{ sub.brand or "No Brand" }}</td>
+
+            <td class="url-col">
+              <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a>
+            </td>
+
+            <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+
+            <td>
+              <div class="days-wrap">
+                <span class="days-num {{ 'neg' if days_left < 0 else 'pos' }}">{{ days_left }} days</span>
+
+                {% if days_left < 0 %}
+                  <span class="pill pill-expired">EXPIRED</span>
+                {% elif days_left <= 1 %}
+                  <span class="pill pill-h2">H-1/TODAY</span>
+                {% elif days_left == 2 %}
+                  <span class="pill pill-h2">H-2</span>
+                {% elif days_left == 3 %}
+                  <span class="pill pill-h3">H-3</span>
+                {% elif days_left <= 7 %}
+                  <span class="pill pill-soon">SOON</span>
+                {% else %}
+                  <span class="pill pill-safe">SAFE</span>
+                {% endif %}
+              </div>
+            </td>
+
+            <td style="text-align:right">
+              <div class="actions">
+                <button class="act act-edit"
+                  onclick="editSubscription('{{ sub.id }}','{{ sub.name|escape }}','{{ sub.url|escape }}','{{ sub.brand|default('', true)|escape }}','{{ sub.expires_at }}')">
+                  ✏️ Edit
+                </button>
+
+                <form method="post" action="/extend/{{ sub.id }}/30" class="inline">
+                  <button class="act act-green" type="submit">➕ 30d</button>
+                </form>
+
+                <form method="post" action="/extend/{{ sub.id }}/365" class="inline">
+                  <button class="act act-green" type="submit">➕ 1y</button>
+                </form>
+
+                <form method="post" action="/archive/{{ sub.id }}" class="inline">
+                  <button class="act act-blue" type="submit">📦 Archive</button>
+                </form>
+
+                <form method="post" action="/delete/{{ sub.id }}" class="inline"
+                  onsubmit="return confirm('Delete this subscription?')">
+                  <button class="act act-red" type="submit">🗑 Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+
+    <!-- ===== LOGS ===== -->
+    <div class="card">
+      <div class="logs-head">
+        <div>
+          <div class="card-title">Logs Terbaru</div>
+          <div class="card-sub">Last 200 events</div>
+        </div>
+        <span class="badge">Last 200 events</span>
+      </div>
+
+      <table class="logs-table">
+        <thead>
+          <tr>
+            <th style="width:180px">Waktu</th>
+            <th style="width:120px">Level</th>
+            <th>Pesan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td style="font-size:12px;font-weight:900">{{ log.created_at }}</td>
+            <td>
+              {% if log.level == "ERROR" %}
+                <span class="level-badge level-error">ERROR</span>
+              {% elif log.level == "WARN" %}
+                <span class="level-badge level-warn">WARN</span>
+              {% else %}
+                <span class="level-badge level-info">INFO</span>
+              {% endif %}
+            </td>
+            <td style="font-weight:800">{{ log.message }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" style="text-align:center;color:var(--text-secondary)">Belum ada logs.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+      <div>
+        RDR Hosting Reminder • v1.0 Premium • © {{ now.strftime('%Y') }}
+      </div>
+      <div class="foot-right">
+        <span class="foot-pill">Asia/Jakarta (WIB)</span>
+        <span class="foot-pill">Telegram Enabled</span>
+        <span class="foot-pill">{{ subs|length }} Items</span>
+      </div>
+    </footer>
+
   </div>
+
+  <script>
+    // ===== Dropdown open/close
+    function toggleDropdown(e){
+      e.stopPropagation();
+      const menu = document.getElementById("toolsMenu");
+      menu.classList.toggle("show");
+    }
+    document.addEventListener("click", ()=>{
+      const menu = document.getElementById("toolsMenu");
+      if(menu) menu.classList.remove("show");
+    });
+
+    function showFileName(input){
+      const el = document.getElementById("fileName");
+      if(!el) return;
+      el.textContent = input.files?.[0]?.name || "No file";
+    }
+
+    // ===== Dark mode
+    function toggleDark(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("rdr-dark", document.body.classList.contains("dark") ? "1":"0");
+    }
+    if(localStorage.getItem("rdr-dark")==="1"){document.body.classList.add("dark");}
+
+    // ===== Quick add
+    function addDays(n){
+      const el = document.getElementById("expires_at");
+      const base = el.value ? new Date(el.value) : new Date();
+      base.setDate(base.getDate() + n);
+      el.value = base.toISOString().slice(0,10);
+    }
+    function addYears(n){
+      const el = document.getElementById("expires_at");
+      const base = el.value ? new Date(el.value) : new Date();
+      base.setFullYear(base.getFullYear() + n);
+      el.value = base.toISOString().slice(0,10);
+    }
+
+    // ===== Edit mode (sesuai backend kamu)
+    function editSubscription(id, name, url, brand, expires){
+      const form = document.getElementById("subscription-form");
+      form.action = "/update/" + id;
+
+      document.getElementById("name").value = name;
+      document.getElementById("url").value = url;
+      document.getElementById("brand").value = brand || "";
+
+      // expires bisa "YYYY-MM-DD" dari backend
+      document.getElementById("expires_at").value = expires;
+
+      document.getElementById("form-title").innerText = "Edit Subscription";
+      document.getElementById("submit-btn").innerText = "Update Subscription";
+      document.getElementById("cancel-btn").style.display = "inline-flex";
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function resetForm(){
+      const form = document.getElementById("subscription-form");
+      form.action = "/add";
+      form.reset();
+      document.getElementById("form-title").innerText = "Add New Subscription";
+      document.getElementById("submit-btn").innerText = "Save Subscription";
+      document.getElementById("cancel-btn").style.display = "none";
+    }
+    resetForm();
+
+    // ===== Filter client-side by days_left
+    document.querySelectorAll(".filter-pill").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".filter-pill").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        const f = btn.dataset.filter;
+
+        document.querySelectorAll("[data-days-left]").forEach(row=>{
+          const d = parseInt(row.dataset.daysLeft || row.getAttribute("data-days-left"),10);
+          let show = true;
+          if(f==="safe") show = d>7;
+          if(f==="soon") show = d>=1 && d<=7;
+          if(f==="h3") show = d===3;
+          if(f==="h2") show = d===2;
+          if(f==="h1") show = d<=1 && d>=0;
+          if(f==="expired") show = d<0;
+          if(f==="all") show = true;
+          row.style.display = show ? "" : "none";
+        });
+      });
+    });
+  </script>
 </body>
 </html>
