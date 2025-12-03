@@ -2,698 +2,637 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RDR Hosting Reminder</title>
 
   <style>
-    /* =========================
-       DESIGN TOKENS (neutral SaaS)
-       ========================= */
     :root{
-      --bg: #f7f8fb;
-      --surface: #ffffff;
-      --surface-2: #f3f5f9;
-      --surface-3: #eef1f6;
-      --text: #0b1220;
-      --text-2: #5b6475;
-      --text-3: #8b95a7;
-      --border: #e6e9f0;
-      --ring: #4f46e5;
-      --radius: 14px;
-      --radius-sm: 10px;
-      --shadow-sm: 0 2px 6px rgba(15,23,42,0.06);
-      --shadow: 0 10px 30px rgba(15,23,42,0.08);
-      --safe: #16a34a;
-      --soon: #2563eb;
-      --warn: #d97706;
-      --danger: #dc2626;
-    }
-    body.dark{
-      --bg: #0b0e14;
-      --surface: #111521;
-      --surface-2: #161b2a;
-      --surface-3: #1b2133;
-      --text: #e7eaf1;
-      --text-2: #aab3c4;
-      --text-3: #8892a6;
-      --border: #232a3d;
-      --shadow-sm: 0 2px 6px rgba(0,0,0,0.35);
-      --shadow: 0 12px 34px rgba(0,0,0,0.55);
+      --bg:#EEF0F3;
+      --card:#FFFFFF;
+      --ink:#121417;
+      --muted:#6B7280;
+      --muted-2:#9AA3AF;
+      --primary:#7C5CFA;
+      --primary-2:#9B7BFF;
+      --success:#10B981;
+      --warn:#F59E0B;
+      --danger:#EF4444;
+      --line:#E7E9EE;
+      --chip:#F4F5F8;
+      --chip-active:#0F172A;
+      --radius:18px;
+      --radius-sm:12px;
+      --shadow:0 8px 24px rgba(16,24,40,.06);
+      --shadow-soft:0 2px 10px rgba(16,24,40,.04);
+      --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
 
     *{box-sizing:border-box}
     body{
       margin:0;
+      font-family:var(--font);
+      color:var(--ink);
       background:var(--bg);
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-    a{color:#4f46e5;text-decoration:none}
-    a:hover{text-decoration:underline}
-    .container{
-      max-width: 1180px;
-      margin: 18px auto;
-      padding: 0 14px;
-      display:grid;
-      gap:14px;
     }
 
-    /* =========================
-       TOPBAR (minimal, real SaaS)
-       ========================= */
+    a{color:#5B6CFF; text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .wrap{
+      max-width:1200px;
+      margin:22px auto 32px;
+      padding:0 14px;
+    }
+
+    /* Topbar */
     .topbar{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius: calc(var(--radius) + 2px);
-      padding:10px 12px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      border-radius:20px;
+      padding:14px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
-      box-shadow:var(--shadow-sm);
-      position:sticky;top:10px;z-index:40;
+      gap:12px;
     }
     .brand{
-      display:flex;align-items:center;gap:10px;min-width:max-content;
+      display:flex; align-items:center; gap:12px;
     }
     .logo{
-      width:36px;height:36px;border-radius:10px;
-      display:grid;place-items:center;font-weight:900;color:#fff;
-      background:#111827;
-      letter-spacing:.02em;
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(145deg,#111827,#374151);
+      display:grid;place-items:center;color:#fff;font-weight:800;letter-spacing:.5px;
+      box-shadow:var(--shadow-soft);
     }
-    body.dark .logo{background:#e7eaf1;color:#111827}
-
     .brand h1{
-      margin:0;font-size:16px;font-weight:900;line-height:1.1;
+      font-size:16.5px; margin:0; font-weight:800;
     }
     .brand .sub{
-      font-size:12px;color:var(--text-2);font-weight:700;margin-top:2px;
+      font-size:12px; color:var(--muted);
     }
 
-    .meta{
-      display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    .stats{
+      display:flex; gap:8px; flex-wrap:wrap;
     }
-    .meta-chip{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:6px 9px;border-radius:999px;
-      background:var(--surface-2);
-      border:1px solid var(--border);
-      font-size:12px;font-weight:800;color:var(--text-2);
+    .stat{
+      background:var(--chip);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12.5px;
+      display:flex; align-items:center; gap:6px;
+      color:#111827;
       white-space:nowrap;
     }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.success{background:var(--success)}
+    .dot.warn{background:var(--warn)}
+    .dot.danger{background:var(--danger)}
 
-    .actions{
-      display:flex;align-items:center;gap:8px;
+    .right-actions{
+      display:flex; align-items:center; gap:8px;
     }
     .btn{
-      border:1px solid var(--border);
-      background:var(--surface-2);
-      color:var(--text);
-      padding:7px 10px;border-radius:10px;
-      font-size:12px;font-weight:900;
-      display:inline-flex;align-items:center;gap:6px;
-      cursor:pointer;transition:.12s ease;
-      line-height:1;
+      height:36px; padding:0 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff; color:#111827;
+      font-size:13px; font-weight:700;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
+      box-shadow:var(--shadow-soft);
+      transition:.15s ease;
     }
-    .btn:hover{transform:translateY(-1px);background:var(--surface-3)}
-    .btn-primary{
-      background:#111827;color:#fff;border-color:#111827;
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{
+      background:var(--primary); color:#fff; border-color:transparent;
+      box-shadow:0 8px 18px rgba(124,92,250,.25);
     }
-    body.dark .btn-primary{
-      background:#e7eaf1;color:#111827;border-color:#e7eaf1;
-    }
-    .btn-danger{
-      background:#ef4444;color:#fff;border-color:#ef4444;
+    .btn.ghost{background:#fff}
+    .btn.small{height:30px; padding:0 9px; font-size:12px; border-radius:10px}
+    .btn.danger{color:#fff; background:var(--danger); border-color:transparent}
+    .btn.success{color:#fff; background:var(--success); border-color:transparent}
+
+    .icon{
+      width:14px;height:14px;display:inline-block;
     }
 
-    /* dropdown */
-    .dropdown{position:relative;}
-    .dropdown-menu{
-      position:absolute;right:0;top:calc(100% + 8px);
-      min-width:220px;background:var(--surface);
-      border:1px solid var(--border);border-radius:12px;
-      box-shadow:var(--shadow);
-      padding:6px;display:none;z-index:90;
+    /* Layout grid */
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:14px;
+      margin-top:14px;
     }
-    .dropdown-menu.show{display:block;}
-    .dropdown-item{
-      width:100%;display:flex;align-items:center;gap:8px;
-      padding:9px 10px;border-radius:9px;
-      font-size:13px;font-weight:800;color:var(--text);
-      text-decoration:none;background:transparent;border:none;cursor:pointer;
-    }
-    .dropdown-item:hover{background:var(--surface-2);}
-    .divider{height:1px;background:var(--border);margin:6px 2px;}
-    .dropdown-form input[type="file"]{display:none;}
-    .file-line{
-      justify-content:space-between;
-    }
-    .file-name{
-      font-size:11px;font-weight:800;color:var(--text-3);
-      max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr}
     }
 
-    @media (max-width:900px){
-      .topbar{flex-wrap:wrap;}
-      .meta{width:100%;}
-      .actions{width:100%;justify-content:flex-end;}
-      .dropdown-menu{left:0;right:auto;}
-    }
-
-    /* =========================
-       CARDS
-       ========================= */
     .card{
-      background:var(--surface);
-      border:1px solid var(--border);
+      background:var(--card);
       border-radius:var(--radius);
-      padding:14px;
-      box-shadow:var(--shadow-sm);
+      box-shadow:var(--shadow);
+      border:1px solid #F6F7FA;
     }
-    .row{
-      display:grid;grid-template-columns: 420px 1fr;gap:14px;align-items:start;
+    .card-head{
+      padding:14px 14px 8px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px;
     }
-    @media(max-width:980px){.row{grid-template-columns:1fr;}}
+    .card-title{
+      font-size:14.5px; font-weight:800; margin:0;
+    }
+    .card-sub{font-size:12px;color:var(--muted)}
 
-    .title{
-      font-size:15px;font-weight:900;margin:0 0 2px 0;
-    }
-    .sub{
-      font-size:12px;color:var(--text-2);font-weight:700;
-    }
-
-    /* scheduler health */
-    .health-grid{
-      margin-top:10px;
-      display:grid;gap:6px;
-    }
-    .health-row{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:8px 10px;border-radius:10px;background:var(--surface-2);
-      border:1px solid var(--border);
-      font-size:13px;font-weight:800;
-    }
-    .health-row span:first-child{color:var(--text-2);font-weight:900;font-size:12px;}
-    .dot{
-      width:8px;height:8px;border-radius:999px;background:#10b981;display:inline-block;margin-right:6px;
-    }
-
-    /* =========================
-       FORM
-       ========================= */
-    .form-head{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
-    }
-    .filters{display:flex;gap:6px;flex-wrap:wrap;}
-    .filter{
-      padding:6px 10px;border-radius:999px;
-      border:1px solid var(--border);background:var(--surface-2);
-      font-size:12px;font-weight:900;cursor:pointer;
-      color:var(--text-2);
-    }
-    .filter.active{
-      background:#111827;color:#fff;border-color:#111827;
-    }
-    body.dark .filter.active{background:#e7eaf1;color:#111827;border-color:#e7eaf1;}
-
-    .form-grid{
-      margin-top:10px;
-      display:grid;grid-template-columns:1.2fr 1.2fr .9fr .7fr;
-      gap:10px;align-items:center;
-    }
-    .form-grid input{
+    /* Form card */
+    .form-body{padding:12px 14px 14px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+    .label{font-size:12px;color:var(--muted);font-weight:700}
+    input{
       width:100%;
-      padding:12px 12px;border-radius:12px;
-      border:1px solid var(--border);background:var(--surface);
-      font-size:14px;font-weight:800;color:var(--text);
+      height:42px;
+      padding:0 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:14px;
       outline:none;
+      transition:.1s ease;
     }
-    .form-grid input:focus{
-      border-color:var(--ring);
-      box-shadow:0 0 0 3px rgba(79,70,229,.12);
+    input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(124,92,250,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr; gap:8px}
+    @media (max-width:980px){
+      .row{grid-template-columns:1fr}
     }
+
     .quick{
-      grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;
+      display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;
     }
     .chip{
-      padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;
-      background:var(--surface-2);border:1px solid var(--border);
-      cursor:pointer;color:var(--text-2);
+      background:var(--chip);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:12px; font-weight:800; color:#111827;
+      cursor:pointer; user-select:none;
+      transition:.12s ease;
     }
-    .chip:hover{background:var(--surface-3)}
+    .chip:hover{transform:translateY(-1px)}
     .form-actions{
-      grid-column:1/-1;display:flex;gap:8px;margin-top:6px;
+      display:flex; gap:8px; margin-top:10px;
     }
 
-    @media(max-width:980px){.form-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+    /* List / filters */
+    .filters{
+      padding:0 14px 10px;
+      display:flex; gap:6px; flex-wrap:wrap;
+    }
+    .filter{
+      background:var(--chip);
+      border:1px solid var(--line);
+      color:#3B4452;
+      font-weight:800;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12.5px;
+      cursor:pointer;
+      transition:.12s ease;
+    }
+    .filter.active{
+      background:var(--chip-active);
+      color:#fff; border-color:transparent;
+    }
 
-    /* =========================
-       TABLE (compact, human)
-       ========================= */
-    table{width:100%;border-collapse:separate;border-spacing:0 8px;}
-    thead th{
-      font-size:11px;text-transform:uppercase;letter-spacing:.04em;
-      color:var(--text-3);font-weight:900;padding:6px 10px;text-align:left;
-    }
-    tbody tr{
-      background:var(--surface);
-      border:1px solid var(--border);
-    }
-    tbody td{
-      padding:10px;vertical-align:middle;
-      border-top:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      font-weight:800;font-size:14px;
-    }
-    tbody tr td:first-child{
-      border-left:1px solid var(--border);
-      border-top-left-radius:12px;border-bottom-left-radius:12px;
-      width:56px;color:var(--text-2);font-weight:900;
-    }
-    tbody tr td:last-child{
-      border-right:1px solid var(--border);
-      border-top-right-radius:12px;border-bottom-right-radius:12px;
-    }
-    tbody tr:hover{background:var(--surface-2)}
+    .list-body{padding:0 10px 10px}
 
-    .service{
-      font-weight:900;font-size:14px;
+    .brand-block{
+      margin:8px 0 12px;
+      border-radius:14px;
+      background:#FAFBFD;
+      border:1px solid var(--line);
+      overflow:hidden;
     }
-    .brand-pill{
-      display:inline-flex;align-items:center;
-      padding:4px 8px;border-radius:999px;
-      background:var(--surface-2);border:1px solid var(--border);
-      font-size:12px;font-weight:900;color:var(--text-2);
+    .brand-head{
+      padding:10px 12px;
+      background:#fff;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px dashed var(--line);
     }
+    .brand-name{
+      font-size:13.5px; font-weight:900; letter-spacing:.3px;
+    }
+    .brand-count{
+      font-size:12px;color:var(--muted);font-weight:800;
+    }
+
+    .item{
+      display:grid;
+      grid-template-columns: 38px 1.3fr 1fr 130px 130px 170px;
+      gap:8px;
+      padding:10px 12px;
+      align-items:center;
+      background:#fff;
+      border-top:1px solid var(--line);
+    }
+    .item:first-child{border-top:none}
+    @media (max-width:1100px){
+      .item{
+        grid-template-columns: 34px 1.5fr 1fr;
+        grid-auto-rows:auto;
+        row-gap:6px;
+      }
+      .item .col-exp,
+      .item .col-days,
+      .item .col-actions{grid-column:2 / -1}
+    }
+
+    .no{
+      font-weight:900; font-size:13px; color:#111827;
+      width:32px;height:32px;border-radius:10px;
+      display:grid;place-items:center;background:#F3F4F6;
+    }
+
+    .svc{
+      font-weight:900; font-size:14px;
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .svc .name{line-height:1.3}
+    .svc .url{font-size:12.5px; color:#5B6CFF; font-weight:700}
+
+    .brand-tag{
+      font-size:12.5px; font-weight:900; color:#111827;
+    }
+    .muted{color:var(--muted); font-size:12.5px; font-weight:700}
+    .exp-date{font-size:12.5px; font-weight:900}
 
     .days{
-      display:flex;align-items:center;gap:8px;white-space:nowrap;
+      font-size:13px; font-weight:900;
+      display:flex; align-items:center; gap:8px;
     }
-    .days-num{font-weight:900;}
-    .days-neg{color:var(--danger)}
-    .days-pos{color:var(--safe)}
-    .status{
-      padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid transparent;
+    .badge{
+      font-size:11px; font-weight:900; letter-spacing:.4px;
+      padding:5px 9px; border-radius:999px; border:1px solid;
+      display:inline-flex; align-items:center; gap:6px;
+      white-space:nowrap;
     }
-    .st-safe{background:rgba(22,163,74,.10);color:#166534;border-color:rgba(22,163,74,.25)}
-    .st-soon{background:rgba(37,99,235,.10);color:#1d4ed8;border-color:rgba(37,99,235,.25)}
-    .st-h3{background:rgba(217,119,6,.10);color:#b45309;border-color:rgba(217,119,6,.25)}
-    .st-h2{background:rgba(234,179,8,.12);color:#92400e;border-color:rgba(234,179,8,.30)}
-    .st-exp{background:rgba(220,38,38,.12);color:#b91c1c;border-color:rgba(220,38,38,.30)}
+    .badge.safe{color:#0F766E; background:#ECFDF3; border-color:#A7F3D0}
+    .badge.soon{color:#1D4ED8; background:#EFF6FF; border-color:#BFDBFE}
+    .badge.h3{color:#92400E; background:#FFFBEB; border-color:#FDE68A}
+    .badge.h2{color:#9A3412; background:#FFF7ED; border-color:#FED7AA}
+    .badge.h1{color:#991B1B; background:#FEF2F2; border-color:#FECACA}
+    .badge.expired{color:#991B1B; background:#FFF1F2; border-color:#FECDD3}
 
-    .row-actions{
-      display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;
+    .actions{
+      display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;
     }
-    .act{
-      padding:7px 9px;border-radius:10px;font-size:12px;font-weight:900;
-      border:1px solid var(--border);background:var(--surface-2);cursor:pointer;
-      display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
-    }
-    .act:hover{background:var(--surface-3)}
-    .act-edit{background:#111827;color:#fff;border-color:#111827;}
-    body.dark .act-edit{background:#e7eaf1;color:#111827;border-color:#e7eaf1;}
-    .act-green{background:#16a34a;color:#fff;border-color:#16a34a;}
-    .act-blue{background:#2563eb;color:#fff;border-color:#2563eb;}
-    .act-red{background:#ef4444;color:#fff;border-color:#ef4444;}
 
-    /* =========================
-       LOGS
-       ========================= */
-    .logs-head{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;
+    .footer{
+      margin-top:14px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
     }
-    .level{
-      padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;
-      display:inline-flex;align-items:center;gap:6px;
-    }
-    .lv-info{background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.25)}
-    .lv-warn{background:rgba(217,119,6,.12);color:#b45309;border:1px solid rgba(217,119,6,.30)}
-    .lv-error{background:rgba(220,38,38,.12);color:#b91c1c;border:1px solid rgba(220,38,38,.30)}
+    .footer b{color:#111827}
 
-    /* =========================
-       FOOTER
-       ========================= */
-    footer{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:12px 14px;
-      display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
-      font-size:12px;font-weight:900;color:var(--text-2);
-      box-shadow:var(--shadow-sm);
-    }
-    .foot-right{
-      display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-    }
-    .foot-chip{
-      padding:4px 8px;border-radius:999px;background:var(--surface-2);
-      border:1px solid var(--border);font-size:11px;font-weight:900;color:var(--text);
-    }
+    /* tiny helpers */
+    .hide{display:none !important}
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="wrap">
 
-    <!-- ================= TOPBAR ================= -->
-    <header class="topbar">
+    <!-- TOPBAR -->
+    <div class="topbar">
       <div class="brand">
         <div class="logo">RDR</div>
         <div>
-          <h1>Hosting Reminder</h1>
-          <div class="sub">Keep subscriptions under control</div>
+          <h1>RDR Hosting Reminder</h1>
+          <div class="sub">Our Hosting List • {{ now.strftime('%d %B %Y - %H:%M WIB') }}</div>
         </div>
       </div>
 
-      <div class="meta">
-        <div class="meta-chip">👤 {{ username }}</div>
-        <div class="meta-chip">🕘 {{ now.strftime('%d %B %Y - %H:%M WIB') }}</div>
+      <div class="stats">
+        <div class="stat"><span class="dot success"></span>Total: <b>{{ subs|length }}</b></div>
+        <div class="stat"><span class="dot warn"></span>Expiring ≤7d: <b>{{ expiring_soon }}</b></div>
+        <div class="stat"><span class="dot danger"></span>Expired: <b>{{ expired_count }}</b></div>
+        <div class="stat">Brands: <b>{{ grouped|length }}</b></div>
       </div>
 
-      <div class="actions">
-        <button class="btn" type="button" onclick="toggleDark()">🌙 Theme</button>
+      <div class="right-actions">
+        <button class="btn primary" onclick="location.href='/trigger'">
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Send to Telegram
+        </button>
+        <button class="btn ghost" onclick="refreshPage()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
 
-        <div class="dropdown">
-          <button class="btn btn-primary" type="button" onclick="toggleDropdown(event)">
-            Tools ▾
-          </button>
-          <div id="toolsMenu" class="dropdown-menu">
-            <a class="dropdown-item" href="/telegram-test">📨 Test Telegram</a>
-            <a class="dropdown-item" href="/trigger">📜 Send Full List</a>
-            <a class="dropdown-item" href="/export">⬇️ Export CSV</a>
-            <div class="divider"></div>
+    <div class="grid">
 
-            <form action="/import" method="post" enctype="multipart/form-data" class="dropdown-form">
-              <input id="csvfile" type="file" name="file" accept=".csv" required onchange="showFileName(this)">
-              <label for="csvfile" class="dropdown-item file-line">
-                📁 Choose CSV
-                <span id="fileName" class="file-name">No file</span>
-              </label>
-              <button class="dropdown-item" style="font-weight:900" type="submit">⬆️ Import Now</button>
-            </form>
+      <!-- LEFT: FORM -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title" id="formTitle">Add New Subscription</div>
+            <div class="card-sub" id="formSub">Input service, brand, URL, and expiry date</div>
           </div>
         </div>
 
-        <a class="btn btn-danger" href="/logout">Logout</a>
-      </div>
-    </header>
+        <div class="form-body">
+          <form id="subForm" method="post" action="/add">
+            <input type="hidden" id="editId" value="">
+            <input type="hidden" id="expires_at_hidden" name="expires_at" value="">
 
-    <!-- ================= HEALTH + OVERVIEW ================= -->
-    <section class="row">
+            <div class="field">
+              <div class="label">Service Name</div>
+              <input id="name" name="name" placeholder="ex: VPS Namecheap Prosehat" required />
+            </div>
+
+            <div class="field">
+              <div class="label">URL</div>
+              <input id="url" name="url" placeholder="https://example.com" required />
+            </div>
+
+            <div class="field">
+              <div class="label">Brand Domain (optional)</div>
+              <input id="brand" name="brand" placeholder="ex: RADAR138" />
+            </div>
+
+            <div class="field">
+              <div class="label">Expire Date</div>
+              <input id="expires_at_ui" type="date" required />
+              <div class="quick">
+                <div class="chip" onclick="addDays(7)">+7 days</div>
+                <div class="chip" onclick="addDays(14)">+14 days</div>
+                <div class="chip" onclick="addDays(30)">+30 days</div>
+                <div class="chip" onclick="addYears(1)">+1 year</div>
+              </div>
+              <div class="muted" style="margin-top:5px">
+                Tanggal akan tersimpan format mm/dd/YYYY sesuai database kamu.
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn primary" type="submit" id="saveBtn">
+                <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Save Subscription
+              </button>
+              <button class="btn ghost hide" type="button" id="cancelBtn" onclick="cancelEdit()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Cancel Edit
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: LIST -->
       <div class="card">
-        <div class="title"><span class="dot"></span>Scheduler Health</div>
-        <div class="sub">Latest reminder runs</div>
-
-        <div class="health-grid">
-          <div class="health-row"><span>Daily</span><span>{{ health.daily or "-" }}</span></div>
-          <div class="health-row"><span>H-3</span><span>{{ health.h3 or "-" }}</span></div>
-          <div class="health-row"><span>H-2</span><span>{{ health.h2 or "-" }}</span></div>
-          <div class="health-row"><span>H-1 / Expired</span><span>{{ health.h1 or "-" }}</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="title">Overview</div>
-        <div class="sub" style="margin-top:4px">
-          Total <b>{{ subs|length }}</b> subscription(s) •
-          Expiring ≤7d <b>{{ expiring_soon }}</b> •
-          Expired <b>{{ expired_count }}</b>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= FORM ================= -->
-    <section class="card">
-      <div class="form-head">
-        <div>
-          <h2 id="form-title" class="title" style="font-size:18px;margin:0">Add New Subscription</h2>
-          <div class="sub">Insert service, brand, and expiry date</div>
+        <div class="card-head" style="padding-bottom:6px">
+          <div>
+            <div class="card-title">Subscriptions</div>
+            <div class="card-sub">Manage all your hosting services</div>
+          </div>
         </div>
 
+        <!-- FILTERS -->
         <div class="filters">
-          <button class="filter active" type="button" data-filter="all">All</button>
-          <button class="filter" type="button" data-filter="safe">Safe</button>
-          <button class="filter" type="button" data-filter="soon">Soon ≤7</button>
-          <button class="filter" type="button" data-filter="h3">H-3</button>
-          <button class="filter" type="button" data-filter="h2">H-2</button>
-          <button class="filter" type="button" data-filter="h1">H-1/Today</button>
-          <button class="filter" type="button" data-filter="expired">Expired</button>
-        </div>
-      </div>
-
-      <form id="subscription-form" method="post" action="/add" class="form-grid">
-        <input id="name" name="name" type="text" placeholder="Service Name" required>
-        <input id="url" name="url" type="url" placeholder="https://example.com" required>
-        <input id="brand" name="brand" type="text" placeholder="Brand / Group (optional)">
-        <input id="expires_at" name="expires_at" type="date" required>
-
-        <div class="quick">
-          <button type="button" class="chip" onclick="addDays(7)">+7d</button>
-          <button type="button" class="chip" onclick="addDays(14)">+14d</button>
-          <button type="button" class="chip" onclick="addDays(30)">+30d</button>
-          <button type="button" class="chip" onclick="addYears(1)">+1y</button>
+          <div class="filter active" data-filter="all" onclick="setFilter('all')">All</div>
+          <div class="filter" data-filter="safe" onclick="setFilter('safe')">Safe</div>
+          <div class="filter" data-filter="soon" onclick="setFilter('soon')">Soon ≤7</div>
+          <div class="filter" data-filter="h3" onclick="setFilter('h3')">H-3</div>
+          <div class="filter" data-filter="h2" onclick="setFilter('h2')">H-2</div>
+          <div class="filter" data-filter="h1" onclick="setFilter('h1')">H-1 / Today</div>
+          <div class="filter" data-filter="expired" onclick="setFilter('expired')">Expired</div>
         </div>
 
-        <div class="form-actions">
-          <button id="submit-btn" type="submit" class="btn btn-primary" style="padding:10px 14px">Save</button>
-          <button id="cancel-btn" type="button" class="btn" onclick="resetForm()" style="display:none;padding:10px 14px">
-            Cancel Edit
-          </button>
-        </div>
-      </form>
-    </section>
+        <div class="list-body">
 
-    <!-- ================= LIST BY BRAND ================= -->
-    {% for brand, items in grouped.items() %}
-    <section class="card">
-      <div class="title" style="margin-bottom:6px">{{ brand }}</div>
+          {% if not subs %}
+            <div style="padding:18px;color:var(--muted);font-weight:700">
+              Belum ada subscription, bro.
+            </div>
+          {% endif %}
 
-      <table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Service</th>
-            <th style="width:140px">Brand</th>
-            <th>URL</th>
-            <th style="width:170px">Expire Date</th>
-            <th style="width:170px">Days Left</th>
-            <th style="width:280px;text-align:right">Actions</th>
-          </tr>
-        </thead>
+          {% for brand, items in grouped.items() %}
+          <div class="brand-block" data-brand="{{ brand }}">
+            <div class="brand-head">
+              <div class="brand-name">{{ brand or "No Brand" }}</div>
+              <div class="brand-count">{{ items|length }} item{{ '' if items|length==1 else 's' }}</div>
+            </div>
 
-        <tbody>
-        {% for sub in items %}
-          {% set days_left = (sub.expires_at - today).days %}
-          <tr class="sub-row" data-days-left="{{ days_left }}">
-            <td>{{ loop.index }}</td>
-
-            <td>
-              <div class="service">{{ sub.name }}</div>
-            </td>
-
-            <td>
-              <span class="brand-pill">{{ sub.brand or "No Brand" }}</span>
-            </td>
-
-            <td>
-              <a href="{{ sub.url }}" target="_blank">{{ sub.url }}</a>
-            </td>
-
-            <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-
-            <td>
-              <div class="days">
-                <span class="days-num {{ 'days-neg' if days_left < 0 else 'days-pos' }}">
-                  {{ days_left }}d
-                </span>
-
-                {% if days_left < 0 %}
-                  <span class="status st-exp">EXPIRED</span>
-                {% elif days_left <= 1 %}
-                  <span class="status st-h2">H-1/TODAY</span>
-                {% elif days_left == 2 %}
-                  <span class="status st-h2">H-2</span>
-                {% elif days_left == 3 %}
-                  <span class="status st-h3">H-3</span>
-                {% elif days_left <= 7 %}
-                  <span class="status st-soon">SOON</span>
-                {% else %}
-                  <span class="status st-safe">SAFE</span>
-                {% endif %}
-              </div>
-            </td>
-
-            <td style="text-align:right">
-              <div class="row-actions">
-                <button class="act act-edit"
-                  onclick="editSubscription('{{ sub.id }}','{{ sub.name|escape }}','{{ sub.url|escape }}','{{ sub.brand|default('', true)|escape }}','{{ sub.expires_at }}')">
-                  ✏️ Edit
-                </button>
-
-                <form method="post" action="/extend/{{ sub.id }}/30" style="display:inline">
-                  <button class="act act-green" type="submit">+30d</button>
-                </form>
-
-                <form method="post" action="/extend/{{ sub.id }}/365" style="display:inline">
-                  <button class="act act-green" type="submit">+1y</button>
-                </form>
-
-                <form method="post" action="/archive/{{ sub.id }}" style="display:inline">
-                  <button class="act act-blue" type="submit">Archive</button>
-                </form>
-
-                <form method="post" action="/delete/{{ sub.id }}" style="display:inline"
-                      onsubmit="return confirm('Delete this subscription?')">
-                  <button class="act act-red" type="submit">Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </section>
-    {% endfor %}
-
-    <!-- ================= LOGS ================= -->
-    <section class="card">
-      <div class="logs-head">
-        <div>
-          <div class="title">Logs Terbaru</div>
-          <div class="sub">Last 200 events</div>
-        </div>
-        <div class="meta-chip">Showing last 200</div>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th style="width:180px">Waktu</th>
-            <th style="width:120px">Level</th>
-            <th>Pesan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for log in logs %}
-          <tr>
-            <td style="font-size:12px;color:var(--text-2)">{{ log.created_at }}</td>
-            <td>
-              {% if log.level == "ERROR" %}
-                <span class="level lv-error">ERROR</span>
-              {% elif log.level == "WARN" %}
-                <span class="level lv-warn">WARN</span>
+            {% for sub in items %}
+              {% set days = (sub.expires_at - now.date()).days %}
+              {% if days < 0 %}
+                {% set status = "expired" %}
+                {% set badge_class = "expired" %}
+                {% set badge_text = "EXPIRED" %}
+                {% set days_text = "Sudah Expired " ~ (-days) ~ " Hari" %}
+                {% set days_color = "var(--danger)" %}
+              {% elif days == 0 or days == 1 %}
+                {% set status = "h1" %}
+                {% set badge_class = "h1" %}
+                {% set badge_text = "H-1/TODAY" %}
+                {% set days_text = days ~ " day" %}
+                {% set days_color = "var(--danger)" %}
+              {% elif days <= 2 %}
+                {% set status = "h2" %}
+                {% set badge_class = "h2" %}
+                {% set badge_text = "H-2" %}
+                {% set days_text = days ~ " days" %}
+                {% set days_color = "var(--warn)" %}
+              {% elif days <= 3 %}
+                {% set status = "h3" %}
+                {% set badge_class = "h3" %}
+                {% set badge_text = "H-3" %}
+                {% set days_text = days ~ " days" %}
+                {% set days_color = "var(--warn)" %}
+              {% elif days <= 7 %}
+                {% set status = "soon" %}
+                {% set badge_class = "soon" %}
+                {% set badge_text = "SOON" %}
+                {% set days_text = days ~ " days" %}
+                {% set days_color = "var(--warn)" %}
               {% else %}
-                <span class="level lv-info">INFO</span>
+                {% set status = "safe" %}
+                {% set badge_class = "safe" %}
+                {% set badge_text = "SAFE" %}
+                {% set days_text = days ~ " days" %}
+                {% set days_color = "var(--success)" %}
               {% endif %}
-            </td>
-            <td>{{ log.message }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="3" style="text-align:center;color:var(--text-3)">Belum ada logs.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
 
-    <!-- ================= FOOTER ================= -->
-    <footer>
-      <div>RDR Hosting Reminder • v1.0 Premium • © {{ now.strftime('%Y') }}</div>
-      <div class="foot-right">
-        <span class="foot-chip">Asia/Jakarta (WIB)</span>
-        <span class="foot-chip">Telegram Enabled</span>
-        <span class="foot-chip">{{ subs|length }} Items</span>
+              <div class="item" data-status="{{ status }}">
+                <div class="no">{{ loop.index }}</div>
+
+                <div class="svc">
+                  <div class="name">{{ sub.name|e }}</div>
+                  <div class="url">🔗 <a href="{{ sub.url }}" target="_blank" rel="noopener">{{ sub.url }}</a></div>
+                </div>
+
+                <div class="brand-tag">{{ sub.brand or "–" }}</div>
+
+                <div class="col-exp">
+                  <div class="muted">Expire</div>
+                  <div class="exp-date">{{ sub.expires_at.strftime('%d %B %Y') }}</div>
+                </div>
+
+                <div class="col-days days" style="color:{{ days_color }}">
+                  <div>{{ days_text }}</div>
+                  <div class="badge {{ badge_class }}">{{ badge_text }}</div>
+                </div>
+
+                <div class="col-actions actions">
+                  <button class="btn small" type="button"
+                    onclick="startEdit('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10-10-4-4L4 16v4z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Edit
+                  </button>
+
+                  <!-- Quick extend (client-side prefill) -->
+                  <button class="btn small success" type="button"
+                    onclick="quickExtend('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}',30)">
+                    +30d
+                  </button>
+                  <button class="btn small success" type="button"
+                    onclick="quickExtend('{{ sub.id }}','{{ sub.name|e }}','{{ sub.url }}','{{ sub.brand or ''|e }}','{{ sub.expires_at.strftime('%m/%d/%Y') }}',365)">
+                    +1y
+                  </button>
+
+                  <form method="post" action="/delete/{{ sub.id }}"
+                        onsubmit="return confirm('Yakin hapus subscription ini?')">
+                    <button class="btn small danger" type="submit">
+                      <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-1 0v14H9V6h6z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+        </div>
       </div>
-    </footer>
+    </div>
+
+    <div class="footer">
+      <div>© {{ now.strftime('%Y') }} <b>RDR Hosting Reminder</b> • Built for long-life monitoring</div>
+    </div>
 
   </div>
 
   <script>
-    /* ========== Dropdown ========== */
-    function toggleDropdown(e){
-      e.stopPropagation();
-      const menu = document.getElementById("toolsMenu");
-      menu.classList.toggle("show");
+    function refreshPage(){ location.reload(); }
+
+    // ===== Date helpers =====
+    const uiDate = document.getElementById("expires_at_ui");
+    const hiddenDate = document.getElementById("expires_at_hidden");
+    const form = document.getElementById("subForm");
+
+    function toMMDDYYYY(dateObj){
+      const mm = String(dateObj.getMonth()+1).padStart(2,'0');
+      const dd = String(dateObj.getDate()).padStart(2,'0');
+      const yy = dateObj.getFullYear();
+      return `${mm}/${dd}/${yy}`;
     }
-    document.addEventListener("click", ()=>{
-      const menu = document.getElementById("toolsMenu");
-      if(menu) menu.classList.remove("show");
-    });
-    function showFileName(input){
-      document.getElementById("fileName").textContent =
-        input.files?.[0]?.name || "No file";
+    function fromMMDDYYYY(str){
+      const [mm,dd,yy] = str.split('/').map(Number);
+      return new Date(yy, mm-1, dd);
+    }
+    function toInputDate(dateObj){
+      const mm = String(dateObj.getMonth()+1).padStart(2,'0');
+      const dd = String(dateObj.getDate()).padStart(2,'0');
+      const yy = dateObj.getFullYear();
+      return `${yy}-${mm}-${dd}`;
     }
 
-    /* ========== Dark mode ========== */
-    function toggleDark(){
-      document.body.classList.toggle("dark");
-      localStorage.setItem("rdr-dark", document.body.classList.contains("dark") ? "1":"0");
-    }
-    if(localStorage.getItem("rdr-dark")==="1"){document.body.classList.add("dark");}
-
-    /* ========== Quick add expiry ========== */
     function addDays(n){
-      const el = document.getElementById("expires_at");
-      const base = el.value ? new Date(el.value) : new Date();
-      base.setDate(base.getDate() + n);
-      el.value = base.toISOString().slice(0,10);
+      let d = uiDate.value ? new Date(uiDate.value) : new Date();
+      d.setDate(d.getDate()+n);
+      uiDate.value = toInputDate(d);
     }
     function addYears(n){
-      const el = document.getElementById("expires_at");
-      const base = el.value ? new Date(el.value) : new Date();
-      base.setFullYear(base.getFullYear() + n);
-      el.value = base.toISOString().slice(0,10);
+      let d = uiDate.value ? new Date(uiDate.value) : new Date();
+      d.setFullYear(d.getFullYear()+n);
+      uiDate.value = toInputDate(d);
     }
 
-    /* ========== Edit mode hook to backend ========== */
-    function editSubscription(id, name, url, brand, expires){
-      const form = document.getElementById("subscription-form");
-      form.action = "/update/" + id;
+    // convert before submit
+    form.addEventListener("submit", (e)=>{
+      if(!uiDate.value){
+        alert("Expire date wajib diisi.");
+        e.preventDefault(); return;
+      }
+      const d = new Date(uiDate.value);
+      hiddenDate.value = toMMDDYYYY(d);
+    });
 
+    // ===== Edit mode =====
+    const formTitle = document.getElementById("formTitle");
+    const formSub = document.getElementById("formSub");
+    const saveBtn = document.getElementById("saveBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    function startEdit(id,name,url,brand,mmddyyyy){
       document.getElementById("name").value = name;
       document.getElementById("url").value = url;
       document.getElementById("brand").value = brand || "";
-      document.getElementById("expires_at").value = expires;
+      const d = fromMMDDYYYY(mmddyyyy);
+      uiDate.value = toInputDate(d);
 
-      document.getElementById("form-title").innerText = "Edit Subscription";
-      document.getElementById("submit-btn").innerText = "Update";
-      document.getElementById("cancel-btn").style.display = "inline-flex";
+      form.action = `/update/${id}`;
+      formTitle.textContent = "Edit Subscription";
+      formSub.textContent = "Update data lalu Save";
+      saveBtn.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Save Changes`;
+      cancelBtn.classList.remove("hide");
       window.scrollTo({top:0,behavior:"smooth"});
     }
 
-    function resetForm(){
-      const form = document.getElementById("subscription-form");
+    function quickExtend(id,name,url,brand,mmddyyyy,days){
+      const d = fromMMDDYYYY(mmddyyyy);
+      d.setDate(d.getDate()+days);
+      startEdit(id,name,url,brand,toMMDDYYYY(d));
+    }
+
+    function cancelEdit(){
       form.action = "/add";
       form.reset();
-      document.getElementById("form-title").innerText = "Add New Subscription";
-      document.getElementById("submit-btn").innerText = "Save";
-      document.getElementById("cancel-btn").style.display = "none";
+      uiDate.value = "";
+      hiddenDate.value = "";
+      formTitle.textContent = "Add New Subscription";
+      formSub.textContent = "Input service, brand, URL, and expiry date";
+      saveBtn.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Save Subscription`;
+      cancelBtn.classList.add("hide");
     }
-    resetForm();
 
-    /* ========== Client-side filter by days_left ========== */
-    document.querySelectorAll(".filter").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        const f = btn.dataset.filter;
-
-        document.querySelectorAll("[data-days-left]").forEach(row=>{
-          const d = parseInt(row.dataset.daysLeft || row.getAttribute("data-days-left"),10);
-          let show = true;
-          if(f==="safe") show = d>7;
-          if(f==="soon") show = d>=1 && d<=7;
-          if(f==="h3") show = d===3;
-          if(f==="h2") show = d===2;
-          if(f==="h1") show = d<=1 && d>=0;
-          if(f==="expired") show = d<0;
-          if(f==="all") show = true;
-          row.style.display = show ? "" : "none";
-        });
+    // ===== Filters =====
+    let activeFilter = "all";
+    function setFilter(key){
+      activeFilter = key;
+      document.querySelectorAll(".filter").forEach(f=>{
+        f.classList.toggle("active", f.dataset.filter===key);
       });
-    });
+      document.querySelectorAll(".item").forEach(item=>{
+        const st = item.dataset.status;
+        item.classList.toggle("hide", !(key==="all" || st===key));
+      });
+    }
+
+    // init default date today
+    uiDate.value = toInputDate(new Date());
   </script>
 </body>
 </html>
