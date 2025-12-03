@@ -26,18 +26,19 @@
             color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
+            padding-bottom: 100px; /* space for floating button */
         }
         .container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 1.5rem 1rem;
         }
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         h1 {
-            font-size: 2.8rem;
+            font-size: 2.4rem;
             font-weight: 700;
             background: linear-gradient(to right, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
@@ -46,44 +47,44 @@
         }
         .subtitle {
             color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
         }
         .stat-card {
             background: var(--surface);
-            border-radius: 16px;
-            padding: 2rem;
+            border-radius: 14px;
+            padding: 1.5rem 1rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
         }
         .stat-value {
-            font-size: 3rem;
+            font-size: 2.4rem;
             font-weight: 700;
             color: var(--primary);
         }
         .stat-label {
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
         }
         .card {
             background: var(--surface);
             border-radius: 16px;
-            padding: 2.5rem;
+            padding: 1.8rem;
             margin-bottom: 2rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0...
         }
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
         input {
@@ -94,7 +95,6 @@
             border-radius: 12px;
             color: var(--text);
             font-size: 1rem;
-            transition: all 0.3s;
         }
         input:focus {
             outline: none;
@@ -104,81 +104,78 @@
         .btn {
             background: var(--primary);
             color: white;
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             border: none;
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
+            font-size: 1rem;
+            width: 100%;
+            margin: 0.5rem 0;
         }
         .btn-cancel {
             background: var(--surface2);
             color: var(--text-secondary);
         }
-        .btn-cancel:hover {
-            background: #e5e7eb;
-        }
         .brand-title {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--primary);
-            margin: 3rem 0 1.5rem 0;
-            padding-bottom: 0.8rem;
+            margin: 2.5rem 0 1rem 0;
+            padding-bottom: 0.6rem;
             border-bottom: 3px solid var(--primary);
         }
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 1rem;
+            border-spacing: 0 0.8rem;
+            margin-bottom: 1rem;
         }
         th {
-            text-align: left;
-            padding: 1.2rem 1.5rem;
-            background: var(--surface2);
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            display: none; /* hidden on mobile */
         }
         td {
-            padding: 1.5rem;
+            display: block;
+            width: 100%;
+            padding: 1rem;
             background: var(--surface);
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: relative;
+            padding-left: 90px;
+            font-size: 0.95rem;
+        }
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         tr:hover td {
-            background: #f3f4f6;
+            background: #f8f5ff;
             transform: translateY(-2px);
-            transition: all 0.2s;
         }
         .days {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.1rem !important;
         }
-        .days-critical { color: var(--danger); }
-        .days-warning { color: var(--warning); }
-        .days-safe { color: var(--success); }
         .action-btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-            margin: 0 0.4rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            margin: 0.4rem 0.3rem;
             border-radius: 8px;
+            width: calc(50% - 0.6rem);
         }
-        .btn-edit {
-            background: #8b5cf6;
-            color: white;
-        }
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-        }
+        .btn-delete { background: var(--danger); }
+        .btn-edit { background: #8b5cf6; color: white; }
         footer {
             text-align: center;
-            margin-top: 5rem;
+            margin-top: 4rem;
             padding: 2rem 0;
             color: var(--text-secondary);
             font-size: 0.9rem;
@@ -188,31 +185,54 @@
             font-weight: bold;
             color: var(--primary);
             letter-spacing: 0.2em;
-            font-size: 0.8rem;
         }
         .trigger-fixed {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
             background: linear-gradient(135deg, #8b5cf6, #ec4899);
             color: white;
-            padding: 1.2rem 2rem;
+            padding: 1rem 2rem;
             border-radius: 50px;
             font-weight: 600;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
-            z-index: 100;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+            z-index: 1000;
             text-decoration: none;
-            transition: all 0.3s;
+            text-align: center;
+            font-size: 1.1rem;
         }
-        .trigger-fixed:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
-        }
-        @media (max-width: 768px) {
+
+        /* Tablet & Desktop */
+        @media (min-width: 640px) {
             .form-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
-            h1 {font-size: 2.2rem;}
+            .btn, .btn-cancel {
+                width: auto;
+                margin: 0 0.5rem;
+            }
+        }
+        @media (min-width: 768px) {
+            h1 { font-size: 2.8rem; }
+            .form-grid { grid-template-columns: repeat(4, 1fr); }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+            th { display: table-cell; padding: 1.2rem 1.5rem; background: var(--surface2); }
+            td { display: table-cell; padding: 1.5rem; padding-left: 1.5rem; }
+            td::before { display: none; }
+            .action-btn { width: auto; }
+            .trigger-fixed {
+                bottom: 30px;
+                right: 30px;
+                left: auto;
+                transform: none;
+                width: auto;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container { padding: 2rem 1rem; }
         }
     </style>
 </head>
@@ -221,76 +241,60 @@
         <header>
             <h1>RDR Hosting Reminder</h1>
             <p class="subtitle">Professional subscription & hosting expiration management system</p>
-            <p style="margin-top: 1rem; color: var(--text-secondary);">
+            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.95rem;">
                 Total: {{ subs|length }} active subscription{{ 's' if subs|length != 1 else '' }} • {{ now.strftime('%d %B %Y - %H:%M WIB') }}
             </p>
         </header>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{{ subs|length }}</div>
-                <div class="stat-label">Total Subscriptions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ grouped|length }}</div>
-                <div class="stat-label">Active Brands</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ expiring_soon }}</div>
-                <div class="stat-label">Expiring in 7 Days</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ expired_count }}</div>
-                <div class="stat-label">Already Expired</div>
-            </div>
+            <div class="stat-card"><div class="stat-value">{{ subs|length }}</div><div class="stat-label">Total</div></div>
+            <div class="stat-card"><div class="stat-value">{{ grouped|length }}</div><div class="stat-label">Brands</div></div>
+            <div class="stat-card"><div class="stat-value">{{ expiring_soon }}</div><div class="stat-label">Expiring Soon</div></div>
+            <div class="stat-card"><div class="stat-value">{{ expired_count }}</div><div class="stat-label">Expired</div></div>
         </div>
 
         <div class="card">
             <h2 style="margin-bottom: 1.5rem; color: var(--text);" id="form-title">Add New Subscription</h2>
-            <form id="subscription-form" method="post">
+            <form id="subscription-form" method="post" action="/add">
                 <div class="form-grid">
                     <input type="text" id="name" name="name" placeholder="Service Name" required>
                     <input type="url" id="url" name="url" placeholder="URL" required>
                     <input type="text" id="brand" name="brand" placeholder="Brand / Provider">
                     <input type="text" id="expires_at" name="expires_at" placeholder="Expire Date (mm/dd/yyyy)" required>
                 </div>
-                <button type="submit" class="btn">Save Subscription</button>
-                <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button type="submit" class="btn">Save Subscription</button>
+                    <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel Edit</button>
+                </div>
             </form>
         </div>
 
         <div class="card">
             <h2 style="margin-bottom: 1.5rem; color: var(--text);">Active Subscriptions</h2>
-
             {% if subs %}
                 {% for brand, items in grouped.items() %}
-                    <div class="brand-title">{{ brand }}</div>
+                    <div class="brand-title">{{ brand or "No Brand" }}</div>
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Service</th>
-                                <th>URL</th>
-                                <th>Expire Date</th>
-                                <th>Days Left</th>
-                                <th>Action</th>
+                                <th>No</th><th>Service</th><th>URL</th><th>Expire Date</th><th>Days Left</th><th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for sub in items %}
                                 {% set days = (sub.expires_at - today).days %}
                                 <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td><strong>{{ sub.name }}</strong></td>
-                                    <td><a href="{{ sub.url }}" target="_blank" style="color: var(--primary); text-decoration: none;">{{ sub.url }}</a></td>
-                                    <td>{{ sub.expires_at.strftime('%d %B %Y') }}</td>
-                                    <td class="days {% if days <= 3 %}days-critical{% elif days <= 7 %}days-warning{% else %}days-safe{% endif %}">
-                                        {{ days
+                                    <td data-label="No">{{ loop.index }}</td>
+                                    <td data-label="Service"><strong>{{ sub.name }}</strong></td>
+                                    <td data-label="URL"><a href="{{ sub.url }}" target="_blank" style="color: var(--primary);">{{ sub.url }}</a></td>
+                                    <td data-label="Expire">{{ sub.expires_at.strftime('%d %B %Y') }}</td>
+                                    <td data-label="Days Left" class="days {% if days <= 3 %}days-critical{% elif days <= 7 %}days-warning{% else %}days-safe{% endif %}">
+                                        {{ days }} day{{ '' if days == 1 else 's' }}
                                     </td>
-                                    <td>
+                                    <td data-label="Action">
                                         <button class="btn action-btn btn-edit" onclick='editSubscription({{ sub.id }}, "{{ sub.name|e }}", "{{ sub.url }}", "{{ sub.brand or ''|e }}", "{{ sub.expires_at.strftime('%m/%d/%Y') }}")'>Edit</button>
                                         <form method="post" action="/delete/{{ sub.id }}" style="display:inline;">
-                                            <button type="submit" class="btn action-btn btn-delete">Delete</button>
+                                            <button type="submit" class="btn action-btn btn-delete" onclick="return confirm('Delete this subscription?')">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -299,9 +303,7 @@
                     </table>
                 {% endfor %}
             {% else %}
-                <p style="text-align: center; color: var(--text-secondary); padding: 4rem 0; font-size: 1.1rem;">
-                    No active subscriptions yet. Add your first one above.
-                </p>
+                <p style="text-align: center; color: var(--text-secondary); padding: 4rem 0;">No active subscriptions yet. Add your first one above.</p>
             {% endif %}
         </div>
 
@@ -324,7 +326,6 @@
             document.getElementById('subscription-form').action = `/update/${id}`;
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
-
         function resetForm() {
             document.getElementById('form-title').innerText = 'Add New Subscription';
             document.getElementById('subscription-form').reset();
