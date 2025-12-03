@@ -6,24 +6,21 @@ from zoneinfo import ZoneInfo
 import secrets
 import re
 from collections import defaultdict
-
-from fastapi import FastAPI, Depends, HTTPException, Request, Form, Form, status
+import asyncio
+from fastapi import FastAPI, Depends, HTTPException, Request, Form, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-
 from database import engine, SessionLocal, Base
 from models import Subscription
 from schemas import SubscriptionCreate
 from crud import get_subscriptions, get_all_subscriptions, create_subscription, update_subscription, delete_subscription
-from telegram_bot import send_full_list_trigger, send_daily_summary
+from telegram_bot import send_telegram_message, send_daily_summary  # pastikan fungsi ini ada
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,23 +28,20 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 logger = logging.getLogger("RDR")
-
 app = FastAPI(title="RDR Hosting Reminder", openapi_url="/openapi.json", docs_url="/docs")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-
 timezone_wib = ZoneInfo("Asia/Jakarta")
 security = HTTPBasic()
 
 # ===================================
-# BOOT: DATABASE CONNECTION TEST + MIGRATION
+# BOOT: DATABASE CONNECTION + MIGRATION
 # ===================================
 logger.info("[BOOT] Menghubungkan ke PostgreSQL...")
 try:
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
     logger.info("[BOOT] Database terkoneksi — semua data aman selamanya!")
-
     Base.metadata.create_all(bind=engine)
     with engine.begin() as conn:
         inspector = inspect(engine)
@@ -60,7 +54,6 @@ try:
                 else:
                     conn.execute(text(f"ALTER TABLE subscription ADD COLUMN {col} INTEGER DEFAULT 0"))
                 logger.info(f"[BOOT] Kolom {col} ditambahkan")
-
 except Exception as e:
     logger.critical(f"[BOOT] GAGAL TERHUBUNG DATABASE: {e}")
     raise RuntimeError("Database connection failed — check DATABASE_URL")
@@ -87,39 +80,37 @@ def validate_input(name: str, url: str, expires_at: str, brand: str | None = Non
     url = url.strip()
     expires_at = expires_at.strip()
     brand = brand.strip() if brand else None
-
     if len(name) < 3:
         raise HTTPException(status_code=400, detail="Nama service minimal 3 karakter")
     if not url.lower().startswith(('http://', 'https://')):
         raise HTTPException(status_code=400, detail="URL harus diawali http:// atau https://")
     if not re.match(r"^\d{2}/\d{2}/\d{4}$", expires_at):
         raise HTTPException(status_code=400, detail="Format tanggal mm/dd/yyyy")
-
     try:
         exp_date = datetime.strptime(expires_at, "%m/%d/%Y").date()
     except ValueError:
         raise HTTPException(status_code=400, detail="Tanggal tidak valid")
-
     return name, url, exp_date, brand
 
 # ===================================
-# ROUTES — CLEAN & PROFESSIONAL
+# ROUTES
 # ===================================
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, username: str = Depends(verify_credentials)):
     db = SessionLocal()
     try:
         subs = get_subscriptions(db)
-
         grouped = defaultdict(list)
         for sub in subs:
             key = (sub.brand or "Tanpa Brand").strip().upper()
             grouped[key].append(sub)
         grouped = dict(sorted(grouped.items()))
+        today = datetime.now(timezone_wib).date()
+        expiring_soon = sum(1 for sub in subs if 0 < (sub.expires_at - today).days <= 7)
+        expired_count = sum(1 for sub in subs if (sub.expires_at - today).days < 0)
     except Exception as e:
         logger.error(f"[ROOT] DB Error: {e}")
-        subs = []
-        grouped = {}
+        subs, grouped, expiring_soon, expired_count = [], {}, 0, 0
     finally:
         db.close()
 
@@ -127,8 +118,10 @@ async def root(request: Request, username: str = Depends(verify_credentials)):
         "request": request,
         "subs": subs,
         "grouped": grouped,
-        "today": datetime.now(timezone_wib).date(),
-        "now": datetime.now(timezone_wib)
+        "today": today,
+        "now": datetime.now(timezone_wib),
+        "expiring_soon": expiring_soon,
+        "expired_count": expired_count
     })
 
 @app.post("/add")
@@ -138,9 +131,6 @@ async def add(username: str = Depends(verify_credentials), name: str = Form(...)
     try:
         create_subscription(db, SubscriptionCreate(name=name, url=url, expires_at=exp_date, brand=brand))
         db.commit()
-    except Exception as e:
-        logger.error(f"[ADD] Error: {e}")
-        raise HTTPException(status_code=500, detail="Gagal menambah subscription")
     finally:
         db.close()
     return RedirectResponse("/", status_code=303)
@@ -168,11 +158,47 @@ async def delete(sub_id: int, username: str = Depends(verify_credentials)):
         db.close()
     return RedirectResponse("/", status_code=303)
 
+# ===================================
+# TRIGGER: SEND FULL LIST TO TELEGRAM (SESUAI PERMINTAAN)
+# ===================================
 @app.get("/trigger")
 async def trigger(username: str = Depends(verify_credentials)):
-    await send_full_list_trigger()
+    db = SessionLocal()
+    try:
+        subs = get_all_subscriptions(db)
+        today = datetime.now(timezone_wib).date()
+        now = datetime.now(timezone_wib)
+
+        if not subs:
+            await send_telegram_message("Belum ada subscription bro!")
+            return HTMLResponse("<h2 style='text-align:center;padding:100px;color:#8b5cf6;font-family:system-ui'>Belum ada subscription bro!<br><a href='/' style='color:#fff'>← Kembali</a></h2>")
+
+        grouped = defaultdict(list)
+        for sub in subs:
+            key = (sub.brand or "Tanpa Brand").strip().upper()
+            grouped[key].append(sub)
+
+        message = f"Our Hosting List\n{now.strftime('%d %B %Y - %H:%M WIB')}\n\n"
+
+        for brand, items in sorted(grouped.items()):
+            message += f"{brand}\n"
+            for i, sub in enumerate(items, 1):
+                days = (sub.expires_at - today).days
+                skull = " Skull" if days < 0 else ""
+                rocket = " Rocket" if days > 30 else ""
+                message += f"{i}. {sub.name}\n   {sub.url}\n   Expire: {sub.expires_at.strftime('%d %B %Y')} ({days} hari lagi){skull}{rocket}\n"
+            message += "─" * 20 + "\n"
+
+        message += f"\nTOTAL: {len(subs)} SUBSCRIPTION"
+
+        await send_telegram_message(message)
+    finally:
+        db.close()
+
     return HTMLResponse(
-        "<div style='text-align:center;padding:120px;background:#0a0a0f;color:#8b5cf6;font-family:system-ui'><h2>List per brand telah dikirim ke Telegram</h2><p><a href='/' style='color:#fff;text-decoration:none;font-size:1.2rem'>← Kembali ke Dashboard</a></p></div>"
+        "<div style='text-align:center;padding:120px;background:#0a0a0f;color:#8b5cf6;font-family:system-ui'>"
+        "<h2>List per brand telah dikirim ke Telegram</h2>"
+        "<p><a href='/' style='color:#fff;text-decoration:none;font-size:1.2rem'>← Kembali ke Dashboard</a></p></div>"
     )
 
 @app.get("/keep-alive")
@@ -191,63 +217,14 @@ async def keep_alive():
     }
 
 # ===================================
-# REMINDER OTOMATIS PALING GANAS (H-3, H-2, H-1, Expired)
+# REMINDER OTOMATIS (DIPINDAH KE telegram_bot.py agar aman dari asyncio.run() di thread)
 # ===================================
 def run_dynamic_reminders():
-    db = SessionLocal()
-    try:
-        today = datetime.now(timezone_wib).date()
-        for sub in get_all_subscriptions(db):
-            days_left = (sub.expires_at - today).days
+    asyncio.run(send_daily_summary())  # atau panggil fungsi dari telegram_bot.py
 
-            # Reset counter kalau sudah diperpanjang
-            if days_left > 20:
-                for col in ['reminder_count_h3', 'reminder_count_h2', 'reminder_count_h1', 'reminder_count_h0']:
-                    setattr(sub, col, 0)
-                db.commit()
-                continue
-
-            expire_str = sub.expires_at.strftime('%d %B %Y')
-
-            if days_left == 3 and getattr(sub, 'reminder_count_h3', 0) < 2:
-                msg = f"⚠️ PERINGATAN DINI\n\n{sub.name}\n{sub.url}\nExpire: {expire_str}\nTinggal 3 hari lagi — segera perpanjang!"
-                asyncio.run(send_telegram_message(msg))
-                sub.reminder_count_h3 += 1
-                db.commit()
-
-            elif days_left == 2 and getattr(sub, 'reminder_count_h2', 0) < 3:
-                msg = f"🚨 MENDESAK!\n\n{sub.name}\n{sub.url}\nExpire: {expire_str}\nTINGGAL 2 HARI — HARI INI HARUS RENEW!"
-                asyncio.run(send_telegram_message(msg))
-                sub.reminder_count_h2 += 1
-                db.commit()
-
-            elif days_left == 1 and getattr(sub, 'reminder_count_h1', 0) < 5:
-                msgs = [
-                    f"🔥 BESOK MATI!\n\n{sub.name}\n{sub.url}\n<24 JAM LAGI!\nRENEW SEKARANG!",
-                    f"🔥 H-1 BRO!!!\n\n{sub.name} besok nonaktif total!",
-                    f"🔥 FINAL WARNING!\n\n{sub.name} tinggal jam lagi!",
-                    f"🔥 RENEW HARI INI = SELAMAT!\n\n{sub.name}",
-                    f"🔥 MALAM TERAKHIR!\n\nGa renew sekarang = besok mati permanen!",
-                ]
-                asyncio.run(send_telegram_message(msgs[getattr(sub, 'reminder_count_h1', 0)]))
-                sub.reminder_count_h1 += 1
-                db.commit()
-
-            elif days_left <= 0 and getattr(sub, 'reminder_count_h0', 0) < 8:
-                days_exp = "hari ini" if days_left == 0 else f"{abs(days_left)} hari lalu"
-                msg = f"💀 SUDAH EXPIRE {days_exp.upper()}!\n\n{sub.name}\n{sub.url}\nRENEW SEKARANG sebelum dihapus permanen!"
-                asyncio.run(send_telegram_message(msg))
-                sub.reminder_count_h0 += 1
-                db.commit()
-    except Exception as e:
-        logger.error(f"[REMINDER] Error: {e}")
-    finally:
-        db.close()
-
-# Scheduler reminder otomatis tiap 7 menit + daily report jam 08:30 WIB
 scheduler = BackgroundScheduler(timezone=timezone_wib)
 scheduler.add_job(run_dynamic_reminders, "interval", minutes=7, next_run_time=datetime.now(timezone_wib))
-scheduler.add_job(lambda: asyncio.run(send_daily_summary(get_all_subscriptions(SessionLocal()))), CronTrigger(hour=8, minute=30))
+scheduler.add_job(lambda: asyncio.run(send_daily_summary()), CronTrigger(hour=8, minute=30, timezone=timezone_wib))
 scheduler.start()
 
-logger.info("RDR Hosting Reminder — BOOT SUKSES TOTAL — DATABASE AMAN — TELEGRAM GANAS — EDIT JALAN — HIDUP SELAMANYA — 03 DESEMBER 2025 ❤️")
+logger.info("RDR Hosting Reminder — BOOT SUKSES TOTAL — OUR HOSTING LIST SIAP — BRAND SUPPORT — MOBILE CANTIK — ABADI SELAMANYA — 03 DESEMBER 2025")
