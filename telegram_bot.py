@@ -57,7 +57,6 @@ def _to_date(value: Any) -> Optional[date]:
     """Pastikan expires_at jadi date."""
     if value is None:
         return None
-    # datetime punya .date(), date juga punya .date tapi return dirinya sendiri
     try:
         return value.date() if hasattr(value, "date") else value
     except Exception:
@@ -70,6 +69,9 @@ def _chunks(text: str, size: int = TELEGRAM_MAX_LEN) -> Iterable[str]:
         yield text[i : i + size]
 
 
+# =========================================================
+# 1) FULL LIST / DAILY SUMMARY
+# =========================================================
 async def send_full_list_trigger():
     """Generate & kirim list hosting lengkap ke Telegram."""
     db = SessionLocal()
@@ -86,7 +88,6 @@ async def send_full_list_trigger():
             )
             return
 
-        # Grouping berdasarkan brand
         grouped = defaultdict(list)
         for sub in subs:
             brand = (sub.brand or "Tanpa Brand").strip().upper()
@@ -104,17 +105,16 @@ async def send_full_list_trigger():
                 else:
                     days_left = (expires_date - today_date).days
 
-                # EMOJI UNICODE ASLI — PASTI KELUAR DI TELEGRAM
                 if days_left < 0:
-                    emoji = "💀"   # sudah kadaluarsa
+                    emoji = "💀"
                 elif days_left == 0:
-                    emoji = "💀"   # jatuh tempo hari ini
+                    emoji = "💀"
                 elif days_left <= 3:
-                    emoji = "🔥"   # sangat mendesak
+                    emoji = "🔥"
                 elif days_left <= 7:
-                    emoji = "⚠️"   # peringatan
+                    emoji = "⚠️"
                 else:
-                    emoji = "✅"   # aman
+                    emoji = "✅"
 
                 safe_name = html_escape(sub.name or "Tanpa Nama")
 
@@ -137,7 +137,6 @@ async def send_full_list_trigger():
         total = len(subs)
         message += f"<b>TOTAL: {total} SUBSCRIPTION{'S' if total != 1 else ''}</b>"
 
-        # kirim per chunk biar gak kepanjangan
         for ch in _chunks(message):
             await send_telegram_message(ch)
 
@@ -149,8 +148,109 @@ async def send_full_list_trigger():
 
 
 async def send_daily_summary():
-    """
-    Daily summary sementara = full list.
-    Bisa kamu ganti logicnya kapan aja.
-    """
+    """Daily summary = full list jam 09:00."""
     await send_full_list_trigger()
+
+
+# =========================================================
+# 2) REMINDER BERTINGKAT
+# =========================================================
+async def _send_filtered_reminders(target_days: list[int], title: str):
+    """
+    Kirim reminder hanya untuk subscription yang days_left ada di target_days.
+    """
+    db = SessionLocal()
+    try:
+        subs = get_all_subscriptions(db)
+        now_dt = datetime.now(timezone_wib)
+        today_date = now_dt.date()
+        now_str = now_dt.strftime("%d %B %Y - %H:%M WIB")
+
+        matched = []
+        for sub in subs:
+            expires_date = _to_date(sub.expires_at)
+            if expires_date is None:
+                continue
+            days_left = (expires_date - today_date).days
+            if days_left in target_days:
+                matched.append((sub, expires_date, days_left))
+
+        if not matched:
+            return
+
+        grouped = defaultdict(list)
+        for sub, expires_date, days_left in matched:
+            brand = (sub.brand or "Tanpa Brand").strip().upper()
+            grouped[brand].append((sub, expires_date, days_left))
+
+        msg = f"<b>{html_escape(title)}</b>\n{now_str}\n\n"
+
+        for brand, items in sorted(grouped.items()):
+            msg += f"<b>{html_escape(brand)}</b>\n"
+            for i, (sub, expires_date, days_left) in enumerate(items, 1):
+
+                if days_left <= 0:
+                    emoji = "💀"
+                elif days_left == 1:
+                    emoji = "💀"
+                elif days_left == 2:
+                    emoji = "⚠️"
+                elif days_left == 3:
+                    emoji = "🔥"
+                else:
+                    emoji = "✅"
+
+                safe_name = html_escape(sub.name or "Tanpa Nama")
+
+                msg += f"{i}. <b>{safe_name}</b>\n"
+                if sub.url:
+                    safe_url = html_escape(sub.url)
+                    msg += f"🔗 <a href='{safe_url}'>{safe_url}</a>\n"
+                msg += (
+                    f"Expire: {expires_date.strftime('%d %B %Y')} "
+                    f"({days_left} hari lagi) {emoji}\n\n"
+                )
+
+            msg += "—" * 30 + "\n\n"
+
+        await send_telegram_message(msg)
+
+    finally:
+        db.close()
+
+
+async def send_reminders_3days():
+    """H-3 → 3x sehari."""
+    await _send_filtered_reminders([3], "⚠️ Reminder 3 Hari Lagi")
+
+
+async def send_reminders_2days():
+    """H-2 → 6x sehari."""
+    await _send_filtered_reminders([2], "🚨 Reminder 2 Hari Lagi")
+
+
+async def send_reminders_1day_or_expired():
+    """H-1 / H / expired → bising tiap 30 menit."""
+    db = SessionLocal()
+    try:
+        subs = get_all_subscriptions(db)
+        now_dt = datetime.now(timezone_wib)
+        today_date = now_dt.date()
+
+        targets = set()
+        for sub in subs:
+            expires_date = _to_date(sub.expires_at)
+            if expires_date is None:
+                continue
+            days_left = (expires_date - today_date).days
+            if days_left <= 1:
+                targets.add(days_left)
+
+        if targets:
+            await _send_filtered_reminders(
+                sorted(targets),
+                "💀 URGENT! 1 Hari / Expired"
+            )
+
+    finally:
+        db.close()
