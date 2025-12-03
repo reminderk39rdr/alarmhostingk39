@@ -358,19 +358,19 @@
         <div class="scheduler-grid">
           <div class="sch-row">
             <span class="sch-label">Daily</span>
-            <span class="sch-value">{{ scheduler_health.daily or "-" }}</span>
+            <span class="sch-value">{{ health.daily or "-" }}</span>
           </div>
           <div class="sch-row">
             <span class="sch-label">H-3</span>
-            <span class="sch-value">{{ scheduler_health.h3 or "-" }}</span>
+            <span class="sch-value">{{ health.h3 or "-" }}</span>
           </div>
           <div class="sch-row">
             <span class="sch-label">H-2</span>
-            <span class="sch-value">{{ scheduler_health.h2 or "-" }}</span>
+            <span class="sch-value">{{ health.h2 or "-" }}</span>
           </div>
           <div class="sch-row">
             <span class="sch-label">H-1 / Expired</span>
-            <span class="sch-value">{{ scheduler_health.h1 or "-" }}</span>
+            <span class="sch-value">{{ health.h1 or "-" }}</span>
           </div>
         </div>
       </div>
@@ -446,7 +446,7 @@
         <tbody>
         {% for sub in items %}
           {% set days_left = (sub.expires_at - today).days %}
-          <tr class="sub-row" data-days-left="{{ days_left }}" data-days-left="{{ days_left }}">
+          <tr class="sub-row" data-days-left="{{ days_left }}">
             <td>{{ loop.index }}</td>
 
             <td>
