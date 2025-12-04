@@ -75,6 +75,7 @@
       border:1px solid var(--line);
       padding:8px 10px; border-radius:999px;
       font-weight:600; font-size:13px;
+      white-space:nowrap;
     }
     .userchip i{color:var(--brand)}
 
@@ -86,6 +87,7 @@
       padding:8px 12px; border-radius:999px;
       font-weight:600; font-size:13px;
       cursor:pointer; box-shadow:var(--shadow-sm);
+      white-space:nowrap;
     }
     .actions-menu{
       position:absolute; right:0; top:44px;
@@ -113,10 +115,12 @@
       background:var(--panel); border:1px solid var(--line);
       border-radius:16px; padding:12px 14px; box-shadow:var(--shadow-sm);
       display:flex; align-items:center; gap:12px;
+      min-width:0;
     }
     .kpi .ico{
       width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
       background:var(--panel-2); color:var(--brand); font-size:18px;
+      flex:0 0 auto;
     }
     .kpi .label{font-size:12px; color:var(--muted); font-weight:600}
     .kpi .value{font-size:20px; font-weight:800; margin-top:2px}
@@ -154,6 +158,7 @@
       padding:7px 11px; border-radius:999px;
       font-size:13px; font-weight:700; color:#334155;
       display:flex; align-items:center; gap:7px;
+      white-space:nowrap;
     }
     .filter-pill .dot{
       width:8px; height:8px; border-radius:50%;
@@ -192,12 +197,14 @@
       border:1px solid var(--line); background:var(--panel-2);
       padding:6px 10px; border-radius:999px;
       font-weight:700; font-size:12px; cursor:pointer;
+      white-space:nowrap;
     }
 
     .btn{
       border:0; cursor:pointer; font-weight:800; font-size:13px;
       padding:10px 12px; border-radius:12px; display:inline-flex; align-items:center; gap:8px;
       box-shadow:var(--shadow-sm);
+      white-space:nowrap;
     }
     .btn-primary{background:var(--brand); color:white;}
     .btn-ghost{background:white; border:1px solid var(--line); color:var(--text);}
@@ -236,6 +243,7 @@
       background:var(--panel-2); border:1px solid var(--line);
       padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800;
       width:max-content;
+      white-space:nowrap;
     }
 
     .expire{ font-weight:700; }
@@ -249,6 +257,7 @@
       padding:5px 9px; font-size:11px; font-weight:900;
       border-radius:999px; letter-spacing:.3px; border:1px solid transparent;
       text-transform:uppercase;
+      white-space:nowrap;
     }
     .st-safe{ color:var(--good); background:#ecfdf3; border-color:#b7f0cc;}
     .st-soon{ color:#2563eb; background:#eff6ff; border-color:#b9d5ff;}
@@ -267,6 +276,7 @@
       padding:8px 10px; font-size:12px; border-radius:10px; font-weight:900;
       display:flex; align-items:center; justify-content:center; gap:6px;
       border:1px solid var(--line); background:white; cursor:pointer;
+      white-space:nowrap;
     }
     .btn-sm.edit{background:#0f172a; color:white; border-color:#0f172a;}
     .btn-sm.plus30{background:#16a34a; color:white; border-color:#16a34a;}
@@ -274,71 +284,158 @@
     .btn-sm.delete{background:#ef4444; color:white; border-color:#ef4444; grid-column:1 / -1;}
 
     /* ===== Logs ===== */
-    /* === Logs scroll container (lebih pendek + scrollbar keliatan) === */
-.logs-scroll{
-  max-height: 220px;          /* lebih pendek, coba 200–260px sesuai selera */
-  overflow-y: scroll;         /* paksa scrollbar selalu muncul */
-  border-radius: 14px;
-  border: 1px solid var(--line);
-}
-
-/* header table tetap nempel pas scroll */
-.logs-scroll thead th{
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--panel-2);
-}
-
-/* bikin scrollbar lebih subtle (opsional, aman di Chrome/Edge) */
-.logs-scroll::-webkit-scrollbar{
-  width: 8px;
-}
-.logs-scroll::-webkit-scrollbar-thumb{
-  background: #cbd5e1;
-  border-radius: 999px;
-}
-.logs-scroll::-webkit-scrollbar-track{
-  background: transparent;
-}
-
     .logs-head{
       display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
     }
+    .logs-wrap{
+      max-height: 320px; /* fixed height so page won't grow */
+      overflow:auto;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:white;
+    }
     .logs-table{
       width:100%; border-collapse:separate; border-spacing:0;
-      overflow:hidden; border-radius:14px; border:1px solid var(--line);
+      overflow:hidden;
     }
     .logs-table th, .logs-table td{
       padding:10px 12px; font-size:13px; border-bottom:1px solid var(--line);
       text-align:left; vertical-align:top;
+      background:white;
     }
     .logs-table th{
+      position:sticky; top:0; z-index:1;
       background:var(--panel-2); font-size:12px; letter-spacing:.4px; text-transform:uppercase;
       color:#334155;
+      border-bottom:1px solid var(--line);
     }
     .level{
       font-weight:900; font-size:11px; padding:4px 8px; border-radius:999px; display:inline-block;
       background:var(--panel-2); border:1px solid var(--line);
+      white-space:nowrap;
     }
     .lvl-info{color:#0ea5e9}
     .lvl-warn{color:#f59e0b}
     .lvl-error{color:#ef4444}
-    
+
     footer{
       margin-top:20px; color:var(--muted); font-size:12px;
       display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
       padding:12px 4px;
     }
 
+    /* ===== Responsive ===== */
     @media (max-width: 980px){
       .form-grid{grid-template-columns:1fr 1fr; }
+
+      .kpi-row{ grid-template-columns:repeat(2,1fr); }
+
       .list-row{
         grid-template-columns:50px 1fr;
         grid-auto-rows:auto;
       }
       .actions-col{justify-content:flex-start;}
       .btn-stack{width:100%;}
+    }
+
+    /* Mobile tighter fixes */
+    @media (max-width: 640px){
+      .container{ margin:12px auto 28px; width:94vw; }
+
+      /* topbar stack */
+      .topbar{
+        top:0;
+        border-radius:16px;
+        padding:12px;
+        flex-direction:column;
+        align-items:stretch;
+        gap:8px;
+      }
+      .brandmark{ width:100%; justify-content:flex-start; }
+      .topbar-spacer{ display:none; }
+      .userchip, .actions-btn{
+        width:max-content;
+      }
+      .topbar .actions{
+        align-self:flex-end;
+      }
+      .topbar .userchip{
+        align-self:flex-start;
+      }
+
+      /* KPI 1 column if very narrow */
+      .kpi-row{ grid-template-columns:1fr; }
+
+      /* control bar full width */
+      .controlbar{
+        padding:8px;
+        gap:8px;
+      }
+      .searchbox{ width:100%; min-width:0; }
+      .filters{
+        width:100%;
+        border-radius:14px;
+        padding:6px;
+        justify-content:flex-start;
+      }
+      .filter-pill{
+        font-size:12px;
+        padding:6px 9px;
+      }
+
+      /* list as card */
+      .list-row{
+        grid-template-columns:44px 1fr;
+        gap:8px;
+        padding:12px;
+      }
+
+      /* put every column under service block */
+      .list-row > :nth-child(2),
+      .list-row > :nth-child(3),
+      .list-row > :nth-child(4),
+      .list-row > :nth-child(5),
+      .list-row > :nth-child(6),
+      .list-row > :nth-child(7){
+        grid-column:2 / -1;
+      }
+
+      /* make meta line wrap nicer */
+      .list-row > :nth-child(3),
+      .list-row > :nth-child(4),
+      .list-row > :nth-child(5),
+      .list-row > :nth-child(6){
+        display:flex;
+        align-items:center;
+        gap:8px;
+        flex-wrap:wrap;
+      }
+
+      .expire{ font-size:13px; }
+      .days .n{ font-size:16px; }
+
+      .actions-col{
+        grid-column:1 / -1 !important;
+        justify-content:flex-start;
+        margin-top:6px;
+      }
+      .btn-stack{
+        grid-template-columns:1fr 1fr;
+        width:100%;
+        gap:8px;
+      }
+      .btn-sm{
+        padding:10px;
+        font-size:12px;
+        border-radius:12px;
+      }
+      .btn-sm.delete{
+        grid-column:1 / -1;
+      }
+
+      /* logs table min width so can horizontal-scroll */
+      .logs-wrap{ max-height:260px; }
+      .logs-table{ min-width:520px; }
     }
   </style>
 </head>
@@ -351,8 +448,8 @@
     <div class="brandmark">
       <div class="logo">RDR</div>
       <div>
-        <div class="title">RDR Hosting Reminder</div>
-        <div class="subtitle">Hosting Subscription Watchlist</div>
+        <div class="title">Hosting Reminder</div>
+        <div class="subtitle">Enterprise Subscription Watchlist</div>
       </div>
     </div>
 
@@ -599,51 +696,47 @@
 
   <!-- ===== LOGS ===== -->
   <section class="panel" style="margin-top:16px">
-  <div class="logs-head">
-    <h3 style="margin:0">Logs Terbaru</h3>
-    <div style="font-size:12px;color:var(--muted);font-weight:800;">Last 200 events</div>
-  </div>
+    <div class="logs-head">
+      <h3 style="margin:0">Logs Terbaru</h3>
+      <div style="font-size:12px;color:var(--muted);font-weight:800;">Last 200 events</div>
+    </div>
 
-  {% set logs_safe = logs|default([]) %}
-  {% if logs_safe and logs_safe|length > 0 %}
-    
-    <!-- WRAPPER SCROLL -->
-    <div class="logs-scroll">
-      <table class="logs-table">
-        <thead>
-          <tr>
-            <th style="width:180px">Waktu</th>
-            <th style="width:90px">Level</th>
-            <th>Pesan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for lg in logs_safe %}
-            {% set lvl = (lg.level or "INFO")|upper %}
+    {% set logs_safe = logs|default([]) %}
+    {% if logs_safe and logs_safe|length > 0 %}
+      <div class="logs-wrap">
+        <table class="logs-table">
+          <thead>
             <tr>
-              <td>{{ lg.created_at.strftime('%d %b %Y %H:%M') if lg.created_at else "-" }}</td>
-              <td>
-                <span class="level {% if lvl=='ERROR' %}lvl-error{% elif lvl=='WARN' %}lvl-warn{% else %}lvl-info{% endif %}">
-                  {{ lvl }}
-                </span>
-              </td>
-              <td>{{ lg.message }}</td>
+              <th style="width:180px">Waktu</th>
+              <th style="width:90px">Level</th>
+              <th>Pesan</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-  {% else %}
-    <div style="padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:700;">
-      Belum ada log.
-    </div>
-  {% endif %}
-</section>
-
+          </thead>
+          <tbody>
+            {% for lg in logs_safe %}
+              {% set lvl = (lg.level or "INFO")|upper %}
+              <tr>
+                <td>{{ lg.created_at.strftime('%d %b %Y %H:%M') if lg.created_at else "-" }}</td>
+                <td>
+                  <span class="level {% if lvl=='ERROR' %}lvl-error{% elif lvl=='WARN' %}lvl-warn{% else %}lvl-info{% endif %}">
+                    {{ lvl }}
+                  </span>
+                </td>
+                <td>{{ lg.message }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:700;">
+        Belum ada log.
+      </div>
+    {% endif %}
+  </section>
 
   <footer>
-    <div>© {{ now.year if now else "2025" }} K39 - All Rights Reserved</div>
+    <div>© {{ now.year if now else "2025" }} RDR Hosting Reminder. All rights reserved.</div>
     <div style="font-weight:700;">System timezone: WIB (Asia/Jakarta)</div>
   </footer>
 
@@ -672,7 +765,6 @@
     return `${yy}-${mm}-${dd}`;
   }
   function fromMMDDYYYY(mmdd){
-    // mm/dd/yyyy -> yyyy-mm-dd
     const [m,d,y] = mmdd.split("/");
     return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
   }
@@ -696,7 +788,6 @@
   }
   expiresUI.addEventListener("change", syncExpiresHidden);
 
-  // Ensure hidden value ready before submit
   subscriptionForm.addEventListener("submit", (e)=>{
     syncExpiresHidden();
     if (!expiresHidden.value) {
@@ -705,7 +796,6 @@
     }
   });
 
-  // Reset form to "Add"
   const resetBtn = document.getElementById("resetBtn");
   resetBtn.addEventListener("click", ()=>{
     subscriptionForm.action = "/add";
@@ -714,7 +804,6 @@
     expiresHidden.value = "";
   });
 
-  // Quick add date buttons
   document.querySelectorAll(".chip[data-add-days], .chip[data-add-years]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const now = new Date();
@@ -737,7 +826,7 @@
       nameInput.value = row.dataset.name || "";
       urlInput.value = row.dataset.url || "";
       brandInput.value = row.dataset.brand || "";
-      expiresUI.value = row.dataset.expires; // yyyy-mm-dd
+      expiresUI.value = row.dataset.expires;
       syncExpiresHidden();
 
       subscriptionForm.action = `/update/${id}`;
@@ -785,7 +874,7 @@
   document.querySelectorAll(".extend-form").forEach(form=>{
     form.addEventListener("submit", (e)=>{
       const row = form.closest(".item");
-      const expiresISO = row.dataset.expires; // yyyy-mm-dd
+      const expiresISO = row.dataset.expires;
       let d;
 
       if (form.dataset.days){
@@ -796,7 +885,6 @@
         return;
       }
 
-      // backend wajib mm/dd/yyyy
       form.querySelector("input[name='expires_at']").value = toMMDDYYYY(d);
     });
   });
